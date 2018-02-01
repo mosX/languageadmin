@@ -3,7 +3,7 @@
         public function init(){
             $this->m->addJS('jquery-ui-1.9.2.custom.min');
             $this->m->addCSS('ui-lightness/jquery-ui-1.9.2.custom.min');
-            redirect('/contacts/');
+            redirect('/lessons/');
         }
         public function indexAction(){
             //получаем пользователей
