@@ -1,0 +1,17 @@
+Options -Indexes
+AddDefaultCharset utf-8
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_URI} (/|\.htm|\.php|\.html|/[^.]*)$  [NC]
+
+RewriteRule (.*) index.php
+
+ErrorDocument 400 " "
+ErrorDocument 402 " "
+ErrorDocument 401 " "
+ErrorDocument 403 " "
+ErrorDocument 404 " "
+ErrorDocument 500 " "
