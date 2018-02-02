@@ -7,14 +7,14 @@
         $scope.editForm = function(event,id){
             console.log(id);
             $http({
-                url:'/channels/editdata/?id='+id,
+                url:'/lessons/lesson_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editChannelModal').modal('show');
+                $('#editLessonModal').modal('show');
             });
             event.preventDefault();
         }
@@ -99,7 +99,8 @@
                     <tr>
                         
                         <th style="width:60px;">ID</th>
-                        <th>НАЗВАНИЕ</th>                        
+                        <th>НАЗВАНИЕ</th>
+                        <th>ОПИСАНИЕ</th>
                         <th style="width:100px;"></th>                        
                         <th style='width:70px;'></th>
                     </tr>
@@ -109,8 +110,13 @@
                             <td>
                                 <?=$item->id?>                                
                             </td>
+                            
                             <td class="username_td">
                                 <a href="/lessons/question_collections/<?=$item->id?>"><?=$item->name?></a>
+                            </td>
+                            
+                            <td class="username_td">
+                                <?=$item->description?>
                             </td>
                             
                             <td>

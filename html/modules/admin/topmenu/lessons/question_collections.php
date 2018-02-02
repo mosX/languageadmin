@@ -110,15 +110,15 @@
         </div>
     </div>
 </div>
-<!--
+
 <script>
-    app.controller('answerEditModalCtrl', ['$scope','$http',function($scope,$http,$userinfo){
-        $scope.form = {};
+    app.controller('questionEditModalCtrl', ['$scope','$http',function($scope,$http){
+        $scope.form = {correct:"0"};
 
         $scope.$on('editData', function (event, ret){
-            console.log(ret.data); // Данные, которые нам прислали
-            
-            $scope.form  = ret.data.channel;
+            //console.log(ret.data); // Данные, которые нам прислали            
+            $scope.form  = ret.data;
+            console.log($scope.form);
         });
         
         $scope.submit = function(event){
@@ -126,7 +126,7 @@
             
             $http({
                 method:'POST',
-                url:'/lessons/',
+                url:'/lessons/questions/',
                 data:$scope.form
             }).then(function(ret){
                 console.log(ret.data);
@@ -140,7 +140,7 @@
     }]);
 </script>
 
-<div ng-controller="answerEditModalCtrl" class="modal fade" id="editAnswerModal" tabindex="-1" role="dialog">
+<div ng-controller="questionEditModalCtrl" class="modal fade" id="editQuesationModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -153,23 +153,63 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">
-                                <label>Текс</label>
+                                <label>Название</label>
                             </div>
                             <div class="col-sm-8">
-                                <textarea class="form-control" ng-model="form.text" style="height: 140px;"></textarea>
+                                <input type="text" class="form-control" name="name" value="" ng-model="form.name">
+                                <div class="error name_error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Вопрос</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" ng-model="form.value" style="height: 140px;"></textarea>
                                 <div class="error name_error"></div>
                             </div>
                             <div ng-show="errors.name" class="error">{{errors.name}}</div>
                         </div>
                     </div>
-                                        
-                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">                    
-                    <input type="hidden" name="id" value="" ng-model="form.id">                    
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Правильный ответ</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select class='form-control' ng-model="form.correct">
+                                    <option value="0">Не выбран</option>
+                                    <option ng-repeat="item in form.answers" value="{{item.id}}">{{item.text}}</option>
+                                </select>
+                                <div class="error name_error"></div>
+                            </div>
+                            <div ng-show="errors.name" class="error">{{errors.name}}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Описание</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" ng-model="form.description" style="height: 140px;"></textarea>
+                            </div>
+                            <div ng-show="errors.description" class="error">{{errors.description}}</div>
+                        </div>
+                    </div>
+
+                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
+                    <input type="hidden" name="id" value="" ng-model="form.id">
                 </form>
             </div>
         </div>
     </div>
-</div>-->
+</div>
 
 <script>
     app.controller('questionModalCtrl', ['$scope','$http',function($scope,$http){

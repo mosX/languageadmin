@@ -101,6 +101,8 @@
                         <th>НАЗВАНИЕ</th>
                         <th>ВОПРОС</th>
                         <th>ОПИСАНИЕ</th>
+                        <th style="width:100px;"></th>
+                        <th style="width:100px"></th>
                     </tr>
 
                     <script>

@@ -129,7 +129,7 @@
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
             
-            $scope.form  = ret.data.channel;
+            $scope.form  = ret.data;
         });
         
         $scope.submit = function(event){

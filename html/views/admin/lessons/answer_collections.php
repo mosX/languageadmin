@@ -5,16 +5,16 @@
         $scope.channel_name  = null;
         
         $scope.editForm = function(event,id){
-            console.log(id);
+            //console.log(id);
             $http({
-                url:'/channels/editdata/?id='+id,
+                url:'/lessons/answers_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
-                console.log(ret.data);
+                //console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editChannelModal').modal('show');
+                $('#editAnswerModal').modal('show');
             });
             event.preventDefault();
         }
@@ -105,11 +105,10 @@
                     <?php foreach ($this->m->data as $item){ ?>
                         <tr data-id="<?=$item->id?>" class="<?=$item->user_id ? 'personal':''?>">
                             <td><?=$item->id?></td>
-                                
-                            <td class="username_td"><?=$item->answer_id?></td>
+                            <td class="username_td"><?=$item->text?></td>
                             
                             <td>
-                                <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
+                                <a ng-click="editForm($event,<?=$item->answer_id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                             <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->status ? 'on':'off'?>"></div></td>
@@ -132,6 +131,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                
                 <form action='' method='POST' ng-submit="confirmDeleting($event)">
                     <div class="modal-body">
                         <p>Вы действительно хотите удалить «<span class="username">{{channel_name}}</span>»?</p>

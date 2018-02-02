@@ -110,7 +110,7 @@
         </div>
     </div>
 </div>
-<!--
+
 <script>
     app.controller('answerEditModalCtrl', ['$scope','$http',function($scope,$http,$userinfo){
         $scope.form = {};
@@ -118,7 +118,7 @@
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
             
-            $scope.form  = ret.data.channel;
+            $scope.form  = ret.data;
         });
         
         $scope.submit = function(event){
@@ -126,7 +126,7 @@
             
             $http({
                 method:'POST',
-                url:'/lessons/',
+                url:'/lessons/answers/',
                 data:$scope.form
             }).then(function(ret){
                 console.log(ret.data);
@@ -164,12 +164,12 @@
                     </div>
                                         
                     <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">                    
-                    <input type="hidden" name="id" value="" ng-model="form.id">                    
+                    <input type="hidden" name="id" value="" ng-model="form.id">
                 </form>
             </div>
         </div>
     </div>
-</div>-->
+</div>
 
 <script>
     app.controller('answerModalCtrl', ['$scope','$http',function($scope,$http){

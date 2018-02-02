@@ -45,7 +45,68 @@
             }
         }
         
-         public function question_collectionsAction(){
+        public function question_dateAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            
+            $this->m->_db->setQuery(
+                        "SELECT `questions`.* "
+                        . " FROM `questions` "
+                        . " WHERE `questions`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
+            
+            //получаем список ответов для селекта
+            $this->m->_db->setQuery(
+                        "SELECT `answer_collections`.* "
+                        . " , `answers`.`text`"
+                        . " FROM `answer_collections` "
+                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " WHERE `answer_collections`.`question_id` = ".$id                        
+                    );
+            $data->answers = $this->m->_db->loadObjectList();
+            
+            echo json_encode($data);
+        }
+        
+        public function answers_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            
+            $this->m->_db->setQuery(
+                        "SELECT `answers`.* "
+                        . " FROM `answers` "
+                        . " WHERE `answers`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
+            
+            echo json_encode($data);
+        }
+        
+        public function lesson_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            
+            $this->m->_db->setQuery(
+                        "SELECT `lessons`.* "
+                        . " FROM `lessons` "
+                        . " WHERE `lessons`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
+            
+            echo json_encode($data);
+        }
+        
+        public function question_collectionsAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
@@ -57,7 +118,9 @@
                 //проверяем или не было добавлено ранее
                 $this->m->_db->setQuery(
                             "SELECT `question_collections`.`id` "
+                            
                             . " FROM `question_collections` "
+                            
                             . " WHERE `question_collections`.`question_id` = ".$row->question_id
                             . " AND `question_collections`.`lesson_id` = ".$row->lesson_id
                             . " LIMIT 1"                        
@@ -85,8 +148,10 @@
                 
                 $this->m->_db->setQuery(
                             "SELECT `question_collections`.* "
-                             . " FROM `question_collections`"
-                             . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]                             
+                            . " , `questions`.`value`"
+                            . " FROM `question_collections`"
+                            . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
+                            . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]
                         );
                 $this->m->data = $this->m->_db->loadObjectList();                
             }
@@ -105,6 +170,7 @@
                 $this->m->_db->setQuery(
                             "SELECT `answer_collections`.`id` "
                             . " FROM `answer_collections` "
+                            
                             . " WHERE `answer_collections`.`answer_id` = ".$row->answer_id
                             . " AND `answer_collections`.`question_id` = ".$row->question_id
                             . " LIMIT 1"                        
@@ -133,12 +199,13 @@
                 
                 $this->m->_db->setQuery(
                             "SELECT `answer_collections`.* "
+                            . " , `answers`.`text`"
                              . " FROM `answer_collections`"
+                             . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                              . " WHERE `answer_collections`.`question_id` = ".(int)$this->m->_path[2]
                              //. " AND `answer_collections`.`status` = 1"
                         );
-                $this->m->data = $this->m->_db->loadObjectList();
-                
+                $this->m->data = $this->m->_db->loadObjectList();                
             }
         }
         
@@ -154,7 +221,7 @@
                 
                 if($id){        //EDIT
                     $this->m->_db->setQuery(
-                                "UPDATE `answers` SET `answers`.`name` = '".$row->text."'"
+                                "UPDATE `answers` SET `answers`.`text` = '".$row->text."'"
                                 . " WHERE `answers`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
@@ -192,17 +259,21 @@
                 $row->value = strip_tags(trim($_POST['value']));
                 $row->description = strip_tags(trim($_POST['description']));
                 
+                
                 if($id){        //EDIT
+                    $row->correct = strip_tags(trim($_POST['correct']));
                     $this->m->_db->setQuery(
-                                "UPDATE `questions` SET `lessons`.`name` = '".$row->name."'"
-                                . " , `questions`.`value` = '".$row->value."'"
+                                "UPDATE `questions` SET `questions`.`name` = '".$row->name."'"
+                                . " , `questions`.`value` = '".$row->value."'"                            
                                 . " , `questions`.`description` = '".$row->description."'"
+                                . " , `questions`.`correct` = '".$row->correct."'"
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
                     if($this->m->_db->query()){
                         echo '{"status":"success"}';
                     }else{
+                        p($this->m->_db->_sql);
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD

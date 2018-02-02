@@ -44,7 +44,7 @@
                 
                 $id = (int)$_POST['id'];
                 $role = (int)$_POST['role'];
-                if($id){                    
+                if($id){
                     $this->m->_db->setQuery(
                                 "UPDATE `supers` SET `supers`.`gid` = ".$role
                                 . " WHERE `supers`.`id` = ".$id
@@ -84,7 +84,7 @@
 
                     $row->email = $login;
                     $row->password = $this->generatePassword($password);
-                    $row->partner = $this->m->_user->id;
+                    //$row->partner = $this->m->_user->id;
                     $row->gid = $role;
                     $row->date = date("Y-m-d H:i:s");
                     if($this->m->_db->insertObject('supers',$row)){

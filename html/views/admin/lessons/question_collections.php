@@ -6,15 +6,16 @@
         
         $scope.editForm = function(event,id){
             console.log(id);
+            console.log('edit FORM');
             $http({
-                url:'/channels/editdata/?id='+id,
+                url:'/lessons/question_date/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editChannelModal').modal('show');
+                $('#editQuesationModal').modal('show');
             });
             event.preventDefault();
         }
@@ -106,10 +107,12 @@
                         <tr data-id="<?=$item->id?>" class="<?=$item->user_id ? 'personal':''?>">
                             <td><?=$item->id?></td>
                                 
-                            <td class="username_td"><?=$item->answer_id?></td>
+                            <td class="username_td">
+                                <a href="/lessons/answer_collections/<?=$item->id?>/"><?=$item->value?></a>
+                            </td>
                             
                             <td>
-                                <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
+                                <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                             <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->status ? 'on':'off'?>"></div></td>
