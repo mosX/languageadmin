@@ -9,8 +9,7 @@
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
-                $_POST = json_decode(file_get_contents('php://input'), true); 
-                
+                $_POST = json_decode(file_get_contents('php://input'), true);
                 
                 $id = (int)$_POST['id'];
                 $row->name = strip_tags(trim($_POST['name']));
@@ -255,17 +254,16 @@
                 
                 
                 $id = (int)$_POST['id'];
-                $row->name = strip_tags(trim($_POST['name']));
+                //$row->name = strip_tags(trim($_POST['name']));
                 $row->value = strip_tags(trim($_POST['value']));
-                $row->description = strip_tags(trim($_POST['description']));
-                
+                //$row->description = strip_tags(trim($_POST['description']));
                 
                 if($id){        //EDIT
                     $row->correct = strip_tags(trim($_POST['correct']));
                     $this->m->_db->setQuery(
-                                "UPDATE `questions` SET `questions`.`name` = '".$row->name."'"
-                                . " , `questions`.`value` = '".$row->value."'"                            
-                                . " , `questions`.`description` = '".$row->description."'"
+                                "UPDATE `questions` "
+                                . " SET `questions`.`value` = '".$row->value."'"
+                                //. " , `questions`.`description` = '".$row->description."'"
                                 . " , `questions`.`correct` = '".$row->correct."'"
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"
@@ -273,7 +271,6 @@
                     if($this->m->_db->query()){
                         echo '{"status":"success"}';
                     }else{
-                        p($this->m->_db->_sql);
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD
@@ -287,11 +284,21 @@
             }else{
                 $this->m->_db->setQuery(
                             "SELECT `questions`.* "
+                            . " , COUNT(`answer_collections`.`id`) as answers"
                             . " FROM `questions` "
+                            . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"
                             . " WHERE `questions`.`status` = 1"
+                            . " GROUP by `questions`.`id`"
                         );
                 $this->m->data = $this->m->_db->loadObjectList();
                 
+                $this->m->_db->setQuery(
+                            "SELECT `answers`.`id` "
+                             . " , `answers`.`text`"
+                             . " FROM `answers` "
+                             . " WHERE `answers`.`status` = 1"
+                        );
+                $this->m->answers = $this->m->_db->loadObjectList();
             }
         }
         

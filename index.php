@@ -1,7 +1,8 @@
 <?php
 
 $starttime = microtime(true);
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED & ~E_STRICT);
+//error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED & ~E_STRICT);
+//error_reporting( E_ERROR );
 
 //@date_default_timezone_set('Europe/London');
 @date_default_timezone_set('Europe/Kiev');

@@ -150,17 +150,6 @@
 
             <div class="modal-body">
                 <form action="" method="POST" ng-submit="submit($event)">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label>Название</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="name" value="" ng-model="form.name">
-                                <div class="error name_error"></div>
-                            </div>
-                        </div>
-                    </div>
                     
                     <div class="form-group">
                         <div class="row">
@@ -190,19 +179,7 @@
                             <div ng-show="errors.name" class="error">{{errors.name}}</div>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label>Описание</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <textarea class="form-control" ng-model="form.description" style="height: 140px;"></textarea>
-                            </div>
-                            <div ng-show="errors.description" class="error">{{errors.description}}</div>
-                        </div>
-                    </div>
-
+                   
                     <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
                     <input type="hidden" name="id" value="" ng-model="form.id">
                 </form>

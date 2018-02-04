@@ -96,55 +96,20 @@
                     }
                 </style>
                 <table class="table">
-                    <tr>                        
+                    <tr>
                         <th style="width:60px;">ID</th>
-                        <th>НАЗВАНИЕ</th>
                         <th>ВОПРОС</th>
-                        <th>ОПИСАНИЕ</th>
+                        <th>ОТВЕТОВ</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px"></th>
                     </tr>
 
-                    <script>
-                        $('document').ready(function(){
-                            $('.table .username_td').hover(function(){
-                                $('.edit_btn',this).css({'display':'inline-block'});
-                            },function(){
-                                $('.edit_btn',this).css({'display':'none'});
-                            });
-
-                            $('.table .edit_btn').click(function(){
-                                $('.edit_panel').remove();
-                                $(this).css({'display':'none'});
-
-                                var parent = $(this).closest('.td');
-                                var username = $('.username',parent).text();
-
-                                $(parent).append('<div class="edit_panel">'
-                                                    +'<input type="text" value="'+username+'" placeholder="">'
-
-                                                    +'<div class="buttons">'
-                                                        +'<a href="" class="btn btn-primary save">Сохранить</a>'
-                                                        +'<a href="" class="btn btn-secondary cancel">Отменить</a>'
-                                                    +'</div>'
-                                                +'</div>');
-
-                                $('.edit_panel input',parent).focus();
-                            });
-                            $('.table').on('click','.edit_panel .cancel',function(){
-                                $(this).closest('.edit_panel').remove();
-                                return false;
-                            });
-                        });
-                    </script>
-
                     <?php foreach ($this->m->data as $item){ ?>
                         <tr data-id="<?=$item->id?>" class="<?=$item->user_id ? 'personal':''?>">
                             <td><?=$item->id?></td>
-                                
-                            <td class="username_td"><a href="/lessons/answer_collections/<?=$item->id?>"><?=$item->name?></a></td>
-                            <td><?=$item->value?></td>                                
-                            <td><?=$item->description?></td>
+                            
+                            <td><a href="/lessons/answer_collections/<?=$item->id?>"><?=$item->value?></a></td>
+                            <td><?=(int)$item->answers?></td>
                                 
                             <td>
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>

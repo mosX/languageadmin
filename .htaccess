@@ -7,6 +7,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 #RewriteCond %{REQUEST_URI} (/|\.htm|\.php|\.html|/[^.]*)$  [NC]
 
+php_value error_reporting 1
+
 RewriteRule (.*) index.php
 
 ErrorDocument 400 " "
