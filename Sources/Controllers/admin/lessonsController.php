@@ -44,7 +44,7 @@
             }
         }
         
-        public function question_dateAction(){
+        public function question_dataAction(){
             $this->disableTemplate();
             $this->disableView();
             
@@ -256,7 +256,9 @@
                 $id = (int)$_POST['id'];
                 //$row->name = strip_tags(trim($_POST['name']));
                 $row->value = strip_tags(trim($_POST['value']));
+                $row->score = (int)$_POST['score'];
                 //$row->description = strip_tags(trim($_POST['description']));
+                $answers  = $_POST['answers'];
                 
                 if($id){        //EDIT
                     $row->correct = strip_tags(trim($_POST['correct']));
@@ -274,7 +276,40 @@
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD
-                    if($this->m->_db->insertObject('questions',$row)){
+                    if($this->m->_db->insertObject('questions',$row,'id')){
+                        foreach($answers as $item){     //добавляем вопросы
+                            if($item['act'] == 'insert'){   //добавляем новый
+                                $answer = new stdClass();
+                                $answer->text = $item['value'];
+                                $answer->date = date("Y-m-d H:i:s");
+                                $this->m->_db->insertObject('answers',$answer,'id');
+                                
+
+                                $collection->answer_id = $answer->id;
+                                $collection->question_id = $row->id;
+                                $this->m->_db->insertObject('answer_collections',$collection);
+                                
+                                
+                                if($item['correct'])$correct = $answer->id;
+                            }else if($item['act'] == 'select'){ //закрепляем существующий
+                                $collection->answer_id = (int)$item['value'];
+                                $collection->question_id = $row->id;
+                                $this->m->_db->insertObject('answer_collections',$collection);
+                                
+                                if($item['correct'])$correct = $collection->answer_id;
+                            }
+                        }
+                        
+                        //добавляем правильный ответ если он есть 
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$row->id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
+                        
                         echo '{"status":"success"}';
                     }else{
                         p($this->m->_db->_sql);

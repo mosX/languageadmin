@@ -7,14 +7,14 @@
         $scope.editForm = function(event,id){
             console.log(id);
             $http({
-                url:'/channels/editdata/?id='+id,
+                url:'/lessons/question_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editChannelModal').modal('show');
+                $('#editQuestionModal').modal('show');
             });
             event.preventDefault();
         }
