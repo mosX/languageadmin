@@ -62,6 +62,7 @@
             $this->m->_db->setQuery(
                         "SELECT `answer_collections`.* "
                         . " , `answers`.`text`"
+                        
                         . " FROM `answer_collections` "
                         . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                         . " WHERE `answer_collections`.`question_id` = ".$id                        
@@ -252,25 +253,66 @@
                 $this->disableView();
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
-                
                 $id = (int)$_POST['id'];
-                //$row->name = strip_tags(trim($_POST['name']));
                 $row->value = strip_tags(trim($_POST['value']));
-                $row->score = (int)$_POST['score'];
-                //$row->description = strip_tags(trim($_POST['description']));
+                $row->score = (int)$_POST['score'];                
                 $answers  = $_POST['answers'];
                 
                 if($id){        //EDIT
-                    $row->correct = strip_tags(trim($_POST['correct']));
+                    //$row->correct = strip_tags(trim($_POST['correct']));
+                    
                     $this->m->_db->setQuery(
                                 "UPDATE `questions` "
                                 . " SET `questions`.`value` = '".$row->value."'"
-                                //. " , `questions`.`description` = '".$row->description."'"
-                                . " , `questions`.`correct` = '".$row->correct."'"
+                                //. " , `questions`.`correct` = '".$row->correct."'"
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
                     if($this->m->_db->query()){
+                        foreach($answers as $item){     //добавляем вопросы
+                            switch($item['act']){
+                                case 'update':
+                                        $this->m->_db->setQuery(
+                                                "UPDATE `answers` SET `answers`.`text` = '".$item['value']."'"
+                                                . " WHERE `answers`.`id` = ".(int)$item['id']
+                                                . " LIMIT 1"
+                                            );
+                                        $this->m->_db->query();
+                                        if($item['correct'])$correct = $answer->id;
+                                    break;
+                                case 'insert':
+                                        $answer = new stdClass();
+                                        $answer->text = $item['value'];
+                                        $answer->date = date("Y-m-d H:i:s");
+                                        $this->m->_db->insertObject('answers',$answer,'id');
+
+                                        $collection->answer_id = $answer->id;
+                                        $collection->question_id = $row->id;
+                                        $this->m->_db->insertObject('answer_collections',$collection);
+
+                                        if($item['correct'])$correct = $answer->id;
+                                    break;
+                                case 'select':
+                                        $collection->answer_id = (int)$item['value'];
+                                        $collection->question_id = $row->id;
+                                        $this->m->_db->insertObject('answer_collections',$collection);
+
+                                        if($item['correct'])$correct = $collection->answer_id;
+                                    break;
+                            }
+                        }
+                        
+                        //добавляем правильный ответ если он есть 
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$row->id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
+                        
+                        
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';
@@ -288,7 +330,6 @@
                                 $collection->answer_id = $answer->id;
                                 $collection->question_id = $row->id;
                                 $this->m->_db->insertObject('answer_collections',$collection);
-                                
                                 
                                 if($item['correct'])$correct = $answer->id;
                             }else if($item['act'] == 'select'){ //закрепляем существующий
