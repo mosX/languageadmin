@@ -235,7 +235,7 @@
                                         <div class="row">
                                             <div class="col-sm-10">
                                                 <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
-                                                <input type='hidden' class='id' value='{{item.answer_id}}'>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
                                             </div>
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer" ng-checked="form.correct == item.id">
@@ -255,6 +255,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
                                     <div class="answer_item" data-act="select" ng-if="item.act == 'select'">
                                         <div class="row">
                                             <div class="col-sm-10">
