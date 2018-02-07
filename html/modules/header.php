@@ -160,6 +160,16 @@
                 </ul>
             </div>
         </li>
+        
+        <li class='dropdown-toggle <?=in_array($this->_controller, ['system']) ? 'active':''?>'>
+            <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="">Обратная Связь</a>
+            <div class="dropdown-menu">
+                <ul>
+                    <li><a href="/feedback/">Просмотреть</a></li>
+                    <hr style='display:block; margin:auto;border:1px solid #384648;margin-top:8px;margin-bottom:0px; width:180px;'/>
+                </ul>
+            </div>
+        </li>
     </ul>
     <style>
         .right_panel .divider{

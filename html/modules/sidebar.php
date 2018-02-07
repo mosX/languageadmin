@@ -173,7 +173,17 @@
                     <div class="menutitle">Управление</div>                
                         
                         <li class='<?=$this->_controller == 'system' && $this->_action == 'admins' ? 'active':''?>'>
-                            <a href="/statistic/payments/"><span class="ico5"></span>Учителя</a>
+                            <a href="/system/admins/"><span class="ico5"></span>Учителя</a>
+                        </li>
+                        
+                    <hr style='display:block; margin:auto;border:2px solid #384648;margin-top:15px;margin-bottom:0px; width:200px;'/>
+                <?php } ?>
+                    
+                <?php if(in_array($this->_controller,['feedback'])){ ?>
+                    <div class="menutitle">Обратная связь</div>
+                        
+                        <li class='<?=$this->_controller == 'feedback' && $this->_action == 'index' ? 'active':''?>'>
+                            <a href="/feedback/"><span class="ico5"></span>Учителя</a>
                         </li>
                         
                     <hr style='display:block; margin:auto;border:2px solid #384648;margin-top:15px;margin-bottom:0px; width:200px;'/>
