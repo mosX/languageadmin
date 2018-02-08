@@ -1,4 +1,5 @@
 <script>
+
     app.controller('pageCtrl', ['$scope','$http',function($scope,$http,$userinfo){
         console.log('START PAGE CONTROLLER');
         $scope.channel_id  = null;
@@ -8,14 +9,14 @@
             console.log(id);
             console.log('edit FORM');
             $http({
-                url:'/lessons/question_date/?id='+id,
+                url:'/lessons/question_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editQuesationModal').modal('show');
+                $('#editQuestionModal').modal('show');
             });
             event.preventDefault();
         }

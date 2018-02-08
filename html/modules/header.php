@@ -124,6 +124,7 @@
             <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="">Обучение</a>
             <div class="dropdown-menu">
                 <ul>
+                    <li><a href="/lessons/results/">Результаты</a></li>
                     <li><a href="/lessons/">Уроки</a></li>
                     <li><a href="/lessons/questions/">Вопросы</a></li>
                     <li><a href="/lessons/answers/">Ответы</a></li>

@@ -44,6 +44,73 @@
             }
         }
         
+        public function testing_checkAction(){
+            $this->m->_db->setQuery(
+                        "SELECT `testing_results`.* "
+                        . " , `lessons`.`name`"
+                        . " FROM `testing_results`"
+                        . " LEFT JOIN `lessons` ON `lessons`.`id` = `testing_results`.`lesson_id`"
+                        . " WHERE `testing_results`.`id` = ".(int)$this->m->_path[2]
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($result);
+            
+            $result->results = unserialize($result->results);
+            
+            //p($result);
+            //получаем вопросы
+            $this->m->_db->setQuery(
+                        "SELECT `question_collections`.* "
+                        . " , `questions`.`value`"
+                        . " , `questions`.`correct`"
+                        . " FROM `question_collections`"
+                        . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
+                        . " WHERE `question_collections`.`lesson_id` = ".(int)$result->lesson_id
+                    );
+            
+            $data = $this->m->_db->loadObjectList('id');
+            //$this->m->testing = $result;
+            
+            foreach($data as $item)$ids[] = $item->question_id;
+            
+            //получаем ответы
+            $this->m->_db->setQuery(
+                        "SELECT `answer_collections`.* "
+                        . " , `answers`.`text`"
+                        . " FROM `answer_collections` "
+                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " WHERE `answer_collections`.`question_id` IN (".  implode(',', $ids).")"
+                    );
+            $answers = $this->m->_db->loadObjectList();
+            
+            foreach($answers as $item){
+                if($item->id == $result->results[$item->question_id]){
+                     $item->selected = 'true';
+                }
+                
+                if($data[$item->question_id]->correct == $item->id){
+                    $item->correct = 'true';
+                }
+                
+                
+                $data[$item->question_id]->answers[] = $item;                                
+            }
+            $this->m->data = $data;
+            //$this->m->testing = $data;
+        }
+        
+        public function resultsAction(){
+            $this->m->_db->setQuery(
+                        "SELECT `testing_results`.* "
+                        . " , `lessons`.`name`"
+                        . " FROM `testing_results`"
+                        . " LEFT JOIN `lessons` ON `lessons`.`id` = `testing_results`.`lesson_id`"
+                        . " WHERE `testing_results`.`status` = 1"
+                    );
+            $this->m->data = $this->m->_db->loadObjectList();
+            
+        }
+        
         public function question_dataAction(){
             $this->disableTemplate();
             $this->disableView();
@@ -107,6 +174,8 @@
         }
         
         public function question_collectionsAction(){
+            $this->m->lesson_id = $this->m->_path[2];
+            
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
@@ -255,7 +324,8 @@
                 
                 $id = (int)$_POST['id'];
                 $row->value = strip_tags(trim($_POST['value']));
-                $row->score = (int)$_POST['score'];                
+                $row->score = (int)$_POST['score'];
+                $lesson_id = (int)$_POST['lesson_id'];
                 $answers  = $_POST['answers'];
                 
                 if($id){        //EDIT
@@ -268,6 +338,7 @@
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
+                    
                     if($this->m->_db->query()){
                         foreach($answers as $item){     //добавляем вопросы
                             
@@ -298,15 +369,16 @@
                                         $answer->date = date("Y-m-d H:i:s");
                                         $this->m->_db->insertObject('answers',$answer,'id');
                                         
+                                        $collection = new stdClass();
                                         $collection->answer_id = $answer->id;
-                                        $collection->question_id = $row->id;
+                                        $collection->question_id = $id;
                                         $this->m->_db->insertObject('answer_collections',$collection,'id');
-
+                                        
                                         if($item['correct'])$correct = $collection->id;
                                     break;
                                 case 'select':
                                         $collection->answer_id = (int)$item['value'];
-                                        $collection->question_id = $row->id;
+                                        $collection->question_id = $id;
                                         $this->m->_db->insertObject('answer_collections',$collection,'id');
 
                                         if($item['correct'])$correct = $collection->id;
@@ -362,6 +434,14 @@
                                         . " LIMIT 1"
                                     );
                             $this->m->_db->query();
+                        }
+                        
+                        //закрепляем за уроком если есть лессон айди
+                        if($lesson_id){
+                            $lesson = new stdClass();
+                            $lesson->question_id = $row->id;
+                            $lesson->lesson_id = $lesson_id;
+                            $this->m->_db->insertObject('question_collections',$lesson);
                         }
                         
                         echo '{"status":"success"}';
