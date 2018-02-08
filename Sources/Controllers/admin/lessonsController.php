@@ -68,7 +68,7 @@
                         . " WHERE `question_collections`.`lesson_id` = ".(int)$result->lesson_id
                     );
             
-            $data = $this->m->_db->loadObjectList('id');
+            $data = $this->m->_db->loadObjectList('question_id');
             //$this->m->testing = $result;
             
             foreach($data as $item)$ids[] = $item->question_id;

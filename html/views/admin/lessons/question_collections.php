@@ -106,10 +106,10 @@
 
                     <?php foreach ($this->m->data as $item){ ?>
                         <tr data-id="<?=$item->id?>" class="<?=$item->user_id ? 'personal':''?>">
-                            <td><?=$item->id?></td>
+                            <td><?=$item->question_id?></td>
                                 
                             <td class="username_td">
-                                <a href="/lessons/answer_collections/<?=$item->id?>/"><?=$item->value?></a>
+                                <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
                             </td>
                             
                             <td>
