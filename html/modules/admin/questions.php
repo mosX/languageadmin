@@ -1,6 +1,6 @@
 <script>
     app.controller('questionModalCtrl', ['$scope','$http',function($scope,$http){
-        $scope.form = {answers:[],lesson_id:<?=(int)$this->lesson_id?>};
+        $scope.form = {answers:[],score:1,lesson_id:<?=(int)$this->lesson_id?>};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
         $scope.answers_list = [];   //для создания новых елементов
         
@@ -13,7 +13,6 @@
                     $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
                 }
             });
-            
             
             $http({
                 method:'POST',
@@ -88,6 +87,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-sm-6">
                             Добавление ответов
                             <div class="form-group">

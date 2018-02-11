@@ -81,13 +81,13 @@
                 <div class='clearfix'></div>
                 <ul class="tabs_list">
                     <li class="<?=!$this->m->_path[2] || $this->m->_path[2] == 'all' ? 'active':''?>">
-                        <a href="/channels/">Все каналы</a>
+                        <a href="/lessons/">Все каналы</a>
                     </li>
                     <li class="<?=$this->m->_path[2] == 'active' ? 'active':''?>">
-                        <a href="/channels/index/active/">Активные</a>
+                        <a href="/lessons/index/active/">Активные</a>
                     </li>
                     <li class="<?=$this->m->_path[2] == 'unactive' ? 'active':''?>">
-                        <a href="/channels/index/unactive/">Отключенные</a>
+                        <a href="/lessons/index/unactive/">Отключенные</a>
                     </li>
                 </ul>
                 <style>
@@ -99,7 +99,9 @@
                 <table class="table">
                     <tr>
                         <th style="width:60px;">ID</th>
-                        <th>ОТВЕТ</th>                        
+                        <th>Вопрос</th>
+                        <th>Ответ</th>
+                        <th>Балов</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px;"></th>
                     </tr>
@@ -111,6 +113,8 @@
                             <td class="username_td">
                                 <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
                             </td>
+                            <td><?=$item->answer?></td>
+                            <td><?=$item->score?></td>
                             
                             <td>
                                 <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>

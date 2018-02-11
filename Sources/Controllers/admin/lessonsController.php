@@ -106,9 +106,9 @@
                         . " FROM `testing_results`"
                         . " LEFT JOIN `lessons` ON `lessons`.`id` = `testing_results`.`lesson_id`"
                         . " WHERE `testing_results`.`status` = 1"
+                        . " ORDER BY `id` DESC"
                     );
             $this->m->data = $this->m->_db->loadObjectList();
-            
         }
         
         public function question_dataAction(){
@@ -181,15 +181,14 @@
                 $this->disableView();
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
-                $row->question_id = (int)$_POST['question'];
+                //UPD использовалось для добавления вопроса из селекта по одному
+                /*$row->question_id = (int)$_POST['question'];
                 $row->lesson_id = (int)$this->m->_path[2];
                 
                 //проверяем или не было добавлено ранее
                 $this->m->_db->setQuery(
                             "SELECT `question_collections`.`id` "
-                            
                             . " FROM `question_collections` "
-                            
                             . " WHERE `question_collections`.`question_id` = ".$row->question_id
                             . " AND `question_collections`.`lesson_id` = ".$row->lesson_id
                             . " LIMIT 1"                        
@@ -205,7 +204,7 @@
                     echo '{"status":"success"}';
                 }else{
                     echo '{"status":"error"}';
-                }
+                }*/
             }else{
                 //получаем все вопросы для селекта
                 $this->m->_db->setQuery(
@@ -218,8 +217,13 @@
                 $this->m->_db->setQuery(
                             "SELECT `question_collections`.* "
                             . " , `questions`.`value`"
+                            . " , `questions`.`correct`"
+                            . " , `questions`.`score`"
+                            . " , `answers`.`text` as answer"
                             . " FROM `question_collections`"
                             . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
+                            . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
+                            . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                             . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]
                         );
                 $this->m->data = $this->m->_db->loadObjectList();                
@@ -334,7 +338,7 @@
                     $this->m->_db->setQuery(
                                 "UPDATE `questions` "
                                 . " SET `questions`.`value` = '".$row->value."'"
-                                //. " , `questions`.`correct` = '".$row->correct."'"
+                                . " , `questions`.`score` = '".$row->score."'"
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
@@ -387,8 +391,7 @@
                         }
                         
                         //добавляем правильный ответ если он есть 
-                        if($correct){
-                            
+                        if($correct){   //$correct єто айдишник в ансвер коллектионс
                             $this->m->_db->setQuery(
                                         "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
                                         . " WHERE `questions`.`id` = ".$id

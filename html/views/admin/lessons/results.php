@@ -60,6 +60,7 @@
                     <tr>
                         <th style="width:37px;"></th>
                         <th style="width:350px;">ТЕСТ</th>
+                        <th>ИМЯ</th>
                         <th>ОЧКОВ</th>
                         <th>ХЄШ</th>
                         <th>ДАТА</th>
@@ -73,7 +74,7 @@
                             <td class="username_td">
                                 <a href="/lessons/testing_check/<?=$item->id?>"><?=$item->name?></a>
                             </td>
-                            
+                            <td><?=$item->username?></td>
                             <td><?=$item->score?></td>
                             <td><?=$item->hash?></td>
                             
