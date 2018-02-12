@@ -14,15 +14,23 @@
                 $id = (int)$_POST['id'];
                 $row->name = strip_tags(trim($_POST['name']));
                 $row->description = strip_tags(trim($_POST['description']));
+                $row->show_answers = (int)$_POST['show_answers'];
+                
+                $row->terms = serialize($_POST['terms']);
                 
                 if($id){        //EDIT
                     $this->m->_db->setQuery(
                                 "UPDATE `lessons` SET `lessons`.`name` = '".$row->name."'"
+                                . " , `lessons`.`show_answers` = '".(int)$row->show_answers."'"
                                 . " , `lessons`.`description` = '".$row->description."'"
+                                . ($row->terms ? " , `lessons`.`terms` = '".$row->terms."'" : '')
                                 . " WHERE `lessons`.`id` = ".(int)$id
                                 . " LIMIT 1"
                             );
                     if($this->m->_db->query()){
+
+                            
+                        
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';
@@ -169,6 +177,7 @@
                         . " LIMIT 1"
                     );
             $this->m->_db->loadObject($data);
+            $data->terms = unserialize($data->terms);
             
             echo json_encode($data);
         }
