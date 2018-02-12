@@ -1,4 +1,59 @@
 <script>
+    app.controller('selectQuestionModalCtrl', ['$scope','$http',function($scope,$http){
+                
+        $scope.submit = function(event){
+            $http({
+                url:location.href,
+                method:'POST',
+                data:{'question':$scope.question_id}
+            }).then(function(ret){               
+                if(ret.data.status == 'success'){
+                    location.href = location.href;
+                }
+            });
+            event.preventDefault();
+        }        
+    }]);
+</script>
+<div ng-controller="selectQuestionModalCtrl" class="modal fade" id="selectQuestionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title font-header"><p><strong>Добавить Новий Вопрос</strong></p></h4>
+            </div>
+
+            <div class="modal-body">
+                <form action="" method="POST" ng-submit="submit($event)">
+                    
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Вопрос</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="question_id">
+                                            <?php foreach($this->list as $item){ ?>
+                                                <option value="<?=$item->id?>"><?=$item->value?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <div class="error name_error"></div>
+                                    </div>
+                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
+                                </div>
+                            </div>
+                           
+                     
+                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
     app.controller('questionModalCtrl', ['$scope','$http',function($scope,$http){
         $scope.form = {answers:[],score:1,lesson_id:<?=(int)$this->lesson_id?>};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта

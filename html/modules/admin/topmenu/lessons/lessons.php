@@ -132,7 +132,9 @@
             console.log(ret.data); // Данные, которые нам прислали
             
             $scope.form  = ret.data;
-            $scope.terms_list = $scope.form.terms;
+            if($scope.form.terms){
+                $scope.terms_list = $scope.form.terms;
+            }           
         });
         
         $scope.addTerm = function(){
