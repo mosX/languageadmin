@@ -28,9 +28,6 @@
                                 . " LIMIT 1"
                             );
                     if($this->m->_db->query()){
-
-                            
-                        
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';

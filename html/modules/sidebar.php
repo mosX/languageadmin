@@ -163,7 +163,16 @@
 
 
                 <?php if(in_array($this->_controller,['tasktable'])){ ?>
-                    <div class="menutitle">Каналы</div>
+                    <div class="menutitle">Расписание</div>
+                    <li class='<?=$this->_controller == 'tasktable' && $this->_action == 'index' ? 'active':''?>'>
+                        <a href="/tasktable/"><span class="ico5"></span>Расписание</a>
+                    </li>
+                    <li class='<?=$this->_controller == 'tasktable' && $this->_action == 'students' ? 'active':''?>'>
+                        <a href="/tasktable/students/"><span class="ico5"></span>Студенты</a>
+                    </li>
+                    <li class='<?=$this->_controller == 'tasktable' && $this->_action == 'lessons' ? 'active':''?>'>
+                        <a href="/tasktable/lessons/"><span class="ico5"></span>Предметы</a>
+                    </li>
                         
                     <hr style='display:block; margin:auto;border:1px solid #384648;margin-top:8px;margin-bottom:0px; width:180px;'/>
                 <?php } ?>

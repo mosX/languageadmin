@@ -134,21 +134,16 @@
         </li>
         
         <li class='dropdown-toggle <?=in_array($this->_controller, ['contacts','tasks','mail','finance']) ? 'active':''?>'>
-            <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="/channels/">Расписание</a>
+            <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="/tasktable/">Расписание</a>
             
             <div class="dropdown-menu">
-                <!--<ul>
-                    <li><a href="/finance/payments/">Payments</a></li>
-                    <li><a href="/contacts/">Подписчики</a></li>
-                    <li><a href="/operators/">Operators/Dealers(pending)</a></li>
-                    <li><a href="/rightholders/">RightHolders(pending)</a></li>
+                <ul>
+                    <li><a href="/tasktable/">Расписание</a></li>
+                    <li><a href="/tasktable/students/">Студенты</a></li>
+                    <li><a href="/tasktable/lessons/">Предметы</a></li>
                                         
                     <hr style='display:block; margin:auto;border:1px solid #384648;margin-top:8px;margin-bottom:0px; width:180px;'/>
-                                        
-                    <li><a href="/tasks/">Задачи</a></li>
-                    <li><a href="/mail/">Почта</a></li>
-                    <hr style='display:block; margin:auto;border:1px solid #384648;margin-top:8px;margin-bottom:0px; width:180px;'/>
-                </ul>-->
+                </ul>
             </div>
         </li>
                 
