@@ -62,7 +62,6 @@
             
             $result->results = unserialize($result->results);
             
-            //p($result);
             //получаем вопросы
             $this->m->_db->setQuery(
                         "SELECT `question_collections`.* "
@@ -188,7 +187,7 @@
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
                 //UPD использовалось для добавления вопроса из селекта по одному
-                /*$row->question_id = (int)$_POST['question'];
+                $row->question_id = (int)$_POST['question'];
                 $row->lesson_id = (int)$this->m->_path[2];
                 
                 //проверяем или не было добавлено ранее
@@ -210,13 +209,14 @@
                     echo '{"status":"success"}';
                 }else{
                     echo '{"status":"error"}';
-                }*/
+                }
             }else{
                 //получаем все вопросы для селекта
                 $this->m->_db->setQuery(
                             "SELECT `questions`.* "
                              . " FROM `questions` "
                             . " WHERE `questions`.`status` = 1"
+                            . " ORDER BY `id` DESC"
                         );
                 $this->m->list = $this->m->_db->loadObjectList();
                 
