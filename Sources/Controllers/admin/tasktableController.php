@@ -7,7 +7,7 @@
             $this->m->addJS('calendar');
             $this->m->addJS('clockpicker/clockpicker')->addJS('jscolor');
             $this->m->addCSS('clockpicker/clockpicker')->addCSS('clockpicker/standalone');
-            
+            /********TEST*********/
         }
         
         public function indexAction(){
