@@ -13,5 +13,13 @@
         public function indexAction(){
             
         }
+        
+        public function lessonsAction(){
+            
+        }
+        
+        public function studentsAction(){
+            
+        }
     }
 ?>
