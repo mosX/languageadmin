@@ -60,8 +60,7 @@
                     <tr>
                         <th style="width:37px;"></th>
                         <th style="width:350px;">ИМЯ</th>
-                        <th>ПРАВА</th>
-                        <th>КЕМ СОЗДАН</th>                        
+                        <th>Телефон</th>                        
                         <th>Created At</th>
                         <th style="width:100px"></th>
                     </tr>
@@ -74,27 +73,14 @@
                                     <div class='box'></div>
                                 </label>-->
                             </td>   
-                            <td class="username_td">
-                                <!--<div class="actions_panel">
-                                    <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags" href=""><span></span>редактировать</a>
-                                    <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user" href=""><span></span>блок</a>
-                                </div>-->
-                                
+                            <td class="username_td">                                
                                 <div class='username_block' style='position:relative;display:inline-block;'>
-                                    <a class='username' href="/contacts/details/<?= $item->id ?>/"><?= $item->email ?></a>
+                                    <a class='username' href="/contacts/details/<?= $item->id ?>/"><?= $item->firstname ?> <?= $item->lastname ?></a>
                                 </div>
                             </td>
                             
-                            <td>
-                                <?php
-                                    switch($item->gid){
-                                        case 10:echo 'Admin';break;
-                                        case 20:echo 'Support';break;
-                                        case 30:echo 'Operator';break;
-                                    }
-                                ?>
-                            </td>
-                            
+                            <td><?=$item->phone?></td>
+                                                            
                             <td style="position:relative;">
                                 <?=$item->partner_email?>
                             </td>

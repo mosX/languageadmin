@@ -141,7 +141,7 @@
         }]);
 </script>
 <script>
-    function setEnd() {
+    /*function setEnd() {
         parent = $('form');
         var arr = $('input[name=start]', parent).val().split(':');
 
@@ -159,9 +159,9 @@
         var new_minutes = new_d.getMinutes();
 
         $('input[name=end]', parent).val(new_hours + ':' + new_minutes);
-    }
+    }*/
 
-    $('document').ready(function () {
+    /*$('document').ready(function () {
         $('.clockpicker_start').clockpicker({
             placement: 'bottom',
             align: 'left',
@@ -180,7 +180,7 @@
             donetext: 'OK',
             autoclose: true
         });
-    });
+    });*/
 </script>
 
 <div ng-controller="addModalCtrl" class="modal fade" id="addModal" tabindex="-1" role="dialog">
@@ -192,7 +192,7 @@
             </div>
 
             <div class="modal-body">
-                <form class="form" action="" method="POST">
+                <form class="form" action="" method="POST" ng-submit="submit($event)">
                     
                     <div class="form-group">
                         <div class="row">

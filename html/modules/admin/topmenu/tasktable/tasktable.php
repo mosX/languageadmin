@@ -121,6 +121,11 @@
 <script>
     app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http) {
             $scope.form = {};
+            $scope.lessons_list = '<?=$this->lessons ?json_encode($this->lessons):'{}'?>';
+            $scope.students_list = '<?=$this->students ?json_encode($this->students):'{}'?>';
+            
+            console.log($scope.lessons_list);
+            console.log($scope.students_list);
 
             $scope.submit = function (event) {
                 $http({
@@ -201,14 +206,14 @@
             </div>
 
             <div class="modal-body">
-                <form class="form" action="" method="POST">
+                <form class="form" action="" method="POST" ng-model="submit($event)">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Заметка</div>
 
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="message" value="<?= $_POST['message'] ?>">
-                                <div class="error"><?= $this->m->error->message ?></div>
+                                <input type="text" class="form-control" name="message" value="" ng-model="form.message">
+                                <div class="error"></div>
                             </div>
                         </div>
                     </div>
@@ -218,8 +223,8 @@
 
                             <div class="col-sm-8">
                                 <input type="text"  class="form-control jscolor {valueElement:'color_picker',value:'ffffff'}" value="">
-                                <input type="hidden" name="color" value="<?= $_POST['color'] ?>" id="color_picker">
-                                <div class="error"><?= $this->m->error->color ?></div>
+                                <input type="hidden" name="color" value="" id="color_picker" ng-model="form.color">
+                                <div class="error"></div>
                             </div>
                         </div>
                     </div>
@@ -231,31 +236,31 @@
                                 <ul class="list-inline">
                                     <li>
                                         ПН
-                                        <input type="checkbox" name="permanent[1]" <?= $_POST['permanent'][1] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[1]" name="permanent[1]">
                                     </li>
                                     <li>
                                         ВТ
-                                        <input type="checkbox" name="permanent[2]" <?= $_POST['permanent'][2] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[2]" name="permanent[2]">
                                     </li>
                                     <li>
                                         СР
-                                        <input type="checkbox" name="permanent[3]" <?= $_POST['permanent'][3] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[3]" name="permanent[3]">
                                     </li>
                                     <li>
                                         ЧТ
-                                        <input type="checkbox" name="permanent[4]" <?= $_POST['permanent'][4] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[4]" name="permanent[4]">
                                     </li>
                                     <li>
                                         ПТ
-                                        <input type="checkbox" name="permanent[5]" <?= $_POST['permanent'][5] ? 'checked=checked' : '' ?>>                            
+                                        <input type="checkbox" ng-model="form.permanent[5]" name="permanent[5]">
                                     </li>
                                     <li>
                                         СБ
-                                        <input type="checkbox" name="permanent[6]" <?= $_POST['permanent'][6] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[6]" name="permanent[6]">
                                     </li>
                                     <li>
                                         НД
-                                        <input type="checkbox" name="permanent[7]" <?= $_POST['permanent'][7] ? 'checked=checked' : '' ?>>
+                                        <input type="checkbox" ng-model="form.permanent[7]" name="permanent[7]">
                                     </li>
                                 </ul>
 

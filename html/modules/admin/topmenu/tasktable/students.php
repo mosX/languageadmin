@@ -119,6 +119,54 @@
 </div>
 
 <script>
+    /*function setEnd() {
+        parent = $('form');
+        var arr = $('input[name=start]', parent).val().split(':');
+
+        var hours = arr[0];
+        var minutes = arr[1];
+
+        var d = new Date();
+
+        d.setHours(hours);
+        d.setMinutes(minutes);
+
+        var new_d = new Date(d.getTime() + 60 * 90 * 1000);
+
+        var new_hours = new_d.getHours();
+        var new_minutes = new_d.getMinutes();
+
+        $('input[name=end]', parent).val(new_hours + ':' + new_minutes);
+    }*/
+
+    /*$('document').ready(function () {
+        $('.clockpicker_start').clockpicker({
+            placement: 'bottom',
+            align: 'left',
+            donetext: 'OK',
+            autoclose: true,
+            afterDone: function () {
+                console.log("after done");
+                setEnd(false);
+                //{{setEnd()}}
+            }
+        });
+
+        $('.clockpicker').clockpicker({
+            placement: 'bottom',
+            align: 'left',
+            donetext: 'OK',
+            autoclose: true
+        });
+    });*/
+
+    /*$('document').ready(function(){
+     var d = new Date();
+     console.log(d.getDay());
+     });*/
+</script>
+
+<script>
     app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http) {
             $scope.form = {};
 
@@ -140,54 +188,6 @@
             }
         }]);
 </script>
-<script>
-    function setEnd() {
-        parent = $('form');
-        var arr = $('input[name=start]', parent).val().split(':');
-
-        var hours = arr[0];
-        var minutes = arr[1];
-
-        var d = new Date();
-
-        d.setHours(hours);
-        d.setMinutes(minutes);
-
-        var new_d = new Date(d.getTime() + 60 * 90 * 1000);
-
-        var new_hours = new_d.getHours();
-        var new_minutes = new_d.getMinutes();
-
-        $('input[name=end]', parent).val(new_hours + ':' + new_minutes);
-    }
-
-    $('document').ready(function () {
-        $('.clockpicker_start').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true,
-            afterDone: function () {
-                console.log("after done");
-                setEnd(false);
-                //{{setEnd()}}
-            }
-        });
-
-        $('.clockpicker').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true
-        });
-    });
-
-    /*$('document').ready(function(){
-     var d = new Date();
-     console.log(d.getDay());
-     });*/
-</script>
-
 <div ng-controller="addModalCtrl" class="modal fade" id="addModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -197,7 +197,7 @@
             </div>
 
             <div class="modal-body">
-                <form class="form" action="" method="POST">
+                <form class="form" action="" method="POST" ng-submit="submit($event)">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">
@@ -205,7 +205,7 @@
                             </div>
 
                             <div class="col-sm-8">
-                                 <input type="text" class="form-control" name="firstname" value="">
+                                 <input type="text" class="form-control" name="firstname" value="" ng-model="form.firstname">
                             </div>
                         </div>
                     </div>
@@ -217,7 +217,7 @@
                             </div>
 
                             <div class="col-sm-8">
-                                 <input type="text" class="form-control" name="lastname" value="">
+                                 <input type="text" class="form-control" name="lastname" value="" ng-model="form.lastname">
                             </div>
                         </div>
                     </div>
@@ -229,7 +229,7 @@
                             </div>
 
                             <div class="col-sm-8">
-                                 <input type="text" class="form-control" name="phone" value="">
+                                 <input type="text" class="form-control" name="phone" value="" ng-model="form.phone">
                             </div>
                         </div>
                     </div>
