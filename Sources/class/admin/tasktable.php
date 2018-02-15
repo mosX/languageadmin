@@ -7,6 +7,7 @@ class Tasktable{
     }
     
     public function checkPermanents(){
+        
         //получаем все активные перманентные
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_tasks`.* "

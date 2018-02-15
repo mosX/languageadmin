@@ -6,7 +6,7 @@
 
 <div ng-controller="pageCtrl">
     <div id="page_wrapper">
-        <?= $this->m->module('topmenu' . DS . 'tasktable' . DS . 'tasktable') ?>
+        <?=$this->m->module('topmenu' . DS . 'tasktable' . DS . 'main') ?>
 
         <div class="content">
             <script>

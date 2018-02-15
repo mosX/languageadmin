@@ -26,39 +26,16 @@ class mainframe {
         session_start();
         $this->parsePath();
         $this->setConfig();
-        //$this->setLang();
-
-        /*if (strlen($this->_path[0]) == 32) {
-            
-            if ($this->setConfig($this->_path[0]) == false) {
-                die();
-            }
-
-            $_SESSION['project'] = $this->_path[0];
-            
-            $this->current_project = $_SESSION['project'];
-            array_shift($this->_path[0]);
-        } else {
-            if (strlen($_SESSION['project']) == 32) {
-                if ($this->setConfig($_SESSION['project']) == false) {
-                    die();
-                }
-
-                $this->current_project = $_SESSION['project'];
-            } else {
-                die();
-            }
-        }*/
-
+       
         $this->setDB();
         $this->_auth = new xAuth($this);
         $this->_auth->initSession();
 
         $this->_user = $this->_auth->getUser();
         
-        if (is_object($this->_user) && $this->_user->id > 0) {
+      /*  if (is_object($this->_user) && $this->_user->id > 0) {
             $this->_islogin = true;
-        }
+        }*/
     
         $this->setPermissions();
         $this->page();

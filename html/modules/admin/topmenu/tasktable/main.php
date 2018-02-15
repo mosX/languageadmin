@@ -1,4 +1,6 @@
+
 <div id="top_menu">
+    
     <?= $this->module('header') ?>
 
     <div class="page_menu">
@@ -121,13 +123,11 @@
 <script>
     app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http) {
             $scope.form = {};
-            $scope.lessons_list = '<?=$this->lessons ?json_encode($this->lessons):'{}'?>';
-            $scope.students_list = '<?=$this->students ?json_encode($this->students):'{}'?>';
+            $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
+            $scope.students_list = <?=$this->students ?json_encode($this->students):'{}'?>;
             
-            console.log($scope.lessons_list);
-            console.log($scope.students_list);
-
             $scope.submit = function (event) {
+                $scope.form.color = $('#color_picker').val();
                 $http({
                     method: 'POST',
                     url: location.href,
@@ -145,6 +145,7 @@
             }
         }]);
 </script>
+
 <script>
     function setEnd() {
         parent = $('form');
@@ -192,11 +193,13 @@
      console.log(d.getDay());
      });*/
 </script>
+
 <style>
     #addModal .modal-dialog{
         width:700px;
     }
 </style>
+
 <div ng-controller="addModalCtrl" class="modal fade" id="addModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -206,7 +209,8 @@
             </div>
 
             <div class="modal-body">
-                <form class="form" action="" method="POST" ng-model="submit($event)">
+                
+                <form class="form" action="" method="POST" ng-submit="submit($event)">
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Заметка</div>
@@ -217,13 +221,14 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Цвет заметки</div>
 
                             <div class="col-sm-8">
                                 <input type="text"  class="form-control jscolor {valueElement:'color_picker',value:'ffffff'}" value="">
-                                <input type="hidden" name="color" value="" id="color_picker" ng-model="form.color">
+                                <input type="hidden" name="color" value="" id="color_picker">
                                 <div class="error"></div>
                             </div>
                         </div>
@@ -272,13 +277,14 @@
                             <div class="col-sm-4">Предмет</div>
 
                             <div class="col-sm-8">
-                                <select name="type" class="form-control">
-                                    <option>Без типа</option>
-                                    <?php foreach ($this->m->lessons as $item) { ?>
-                                        <option value="<?= $item->id ?>"><?= $item->name ?></option>
-                                    <?php } ?>
+                                <select name="type" class="form-control" ng-model="form.type">
+                                    <option value="0">Без типа</option>
+                                    <option ng-repeat="item in lessons_list" value="{{item.id}}">{{item.name}}</option>
+                                    <?php //foreach ($this->m->lessons as $item) { ?>
+                                        <!--<option value="<?= $item->id ?>"><?= $item->name ?></option>-->
+                                    <?php //} ?>
                                 </select>
-                                <div class="error"><?= $this->m->error->type ?></div>
+                                <div class="error"></div>
                             </div>
                         </div>
                     </div>
@@ -315,9 +321,7 @@
                                             <div class="col-sm-10">
                                                 <select name="students[]" class="form-control">
                                                     <option>Пусто</option>
-                                                    <?php foreach ($this->m->students as $item) { ?>
-                                                        <option value="<?= $item->id ?>"><?= $item->firstname ?> <?= $item->lastname ?></option>
-                                                    <?php } ?>
+                                                    <option ng-repeat="item in students_list" value="{{item.id}}">{{item.firstname}} {{item.lastname}}</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-2 text-center">
@@ -329,7 +333,7 @@
 
                                 <div class="btn btn-primary add_student">Добавить</div>
 
-                                <div class="error"><?= $this->m->error->students ?></div>
+                                <div class="error"></div>
                             </div>
                         </div>
                     </div>
@@ -338,8 +342,8 @@
                             <div class="col-sm-4">Начало</div>
 
                             <div class="col-sm-8">
-                                <input type="text" class="form-control clockpicker_start" name="start" value="<?= $_POST['start'] ?>">
-                                <div class="error"><?= $this->m->error->start ?></div>
+                                <input type="text" class="form-control clockpicker_start" name="start" value="" ng-model="form.start">
+                                <div class="error"></div>
                             </div>
                         </div>
                     </div>
@@ -348,7 +352,7 @@
                             <div class="col-sm-4">Окончание</div>
 
                             <div class="col-sm-8">
-                                <input type="text" class="form-control clockpicker" name="end" value="<?= $_POST['end'] ?>">
+                                <input type="text" class="form-control clockpicker" name="end" value="" ng-model="form.end">
                                 <div class="error"><?= $this->m->error->end ?></div>
                             </div>
                         </div>
@@ -362,7 +366,9 @@
                         </div>
                     </div>      
                 </form>
+                
             </div>
         </div>
     </div>
+    
 </div>

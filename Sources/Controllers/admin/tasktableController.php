@@ -9,10 +9,9 @@
             $this->m->addCSS('clockpicker/clockpicker')->addCSS('clockpicker/standalone');
             /********TEST*********/
             
-            return;
-            xload('class.admin.tasktable');
+            /*xload('class.admin.tasktable');
             $tasktable = new Tasktable($this->m);
-            $tasktable->checkPermanents();            
+            $tasktable->checkPermanents();            */
         }
         
         public function indexAction(){
@@ -59,13 +58,9 @@
                         $tempTimestamp += 60*60*24;
                     }while($tempDay != date("N",$tempTimestamp));
 
-                    die('{"status":"success"}');
-                    //return true;            
-                    //redirect('/?date='.date("Y-m-d",strtotime($start)));
+                    die('{"status":"success"}');                    
                 }else{
                     if($tasktable->addTaskElement(strtotime($start_date), $start, $end,0)){
-                        //redirect('/?date='.date("Y-m-d",strtotime($start)));
-                        //return true;
                         die('{"status":"success"}');
                     }
                 }
@@ -77,6 +72,7 @@
                         );
                 $this->m->lessons = $this->m->_db->loadObjectList();
                 
+                
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_students`.* "
                             . " FROM `tasktable_students`"
@@ -85,41 +81,7 @@
                 $this->m->students = $this->m->_db->loadObjectList();
             }
         }
-        
-       /* public function addTaskElement($timestamp, $start, $end, $permanent = 1){
-            $row->user_id = $this->m->_user->id;
-            $row->color = $_POST['color'];
-            $row->lesson = $_POST['type'];
-            $row->start = date("Y-m-d ".$start,$timestamp);
-            $row->end = date("Y-m-d ".$end,$timestamp);
-            $row->permanent = $permanent;
-
-            $row->permanent_update = $row->start;
-            $row->message = strip_tags(trim($_POST['message']));
-            $row->date = date('Y-m-d H:i:s');
-
-            if($this->m->_db->insertObject('tasktable_tasks',$row,'id')){
-                //xload('class.students');
-                //$class = new Students($this->m);
-                //получаем выбранных студентов
-                foreach($_POST['students'] as $item){
-                    if($item != 0)$students[] = $item;
-                }
-                $students = array_unique($students);
-                foreach($students as $item){
-                    $row->user_id = $this->m->_user->id;
-                    $row->task_id = $row->id;
-                    $row->student_id = $item;
-                    $row->date = date("Y-m-d H:i:s");
-                    $this->m->_db->insertObject('tasktable_students',$row);
-                }
-                    
-                //redirect('/?date='.date("Y-m-d",strtotime($start)));
-            }
-
-            return true;
-        }*/
-        
+ 
         public function lessonsAction(){
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
