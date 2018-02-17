@@ -20,10 +20,14 @@
                 $this->disableView();
                 $_POST = json_decode(file_get_contents('php://input'), true);
                 
-                $year = $_GET['year'];
+                //надо их предавать взависимости от выбранного дня
+                /*$year = $_GET['year'];
                 $month = $_GET['month'];
-                $day = $_GET['day'];
-
+                $day = $_GET['day'];*/
+                $year = 2018;
+                $month = 2;
+                $day = 15;
+                
                 $message = strip_tags(trim($_POST['message']));
 
                 $start = $_POST['start'];
@@ -34,15 +38,26 @@
 
                 if(strtotime($end_date) < strtotime($start_date)){
                     $this->validation = false;
-                    $this->error->date = 'Дата окончания не может быть раньше даты начала';
+                    $json->error->date = 'Дата окончания не может быть раньше даты начала';
                 }
 
                 if(!$this->validation){
                     //return false;
-                    die('{"status":"error"}');
+                    $json->status = 'error';
+                    echo json_encode($json);
+                    //die('{"status":"error"}');
+                    return false;
                 }
-                //p($_POST);
-                if($_POST['permanent']){
+                
+                //проверяем есть постоянные или занятия или нет
+                $permanent_status = false;
+                foreach($_POST['permanent'] as $item){
+                    if($item) $permanent_status = true;
+                    
+                    break;                    
+                }
+                
+                if($permanent_status ){
                     xload('class.admin.tasktable');
                     $tasktable = new Tasktable($this->m);
                     
@@ -79,6 +94,7 @@
                             . " WHERE `tasktable_students`.`status` = 1"
                         );
                 $this->m->students = $this->m->_db->loadObjectList();
+                
             }
         }
  

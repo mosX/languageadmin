@@ -121,13 +121,22 @@
 </div>
 
 <script>
-    app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http) {
+    app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http){
             $scope.form = {};
+            $scope.student_selects = [true];
+                    
             $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
             $scope.students_list = <?=$this->students ?json_encode($this->students):'{}'?>;
             
-            $scope.submit = function (event) {
+            $scope.addStudentForm = function($event){
+                $scope.student_selects.push(true);
+            }
+            
+            console.log($scope.students_list);
+            $scope.submit = function (event){
                 $scope.form.color = $('#color_picker').val();
+                console.log($scope.form);
+                
                 $http({
                     method: 'POST',
                     url: location.href,
@@ -241,31 +250,31 @@
                                 <ul class="list-inline">
                                     <li>
                                         ПН
-                                        <input type="checkbox" ng-model="form.permanent[1]" name="permanent[1]">
+                                        <input type="checkbox" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         ВТ
-                                        <input type="checkbox" ng-model="form.permanent[2]" name="permanent[2]">
+                                        <input type="checkbox" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         СР
-                                        <input type="checkbox" ng-model="form.permanent[3]" name="permanent[3]">
+                                        <input type="checkbox" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         ЧТ
-                                        <input type="checkbox" ng-model="form.permanent[4]" name="permanent[4]">
+                                        <input type="checkbox" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         ПТ
-                                        <input type="checkbox" ng-model="form.permanent[5]" name="permanent[5]">
+                                        <input type="checkbox" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         СБ
-                                        <input type="checkbox" ng-model="form.permanent[6]" name="permanent[6]">
+                                        <input type="checkbox" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                     <li>
                                         НД
-                                        <input type="checkbox" ng-model="form.permanent[7]" name="permanent[7]">
+                                        <input type="checkbox" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">
                                     </li>
                                 </ul>
 
@@ -280,25 +289,12 @@
                                 <select name="type" class="form-control" ng-model="form.type">
                                     <option value="0">Без типа</option>
                                     <option ng-repeat="item in lessons_list" value="{{item.id}}">{{item.name}}</option>
-                                    <?php //foreach ($this->m->lessons as $item) { ?>
-                                        <!--<option value="<?= $item->id ?>"><?= $item->name ?></option>-->
-                                    <?php //} ?>
                                 </select>
                                 <div class="error"></div>
                             </div>
                         </div>
                     </div>
-                    <script>
-                                $('document').ready(function () {
-                                    $('.add_student').click(function () {
-                                        $('.student_block .element').eq(0).clone().appendTo('.student_block');
-                                    });
-
-                                    $('.student_block').on('click', '.remove_student', function () {
-                                        $(this).closest('.element').remove();
-                                    });
-                                });
-                    </script>
+              
                     <style>
                         .student_block .element:first-child .remove_student{
                             display:none;
@@ -316,10 +312,10 @@
 
                             <div class="col-sm-8">
                                 <div class="student_block">
-                                    <div class="form-group element">
-                                        <div class="row">
+                                    <div class="form-group element" ng-repeat="item in student_selects track by $index">
+                                        <div class="row">                                            
                                             <div class="col-sm-10">
-                                                <select name="students[]" class="form-control">
+                                                <select class="form-control" ng-model="form.students[$index]">
                                                     <option>Пусто</option>
                                                     <option ng-repeat="item in students_list" value="{{item.id}}">{{item.firstname}} {{item.lastname}}</option>
                                                 </select>
@@ -331,7 +327,7 @@
                                     </div>
                                 </div>
 
-                                <div class="btn btn-primary add_student">Добавить</div>
+                                <div class="btn btn-primary add_student" ng-click="addStudentForm($event)">Добавить</div>
 
                                 <div class="error"></div>
                             </div>
@@ -359,7 +355,7 @@
                     </div>
 
                     <div class="form-group">
-                        <div class="row">                
+                        <div class="row">
                             <div class="col-sm-12">
                                 <input type="submit" class="btn btn-primary" value="Сохранить">
                             </div>
