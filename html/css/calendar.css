@@ -54,35 +54,34 @@
         display:table-row;
         clear:both;
     }
-    .c_row .c_day_name{
+    .c_day_name{
         vertical-align: middle;        
         display:table-cell;
         text-align: center;
     }
-    .c_row .c_day{
+    .c_day{
         cursor:pointer;
         vertical-align: middle;        
         display:table-cell;
         text-align: center;
     }
-    .c_row .c_day.today{
+    .c_day.today{
         border-radius: 10px;
         background: rgba(103,183,255,0.5);
     }
-    .c_row .c_day.holiday.reserved,.c_row .c_day.reserved{
+    .c_day.holiday.reserved,.c_day.reserved{
         font-weight:bolder;
         color: red;
     }
-    .c_row .c_day.holiday{
+    .c_day.holiday{
         font-weight:bolder;
         color: #3498db;
     }
-    .c_row .c_day.prev,.c_row .c_day.next{
+    .c_day.prev,.c_day.next{
         
         color: #a6a6a6;
     }
    
-    
     .date_tags{
         height:30px;
     }

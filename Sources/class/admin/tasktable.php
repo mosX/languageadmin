@@ -6,6 +6,70 @@ class Tasktable{
         $this->m =  $mainframe;        
     }
     
+    public function getData($date){
+        
+        $start = date("Y-m-d 00:00:00",strtotime($date));
+        $end = date("Y-m-d 23:59:59",strtotime($date));
+        //p(date('N',strtotime($start)));
+        
+        
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_tasks`.* "
+                    . " , `tasktable_lessons`.`name` as lessons_name"
+                    . " , `tasktable_permanent_exceptions`.`id` as 'ignore'"
+                    . " , `tasktable_tasks`.`start` as test_start"
+                    . " , DATE_FORMAT(`tasktable_tasks`.`permanent_update`,'%Y:%m:%d') as test_upd"
+                    . " FROM `tasktable_tasks` "
+                    . " LEFT JOIN `tasktable_lessons` ON `tasktable_lessons`.`id` = `tasktable_tasks`.`lesson`"
+                    . " LEFT JOIN `tasktable_permanent_exceptions` ON `tasktable_permanent_exceptions`.`task_id` = `tasktable_tasks`.`id` AND DATE_FORMAT(`tasktable_permanent_exceptions`.`date`,'%Y-%m-%d') = DATE_FORMAT('".$start."','%Y-%m-%d')"   //проверка на исключение
+                    . " WHERE 1 "
+                    . " AND ("
+                            ."("
+                                ."`tasktable_tasks`.`start` > '".$start."'"
+                                . " AND `tasktable_tasks`.`end` < '".$end."'"
+                                //. " AND `tasktable_tasks`.`permanent` = 0"
+                            .") OR ( "
+                                ." ( "
+                                    . "`tasktable_tasks`.`permanent` = 1 AND DAYOFWEEK(`tasktable_tasks`.`start`)-1 = '".date('N',strtotime($start))."'"    //тот же день недели и перманент
+                                    //. " AND `tasks`.`permanent_update` < '".$start."'"
+                                    . " AND `tasktable_tasks`.`permanent_update` < '".$end."'"
+                                    . " AND ( " //если тот же день
+                                        ."( DATE_FORMAT(`tasktable_tasks`.`permanent_update`,'%H:%i:%s') < DATE_FORMAT(`tasktable_tasks`.`end`,'%H:%i:%s') AND DATE_FORMAT(`tasktable_tasks`.`permanent_update`,'%Y-%m-%d') = '".date("Y-m-d",strtotime($date))."')"
+                                        ."OR"   //если не тот же день
+                                        ."(DATE_FORMAT(`tasktable_tasks`.`permanent_update`,'%Y-%m-%d') != '".date("Y-m-d",strtotime($date))."') "
+                                    ." )"
+                                    
+                                .")"
+                            .")"
+
+                    .") "
+                    //. " AND `tasks`.`user_id` = ".$this->m->_user->id
+                    . " AND `tasktable_tasks`.`status` = 1"
+                    . " ORDER BY DATE_FORMAT(`start`,'%H:%i:%s') ASC"
+                );
+        $ret = $this->m->_db->loadObjectList();
+        
+        foreach($ret as $item){
+            $item->start = strtotime($item->start);
+        }
+        
+        
+        if($ret){
+            foreach($ret as $key=>$item){
+                if($item->ignore) unset($ret[$key]);
+            }
+        }
+        
+        if($ret){
+            foreach($ret as $item){
+                $data[] = $item;
+            }
+        }
+                        
+        return $data;
+    
+    }
+    
     public function checkPermanents(){
         
         //получаем все активные перманентные

@@ -114,14 +114,14 @@
             }
         </style>
 
-        <div class="actions">          
+        <div class="actions">
             <a href="" data-toggle="modal" data-target="#addModal" class="button add_deal">+ ДОБАВИТЬ РАСПИСАНИЕ</a>
         </div>
     </div>
 </div>
 
 <script>
-    app.controller('addModalCtrl', ['$scope', '$http', function ($scope, $http){
+    app.controller('addModalCtrl', ['$scope','$rootScope', '$http', function ($scope,$rootScope, $http){
             $scope.form = {};
             $scope.student_selects = [true];
                     
@@ -132,9 +132,17 @@
                 $scope.student_selects.push(true);
             }
             
-            console.log($scope.students_list);
+            $rootScope.$on('setDate',function(event,data){
+                data.day = data.day < 10 ? '0'+data.day : data.day;
+                data.month = data.month < 10 ? '0'+data.month : data.month;
+                
+                $scope.date = data.year + '-'+data.month+'-'+data.day;
+                $('#addModal').modal('show');
+            });
+            
             $scope.submit = function (event){
                 $scope.form.color = $('#color_picker').val();
+                $scope.form.date = $('input[name=date]').val();
                 console.log($scope.form);
                 
                 $http({
@@ -152,56 +160,48 @@
 
                 event.preventDefault();
             }
+            
+            $scope.setEnd = function(){
+                var parent = $('form');
+                var arr = $('input[name=start]', parent).val().split(':');
+
+                var hours = arr[0];
+                var minutes = arr[1];
+
+                var d = new Date();
+
+                d.setHours(hours);
+                d.setMinutes(minutes);
+
+                var new_d = new Date(d.getTime() + 60 * 90 * 1000);
+
+                var new_hours = new_d.getHours();
+                var new_minutes = new_d.getMinutes();
+
+                $scope.form.end = new_hours + ':' + new_minutes;
+                $scope.$digest();
+                //$('input[name=end]', parent).val(new_hours + ':' + new_minutes);
+            }
+            
+            $('.clockpicker_start').clockpicker({
+                placement: 'bottom',
+                align: 'left',
+                donetext: 'OK',
+                autoclose: true,
+                afterDone: function(){
+                    $scope.setEnd(false);                    
+                }
+            });
+
+            $('.clockpicker').clockpicker({
+                placement: 'bottom',
+                align: 'left',
+                donetext: 'OK',
+                autoclose: true
+            });
         }]);
 </script>
 
-<script>
-    function setEnd() {
-        parent = $('form');
-        var arr = $('input[name=start]', parent).val().split(':');
-
-        var hours = arr[0];
-        var minutes = arr[1];
-
-        var d = new Date();
-
-        d.setHours(hours);
-        d.setMinutes(minutes);
-
-        var new_d = new Date(d.getTime() + 60 * 90 * 1000);
-
-        var new_hours = new_d.getHours();
-        var new_minutes = new_d.getMinutes();
-
-        $('input[name=end]', parent).val(new_hours + ':' + new_minutes);
-    }
-
-    $('document').ready(function () {
-        $('.clockpicker_start').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true,
-            afterDone: function () {
-                console.log("after done");
-                setEnd(false);
-                //{{setEnd()}}
-            }
-        });
-
-        $('.clockpicker').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true
-        });
-    });
-
-    /*$('document').ready(function(){
-     var d = new Date();
-     console.log(d.getDay());
-     });*/
-</script>
 
 <style>
     #addModal .modal-dialog{
@@ -218,8 +218,28 @@
             </div>
 
             <div class="modal-body">
-                
                 <form class="form" action="" method="POST" ng-submit="submit($event)">
+                    
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Выбранная Дата</div>
+
+                            <div class="col-sm-8">
+                               <input type="text" name="date" class="datetimepicker form-control" value="" ng-model="date">
+                                
+                                <script>
+                                    $('document').ready(function(){
+                                        $(".datetimepicker").datetimepicker({
+                                            format: "YYYY-MM-DD",
+                                        });
+                                    });
+                                </script>
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Заметка</div>

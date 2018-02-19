@@ -3,8 +3,11 @@
         public function init(){
             /*$this->m->addJS('jquery-ui.min');
             $this->m->addCSS('jquery-ui.min');*/
+            $this->m->addCSS('bootstrap-datetimepicker.min');
+            $this->m->addJS('moment')->addJS('bootstrap-datetimepicker.min');
+            
             $this->m->addCSS('calendar');
-            $this->m->addJS('calendar');
+            //$this->m->addJS('calendar');
             $this->m->addJS('clockpicker/clockpicker')->addJS('jscolor');
             $this->m->addCSS('clockpicker/clockpicker')->addCSS('clockpicker/standalone');
             /********TEST*********/
@@ -15,27 +18,33 @@
         }
         
         public function indexAction(){
+            xload('class.admin.tasktable');
+            $tasktable = new Tasktable($this->m);
+                
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
                 $_POST = json_decode(file_get_contents('php://input'), true);
+                $this->validation = true;
                 
                 //надо их предавать взависимости от выбранного дня
-                /*$year = $_GET['year'];
+                /*$year = $_GET['date'];
                 $month = $_GET['month'];
                 $day = $_GET['day'];*/
-                $year = 2018;
+                
+                /*$year = 2018;
                 $month = 2;
-                $day = 15;
+                $day = 15;*/
+                $date = date("Y-m-d",strtotime($_POST['date']));
                 
                 $message = strip_tags(trim($_POST['message']));
 
                 $start = $_POST['start'];
                 $end = $_POST['end'];
 
-                $start_date = $year.'-'.$month.'-'.$day.' '.$start;
-                $end_date = $year.'-'.$month.'-'.$day.' '.$end;
-
+                $start_date = $date.' '.$start;
+                $end_date = $date.' '.$end;
+                    
                 if(strtotime($end_date) < strtotime($start_date)){
                     $this->validation = false;
                     $json->error->date = 'Дата окончания не может быть раньше даты начала';
@@ -57,10 +66,8 @@
                     break;                    
                 }
                 
+                
                 if($permanent_status ){
-                    xload('class.admin.tasktable');
-                    $tasktable = new Tasktable($this->m);
-                    
                     //получаем текущий день недели
                     $tempDay = date("N",strtotime($start_date));
                     $tempTimestamp = strtotime($start_date);
@@ -80,6 +87,8 @@
                     }
                 }
             }else{
+                $this->m->data = $tasktable->getData(date("Y-m-d H:i:s"));
+                
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_lessons`.* "
                             . " FROM `tasktable_lessons`"
