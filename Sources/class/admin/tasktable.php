@@ -113,11 +113,117 @@ class Tasktable{
         }
     }
     
+    public function getFilledDates(){
+        $date = strtotime(date('Y-m-d'));        
+        if($_GET['date']){            
+            $date = strtotime($_GET['date']);
+        }
+        
+        $start = date('Y-m-01 00:00:00',$date);
+        
+        $end = date('Y-m-t 23:59:59',$date);
+        $permanents_dates = array();
+        
+        //получаем перманентные записи
+        $this->m->_db->setQuery(
+                    "SELECT DATE_FORMAT(`tasktable_tasks`.`start`,'%Y-%m-%d') as start "
+                    . " , DATE_FORMAT(`tasktable_tasks`.`permanent_update`,'%Y-%m-%d') as permanent_update "
+                    . " , `tasktable_tasks`.`permanent_update` as updated "
+                    . " , UNIX_TIMESTAMP(start) as timestamp"
+                    . " , `tasktable_tasks`.`id`"
+                    . " , `tasktable_tasks`.`start`"
+                    . " , `tasktable_tasks`.`end`"                    
+                    . " FROM `tasktable_tasks` "                    
+                    . " WHERE `tasktable_tasks`.`status` = 1"
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " AND `tasktable_tasks`.`permanent` = 1"
+                    . " AND `tasktable_tasks`.`status` = 1"                    
+                    . " GROUP BY start"
+                );
+        $permanents = $this->m->_db->loadObjectList();
+        
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_permanent_exceptions`.* "
+                    . " , UNIX_TIMESTAMP(date) as timestamp"
+                    . " FROM `tasktable_permanent_exceptions` "
+                    . " WHERE `tasktable_permanent_exceptions`.`date` > '".$start."'"
+                    . " AND `tasktable_permanent_exceptions`.`date` < '".$end."'"
+                    . " AND `tasktable_permanent_exceptions`.`user_id` = ".$this->m->_user->id 
+                );
+        //$permanent_exceptions = $this->m->_db->loadObjectList('timestamp');
+        $permanent_exceptions_tmp = $this->m->_db->loadObjectList();
+        
+        foreach($permanent_exceptions_tmp as $item){
+            $permanent_exceptions[strtotime($item->date)][$item->task_id] = $item;            
+        }
+        
+        $start_month = (int)date("m",strtotime($start));
+        
+        foreach($permanents as $item){
+            $dayOfWeek = date('N',strtotime($item->start));
+            //$startDayOfWeek = strtotime($item->start);
+            $startDayOfWeek = strtotime($item->permanent_update);
+            
+            $temp_date = strtotime($start);
+            
+            while(date('m',$temp_date) == $start_month){    //пока тот же месяц
+                if($temp_date < $startDayOfWeek){   //если дата создание больше чем дата счетчика
+                    $temp_date += 60*60*24;    
+                    continue;
+                }
+                
+                if(date("N",$temp_date) == $dayOfWeek){
+                    if($permanent_exceptions[$temp_date][$item->id]){   //проверяем исключения
+                        $temp_date += 60*60*24;    
+                        continue;
+                    }
+                    
+                    if(date('Y-m-d',$temp_date) == date("Y-m-d")){  //если проверяем сегодняшнюю дату
+                        
+                        if(time() > strtotime($item->updated)){
+                            $temp_date += 60*60*24;    
+                            continue;
+                        }                        
+                    }
+                    
+                    $permanents_dates[] = $temp_date;                    
+                }
+                
+                $temp_date += 60*60*24;
+            }            
+        }
+        
+        $this->m->_db->setQuery(
+                    "SELECT DATE_FORMAT(`tasktable_tasks`.`start`,'%Y-%m-%d') as start "
+                    . " , UNIX_TIMESTAMP(start) as timestamp"
+                    . " FROM `tasktable_tasks` "
+                    . " WHERE `tasktable_tasks`.`status` = 1"
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " AND `tasktable_tasks`.`start` > '".$start."'"
+                    . " AND `tasktable_tasks`.`end` < '".$end."'"
+                    . " AND `tasktable_tasks`.`permanent` = 0"
+                                    
+                    . " GROUP BY start"
+                );
+        $data = $this->m->_db->loadObjectList();
+        
+        $single_dates = array();
+        if($data){
+            foreach($data as $item){
+                $single_dates[] = strtotime($item->start);
+            }
+        }
+        
+        $result = array_merge($permanents_dates,$single_dates);
+        $result = array_unique($result);
+        
+        return $result;
+    }
+    
     public function getData($date){        
         $start = date("Y-m-d 00:00:00",strtotime($date));
         $end = date("Y-m-d 23:59:59",strtotime($date));
         //p(date('N',strtotime($start)));
-        
         
         $this->m->_db->setQuery(
                     "SELECT `tasktable_tasks`.* "
@@ -133,7 +239,7 @@ class Tasktable{
                             ."("
                                 ."`tasktable_tasks`.`start` > '".$start."'"
                                 . " AND `tasktable_tasks`.`end` < '".$end."'"
-                                //. " AND `tasktable_tasks`.`permanent` = 0"
+                                . " AND `tasktable_tasks`.`permanent` = 0"
                             .") OR ( "
                                 ." ( "
                                     . "`tasktable_tasks`.`permanent` = 1 AND DAYOFWEEK(`tasktable_tasks`.`start`)-1 = '".date('N',strtotime($start))."'"    //тот же день недели и перманент
@@ -186,7 +292,7 @@ class Tasktable{
                             . " FROM `tasktable_tasks` "
                             . " WHERE `tasktable_tasks`.`permanent` = 1"
                             . " AND `tasktable_tasks`.`status` = 1"
-                            . " AND `tasktable_tasks`.`user_id` = ".$this->_user->id
+                            //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                         );
                 $data = $this->m->_db->loadObjectList();
 
@@ -254,7 +360,7 @@ class Tasktable{
                                 );
                         $this->m->_db->loadObject($check);
                         if($check) continue;
-
+                        
                         $this->m->_db->insertObject('tasktable_tasks',$row);
                     }
                     //обновляем поле permanent_update

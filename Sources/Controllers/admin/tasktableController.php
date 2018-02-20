@@ -12,13 +12,27 @@
             $this->m->addCSS('clockpicker/clockpicker')->addCSS('clockpicker/standalone');
             /********TEST*********/
             
-            /*xload('class.admin.tasktable');
+            xload('class.admin.tasktable');            
             $tasktable = new Tasktable($this->m);
-            $tasktable->checkPermanents();            */
+            $tasktable->checkPermanents();
         }
         
+        public function clear_permanentAction(){
+            //xload('class.admin.tasktable');
+            $tasktable = new Tasktable($this->m);
+            
+            $this->disableTemplate();
+            $this->disableView();
+            $id = $this->m->_path[2];
+            
+            $date = date("Y-m-d H:i:s",strtotime($_GET['date']));
+            
+            $tasktable->clearPermanent($id,$date);
+        }
+        
+        
         public function getdataAction(){
-            xload('class.admin.tasktable');
+            //xload('class.admin.tasktable');
             $tasktable = new Tasktable($this->m);
             
             $this->disableTemplate();
@@ -32,7 +46,7 @@
         }
         
         public function indexAction(){
-            xload('class.admin.tasktable');
+            //xload('class.admin.tasktable');
             $tasktable = new Tasktable($this->m);
                 
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -91,7 +105,8 @@
                 }
             }else{
                 $this->m->data = $tasktable->getData(date("Y-m-d H:i:s"));
-                
+                $this->filled_data = $tasktable->getFilledDates(date("Y-m-d H:i:s"));
+                                
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_lessons`.* "
                             . " FROM `tasktable_lessons`"

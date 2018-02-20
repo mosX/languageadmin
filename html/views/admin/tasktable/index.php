@@ -25,8 +25,8 @@
                         $scope.current_date = '';
                         $scope.calendar_elements = [];
                         
-                        $scope.reservedDates = <?=$this->m->data ? json_encode($this->m->data) : []?>;
-                        
+                        //$scope.reservedDates = <?=$this->m->data ? json_encode($this->m->data) : []?>;
+                        $scope.reservedDates = <?=$this->filled_data ? json_encode($this->filled_data) : []?>;
                         
                         $scope.month_array = ['January','February','March','April','May','June',"July",'August','September','October','November','December'];
                         $scope.short_tags_array = ['Mon','Tue','Wed','Thu','Fri','Sat',"Sun"];
@@ -34,7 +34,7 @@
                         var d = new Date(<?= time() * 1000 ?>);                        
                         $scope.month = d.getMonth()+1;
                         $scope.year = d.getYear()+1900;
-                        
+                        $scope.day = d.getDate();
                         
                         /*$scope.clear = function(){
                             $('.c_box .c_dates',$scope.parent).empty();
@@ -48,6 +48,8 @@
                         }
                         
                         $scope.loadData = function(event,day){
+                            $scope.day = day;
+                            
                             $http({
                                 url:'/tasktable/getdata/?date='+$scope.year+'-'+$scope.month+'-'+day,
                                 method:'GET'
@@ -62,9 +64,9 @@
                             var d;
                             
                             for(var key in $scope.reservedDates){
-                                d = new Date($scope.reservedDates[key].start_timestamp*1000);
+                                d = new Date($scope.reservedDates[key]*1000);
                                 
-                                if(day == d.getDate() && month == d.getMonth()+1 && year == d.getYear()+1900){
+                                if(day == d.getDate() && month == d.getMonth()+1 && year == d.getYear()+1900){                                    
                                     return 'reserved';    
                                     //return true;
                                 }
@@ -149,6 +151,18 @@
 
                             $scope.addDays();
                         }
+                        
+                        $scope.addException = function(event,id){
+                            //http://tasktable/tasks/clear_permanent/5/?date=2018-02-27
+                            $http({
+                                url:'/tasktable/clear_permanent/'+id+'/?date='+$scope.year+'-'+$scope.month+'-'+$scope.day,
+                                method:'GET'
+                            }).then(function(ret){
+                                console.log(ret.data);
+                            });
+                            
+                            event.preventDefault();
+                        }
 
                         $scope.render();
                     }]);
@@ -208,7 +222,7 @@
                             </div>
                             
                             <div class="days_content">
-                                <div  ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.today}} {{item.holiday}} {{item.reserved}}'>
+                                <div  ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.today}} {{item.holiday}} {{item.reservated}}'>
                                     <div ng-click="loadData($event,item.day)" class="cell">{{item.day}}</div>
                                     <div ng-click="initForm($event,item.day)" class="add_btn"><span class="glyphicon glyphicon-plus-sign"></span></div>
                                 </div>
@@ -217,7 +231,7 @@
                     </div>
                 </div>
                 
-                <div class="table_holder">                    
+                <div class="table_holder">
                     <style>
                         .color_block{
                             width:40px;
@@ -236,34 +250,26 @@
                         </tr>
                         
                         <tr data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
-                            <td>
+                            <td></td>
 
-                            </td>   
                             <td class="username_td">
                                 {{item.message}}
                             </td>
 
-                            <td>
-                                {{item.lessons_name}}
-                            </td>
-
+                            <td>{{item.lessons_name}}</td>
+                                
                             <td>
                                 <div class="color_block" style="background:#{{item.color}}"></div>
                             </td>
 
-                            <td>
-                                {{item.start|date:"HH:mm"}} {{item.end|date:"HH:mm"}}
-                                <div style="height: 40px; width:40px;" href="" class="glyphicon glyphicon-remove-sign"></div>
-                            </td>
-
-                            <td>
+                            <td>{{item.start|date:"HH:mm"}} {{item.end|date:"HH:mm"}}</td>
                                 
+                            <td>
+                                <div ng-if="item.permanent == 1" style="font-size: 20px; cursor:pointer" ng-click="addException($event,item.id)" class="glyphicon glyphicon-remove-sign"></div>
                                 <a ng-click="editModal($event,item.id)" class="edit_tags_ico" href=""></a>
                                 <a ng-click='showBlockModal($event,item.id)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>
-
-                      
                     </table>
                 </div>
         </div>
