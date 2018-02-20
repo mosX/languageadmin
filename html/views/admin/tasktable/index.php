@@ -8,14 +8,15 @@
     <div id="page_wrapper">
         <?=$this->m->module('topmenu' . DS . 'tasktable' . DS . 'main') ?>
 
-        <div class="content">
-            <div class="container">
+        <div class="content" ng-controller="calendarCtrl">
                 <script>
-                    app.controller('calendarCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){
-                            
+                    app.controller('calendarCtrl',['$scope','$rootScope','$http',function($scope,$rootScope,$http){                            
                         $scope.parent = '#calendar';
                         $scope.width = '500px';
                         $scope.height = '500px';
+                        
+                        $scope.table_data = <?=$this->m->data ? json_encode($this->m->data): []?>;
+                        
                         
                         $scope.prev = {};    //данные за предыдущий месяц
                         $scope.current = {};    //данные за текущий месяц
@@ -45,16 +46,25 @@
                             $rootScope.$broadcast('setDate',{day:day,month:$scope.month,year:$scope.year});
                             event.preventDefault();
                         }
+                        
+                        $scope.loadData = function(event,day){
+                            $http({
+                                url:'/tasktable/getdata/?date='+$scope.year+'-'+$scope.month+'-'+day,
+                                method:'GET'
+                            }).then(function(ret){
+                                console.log(ret.data);
+                                $scope.table_data = ret.data;
+                            });
+                            event.preventDefault();
+                        }
     
                         $scope.checkReservatedDays = function(year, month, day){
                             var d;
                             
                             for(var key in $scope.reservedDates){
-                                d = new Date($scope.reservedDates[key].start*1000);
-                                //console.log($scope.reservedDates[key].start);
+                                d = new Date($scope.reservedDates[key].start_timestamp*1000);
                                 
                                 if(day == d.getDate() && month == d.getMonth()+1 && year == d.getYear()+1900){
-                                    
                                     return 'reserved';    
                                     //return true;
                                 }
@@ -67,7 +77,7 @@
                             var d = new Date(year,month,day);
                             var dayOfWeek = d.getDay();
 
-                            if(dayOfWeek == 6 || dayOfWeek == 0){
+                            if(dayOfWeek == 0 || dayOfWeek == 1){
                                 return 'holiday';
                             }
 
@@ -77,9 +87,9 @@
                         $scope.checkToday = function(year,month,day){
                             var date = new Date();
 
-                            var m = date.getMonth();
+                            var m = date.getMonth()+1;
                             var y = date.getYear()+1900;
-                            var d = date.getDate();
+                            var d = date.getDate()+1;
 
                             if(year == y && month == m && day == d){
                                 return 'today';
@@ -161,11 +171,13 @@
                         float:left;
                     }
                     .days_content{
+                        position:relative;
                         display:block;
                         width:100%;
                         height: 100%;
                     }
                     .days_content .c_day{
+                        position: relative;
                         display:table;
                         
                     }
@@ -173,9 +185,19 @@
                         display:table-cell;
                         vertical-align: middle;
                     }
+                    .days_content .add_btn{
+                        display:none;
+                        position:absolute;
+                        right:5px;
+                        top:5px;
+                        color: #3498db;
+                    }
+                    .days_content .c_day:hover .add_btn{
+                        display:block;
+                    }
                 </style>
                 
-                <div id="calendar" ng-controller="calendarCtrl">                    
+                <div id="calendar" >                    
                     <div class="c_box online">
                         <div class='header'>
                             <div class="prev_button"></div><div class="current_date">{{current_date}}</div><div class="next_button"></div>
@@ -186,12 +208,64 @@
                             </div>
                             
                             <div class="days_content">
-                                <div ng-click="initForm($event,item.day)" ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.today}} {{item.holiday}} {{item.reserved}}'><div class="cell">{{item.day}}</div></div>
+                                <div  ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.today}} {{item.holiday}} {{item.reserved}}'>
+                                    <div ng-click="loadData($event,item.day)" class="cell">{{item.day}}</div>
+                                    <div ng-click="initForm($event,item.day)" class="add_btn"><span class="glyphicon glyphicon-plus-sign"></span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                
+                <div class="table_holder">                    
+                    <style>
+                        .color_block{
+                            width:40px;
+                            height:40px;
+                        }
+                    </style>
+                    <table class='table'>
+                        <tr>
+                            <th style="width:37px;"></th>
+                            <th style="width:350px;">Название</th>
+                            <th>Предмет</th>
+                            <th>Цвет</th>                        
+                            <th>Время</th>
+                            
+                            <th style="width:100px"></th>
+                        </tr>
+                        
+                        <tr data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
+                            <td>
+
+                            </td>   
+                            <td class="username_td">
+                                {{item.message}}
+                            </td>
+
+                            <td>
+                                {{item.lessons_name}}
+                            </td>
+
+                            <td>
+                                <div class="color_block" style="background:#{{item.color}}"></div>
+                            </td>
+
+                            <td>
+                                {{item.start|date:"HH:mm"}} {{item.end|date:"HH:mm"}}
+                                <div style="height: 40px; width:40px;" href="" class="glyphicon glyphicon-remove-sign"></div>
+                            </td>
+
+                            <td>
+                                
+                                <a ng-click="editModal($event,item.id)" class="edit_tags_ico" href=""></a>
+                                <a ng-click='showBlockModal($event,item.id)' class="del_user_ico" href=""></a>
+                            </td>
+                        </tr>
+
+                      
+                    </table>
+                </div>
         </div>
     </div>
 </div>

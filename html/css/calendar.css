@@ -49,11 +49,7 @@
             height:94%;
             display:table;
     }
-    .c_row{
-        width:100%;        
-        display:table-row;
-        clear:both;
-    }
+    
     .c_day_name{
         vertical-align: middle;        
         display:table-cell;

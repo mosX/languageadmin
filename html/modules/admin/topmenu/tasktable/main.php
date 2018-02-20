@@ -270,31 +270,59 @@
                                 <ul class="list-inline">
                                     <li>
                                         ПН
-                                        <input type="checkbox" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">-->
+                                         <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         ВТ
-                                        <input type="checkbox" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         СР
-                                        <input type="checkbox" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         ЧТ
-                                        <input type="checkbox" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         ПТ
-                                        <input type="checkbox" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         СБ
-                                        <input type="checkbox" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                     <li>
                                         НД
-                                        <input type="checkbox" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">
+                                        <!--<input type="checkbox" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">-->
+                                        <label class='checkbox'>
+                                            <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">
+                                            <div class='box'></div>
+                                        </label>
                                     </li>
                                 </ul>
 

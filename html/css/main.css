@@ -130,6 +130,8 @@ ul,ol{
 .checkbox{
     margin:0px;
     padding:0px;
+    display:inline-block;
+    vertical-align: middle;
 
 }
 .checkbox input{

@@ -17,6 +17,20 @@
             $tasktable->checkPermanents();            */
         }
         
+        public function getdataAction(){
+            xload('class.admin.tasktable');
+            $tasktable = new Tasktable($this->m);
+            
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $date = date("Y-m-d",strtotime($_GET['date']));
+            
+            $data = $tasktable->getData($date);
+            
+            echo $data ? json_encode($data): '[]';
+        }
+        
         public function indexAction(){
             xload('class.admin.tasktable');
             $tasktable = new Tasktable($this->m);
@@ -27,15 +41,7 @@
                 $_POST = json_decode(file_get_contents('php://input'), true);
                 $this->validation = true;
                 
-                //надо их предавать взависимости от выбранного дня
-                /*$year = $_GET['date'];
-                $month = $_GET['month'];
-                $day = $_GET['day'];*/
-                
-                /*$year = 2018;
-                $month = 2;
-                $day = 15;*/
-                $date = date("Y-m-d",strtotime($_POST['date']));
+                $date = date("Y-m-d",strtotime($_POST['date']));    //надо их предавать взависимости от выбранного дня
                 
                 $message = strip_tags(trim($_POST['message']));
 
@@ -51,10 +57,8 @@
                 }
 
                 if(!$this->validation){
-                    //return false;
                     $json->status = 'error';
-                    echo json_encode($json);
-                    //die('{"status":"error"}');
+                    echo json_encode($json);                    
                     return false;
                 }
                 
@@ -73,7 +77,6 @@
                     $tempTimestamp = strtotime($start_date);
 
                     do{
-                        //p(date('Y-m-d',$tempTimestamp));
                         if($_POST['permanent'][date("N",$tempTimestamp)]){
                             $tasktable->addTaskElement($tempTimestamp, $start, $end);
                         }

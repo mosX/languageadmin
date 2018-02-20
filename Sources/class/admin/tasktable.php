@@ -6,8 +6,114 @@ class Tasktable{
         $this->m =  $mainframe;        
     }
     
-    public function getData($date){
+    public function clearPermanent($id){
+        $id = (int)$id;
+        $date = date('Y-m-d 00:00:00',strtotime($_GET['date']));
         
+        if(!$id){
+            echo '{"status":"error","message":"Не верный айди"}';
+            return false;
+        }
+        
+        //получаем запись для проверки и получения предыдущих дней
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_tasks`.* "
+                    . " FROM `tasktable_tasks` "
+                    . " WHERE `tasktable_tasks`.`id` = ".$id
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " AND `tasktable_tasks`.`permanent` = 1"
+                    . " LIMIT 1"
+                );
+        $this->m->_db->loadObject($data);
+        
+        if(!$data){
+            echo '{"status":"error","message":"Данные не были найдены"}';
+            return false;
+        }
+        
+        $this->setPastPermanentDates($data,$date);
+        //p($dates);
+        
+        $this->m->_db->setQuery(
+                    "UPDATE `tasktable_tasks` "
+                    . " SET `tasktable_tasks`.`status` = 0"
+                    . " WHERE `tasktable_tasks`.`id` = ".$id
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " AND `tasktable_tasks`.`permanent` = 1"
+                    . " LIMIT 1"
+                );
+        if($this->m->_db->query()){
+            echo '{"status":"success"}';
+        }else{
+            echo '{"status":"error"}';
+        }
+    }
+    
+    public function setPastPermanentDates($data,$date){
+        //foreach($data as $item)$ids[] = $item->id;
+        
+        //получаем исключения
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_permanent_exceptions`.* "
+                    . " , UNIX_TIMESTAMP(`tasktable_permanent_exceptions`.`date`) as timestamp"
+                    . " FROM `tasktable_permanent_exceptions`"
+                    . " WHERE `tasktable_permanent_exceptions`.`task_id` = ".$data->id
+                    . " AND `tasktable_permanent_exceptions`.`date` < '".$date."'"
+                );
+        $exseptions_tmp = $this->m->_db->loadObjectList();
+        foreach($exseptions_tmp as $item){
+            $exseptions[strtotime($item->date)][$item->task_id] = $item;
+        }
+        
+        //получаем день недели начала 
+        $dayOfWeek = date("N",strtotime($data->start));
+        //$temp_date = strtotime(date("Y-m-d",strtotime($data->permanent_update)));
+        $temp_date = strtotime(date("Y-m-d 00:00:00",strtotime($data->permanent_update) - 60*60*24)); //отнимаем что бы в вайле первым делом прибавить
+
+        while($temp_date < strtotime($date)){
+            $temp_date += 60*60*24;
+            $upd_timestamp =  strtotime($item->permanent_update);
+            if(date("N",$temp_date) != $dayOfWeek) continue;
+            //if($exseptions[$temp_date]) continue;       //улучшить систему исключений тут
+
+
+            if(date("Y-m-d",$temp_date) == date("Y-m-d",$upd_timestamp)){                       //если тот же день
+                $end_date = date(date("Y",$upd_timestamp).'-'.date("m",$upd_timestamp).'-'.date("d",$upd_timestamp).' H:i:s',strtotime($item->end));                    
+
+                if(date("Y-m-d H:i:s",$upd_timestamp) > $end_date) continue;
+            }
+            
+            if($exseptions[$temp_date][$data->id]) continue;
+            
+                //добавляем в задачи поле
+                $row = new stdClass();
+                $row->user_id = $data->user_id;
+                $row->message = $data->message;
+                $row->lesson = $data->lesson;
+                $row->color = $data->color;
+                $row->permanent = 0;
+                $row->permanent_id = $data->id;
+                $row->start = date("Y-m-d ".date("H",strtotime($data->start)).":".date("i",strtotime($data->start)).":00",$temp_date);
+                $row->end = date("Y-m-d ".date("H",strtotime($data->end)).":".date("i",strtotime($data->end)).":00",$temp_date);
+
+                $row->date = date("Y-m-d H:i:s");
+                $row->status = 1;
+                
+                //проверяем или такая запись уже есть
+                $this->m->_db->setQuery(
+                            "SELECT `tasktable_tasks`.* "
+                            . " FROM `tasktable_tasks` WHERE DATE_FORMAT(`tasktable_tasks`.`start`,'%Y-%m-%d') = '".date("Y-m-d",$temp_date)."'"
+                            . " AND `tasktable_tasks`.`permanent_id` = ".$row->permanent_id
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($check);
+                if($check) continue;
+
+                $this->m->_db->insertObject('tasktable_tasks',$row);            
+        }
+    }
+    
+    public function getData($date){        
         $start = date("Y-m-d 00:00:00",strtotime($date));
         $end = date("Y-m-d 23:59:59",strtotime($date));
         //p(date('N',strtotime($start)));
@@ -50,7 +156,9 @@ class Tasktable{
         $ret = $this->m->_db->loadObjectList();
         
         foreach($ret as $item){
+            $item->start_timestamp = strtotime($item->start);
             $item->start = strtotime($item->start);
+            $item->end = strtotime($item->end);
         }
         
         
