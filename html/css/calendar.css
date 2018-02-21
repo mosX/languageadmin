@@ -61,7 +61,7 @@
         display:table-cell;
         text-align: center;
     }
-    .c_day.today{
+    .c_day.active{
         border-radius: 10px;
         background: rgba(103,183,255,0.5);
     }

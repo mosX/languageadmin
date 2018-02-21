@@ -64,7 +64,7 @@
 
                 $start_date = $date.' '.$start;
                 $end_date = $date.' '.$end;
-                    
+
                 if(strtotime($end_date) < strtotime($start_date)){
                     $this->validation = false;
                     $json->error->date = 'Дата окончания не может быть раньше даты начала';
@@ -105,7 +105,7 @@
                 }
             }else{
                 $this->m->data = $tasktable->getData(date("Y-m-d H:i:s"));
-                $this->filled_data = $tasktable->getFilledDates(date("Y-m-d H:i:s"));
+                //$this->filled_data = $tasktable->getFilledDates(date("Y-m-d H:i:s"));
                                 
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_lessons`.* "
@@ -114,15 +114,31 @@
                         );
                 $this->m->lessons = $this->m->_db->loadObjectList();
                 
-                
                 $this->m->_db->setQuery(
                             "SELECT `tasktable_students`.* "
                             . " FROM `tasktable_students`"
                             . " WHERE `tasktable_students`.`status` = 1"
                         );
                 $this->m->students = $this->m->_db->loadObjectList();
-                
             }
+        }
+        
+        public function edit_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $tasktable = new Tasktable($this->m);
+            
+            echo json_encode($tasktable->getEditData((int)$_GET['id']));
+        }
+        
+        public function filledAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $tasktable = new Tasktable($this->m);
+            
+            $data = $tasktable->getFilledDates(date("Y-m-d",strtotime($_GET['date'])));
+            
+            echo json_encode($data);
         }
  
         public function lessonsAction(){

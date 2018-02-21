@@ -17,47 +17,95 @@
                         
                         $scope.table_data = <?=$this->m->data ? json_encode($this->m->data): []?>;
                         
-                        
                         $scope.prev = {};    //данные за предыдущий месяц
                         $scope.current = {};    //данные за текущий месяц
                         $scope.next = {};    //данные за следующий месяц
                         
                         $scope.current_date = '';
                         $scope.calendar_elements = [];
-                        
-                        //$scope.reservedDates = <?=$this->m->data ? json_encode($this->m->data) : []?>;
-                        $scope.reservedDates = <?=$this->filled_data ? json_encode($this->filled_data) : []?>;
-                        
+                        $scope.reservedDates = []
+                                                
                         $scope.month_array = ['January','February','March','April','May','June',"July",'August','September','October','November','December'];
                         $scope.short_tags_array = ['Mon','Tue','Wed','Thu','Fri','Sat',"Sun"];
                         
-                        var d = new Date(<?= time() * 1000 ?>);                        
-                        $scope.month = d.getMonth()+1;
+                        var d = new Date(<?= time() * 1000 ?>);
+                        $scope.month = d.getMonth();
                         $scope.year = d.getYear()+1900;
                         $scope.day = d.getDate();
                         
-                        /*$scope.clear = function(){
-                            $('.c_box .c_dates',$scope.parent).empty();
-                        },*/
-    
                         $scope.initForm = function(event,day){
-                            console.log('init Form');
-                            
                             $rootScope.$broadcast('setDate',{day:day,month:$scope.month,year:$scope.year});
                             event.preventDefault();
                         }
                         
-                        $scope.loadData = function(event,day){
-                            $scope.day = day;
+                        $scope.loadData = function(event,index){
+                            $scope.day = $scope.calendar_elements[index].day;
                             
+                            for(var key in $scope.calendar_elements){
+                                if(key == index){
+                                    $scope.calendar_elements[key].active = true;
+                                }else{
+                                    $scope.calendar_elements[key].active = false;
+                                }
+                            }
+                            
+                            if($scope.calendar_elements[index].month != $scope.month){
+                                $scope.month = $scope.calendar_elements[index].month;
+                                $scope.year = $scope.calendar_elements[index].year;
+                                $scope.render();
+                            }
+                            
+                            //проверяем какой єто месяц
                             $http({
-                                url:'/tasktable/getdata/?date='+$scope.year+'-'+$scope.month+'-'+day,
+                                url:'/tasktable/getdata/?date='+$scope.year+'-'+($scope.month+1)+'-'+$scope.day,
                                 method:'GET'
                             }).then(function(ret){
                                 console.log(ret.data);
                                 $scope.table_data = ret.data;
                             });
                             event.preventDefault();
+                        }
+                        
+                        $scope.reInit = function(){
+                            $scope.current_date = $scope.month_array[$scope.month]+' '+$scope.year;   
+                        }
+                        
+                        $scope.getFilledDatas = function(){
+                            $http({
+                                url:'/tasktable/filled/?date='+$scope.year+'-'+($scope.month+1)+'-'+$scope.day,
+                                type:'GET'                                
+                            }).then(function(ret){
+                                console.log(ret.data);
+                                //$scope.reservedDates = <?=$this->filled_data ? json_encode($this->filled_data) : []?>;
+                                $scope.reservedDates = ret.data;
+                                
+                                for(var key in $scope.calendar_elements){
+                                    $scope.calendar_elements[key].reservated = $scope.checkReservatedDays($scope.year,$scope.month,$scope.calendar_elements[key].day);
+                                }
+                            });
+                        }
+                        
+                        $scope.nextMonth = function(){
+                            console.log('NEXT MONTH');
+                            //var self = this;
+                            var d = new Date($scope.year,$scope.month+1);
+                            $scope.month = d.getMonth();
+                            $scope.year = d.getYear()+1900;
+
+                            $scope.render();
+                            
+                            //this.getFilledDatas(function(){self.render();});
+                        }
+
+                        $scope.prevMonth = function(){
+                            //var self = this;
+                            var d = new Date($scope.year,$scope.month-1);
+                            $scope.month = d.getMonth();
+                            $scope.year = d.getYear()+1900;
+                            
+                            $scope.render();
+
+                            //this.getFilledDatas(function(){self.render();});
                         }
     
                         $scope.checkReservatedDays = function(year, month, day){
@@ -66,13 +114,12 @@
                             for(var key in $scope.reservedDates){
                                 d = new Date($scope.reservedDates[key]*1000);
                                 
-                                if(day == d.getDate() && month == d.getMonth()+1 && year == d.getYear()+1900){                                    
-                                    return 'reserved';    
-                                    //return true;
+                                if(day == d.getDate() && month == d.getMonth() && year == d.getYear()+1900){
+                                    return true;
                                 }
                             }
 
-                            return;
+                            return false;
                         },
     
                         $scope.checkHoliday = function(year,month,day){
@@ -86,48 +133,61 @@
                             return '';
                         },
                                 
-                        $scope.checkToday = function(year,month,day){
+                        $scope.checkActive = function(year,month,day){
                             var date = new Date();
 
-                            var m = date.getMonth()+1;
+                            var m = date.getMonth();
                             var y = date.getYear()+1900;
-                            var d = date.getDate()+1;
-
+                            var d = date.getDate();
+                            
                             if(year == y && month == m && day == d){
-                                return 'today';
+                                return true;
                             }
-                            return '';
+                            return false;
                         }
     
                         $scope.addDays = function(){
                             var k=0;
                             var grey = false;
+                            $scope.calendar_elements = [];
                             
-
+                            
+                            var date = new Date($scope.year,$scope.month-1);
+                            var prev_month = date.getMonth();
+                            var prev_year = date.getYear()+1900;
+                            date = new Date($scope.year,$scope.month+1);
+                            var next_month = date.getMonth();
+                            var next_year = date.getYear()+1900;
+                            
+                            console.log(prev_month,$scope.month,next_month);
+                            
                             for(var i=0;i<6; i++ ){
                                 if(i==0){   //первая неделя с частью предыдущего месяца
                                     if(this.current.first_day_of_week == 1){    //если первый день это понедельник то первоя строка это все прошлый месяц
                                         for(var j=$scope.prev.total_days-6;j<=$scope.prev.total_days;j++){
-                                            $scope.calendar_elements.push({'act':'prev','day':j});
+                                            $scope.calendar_elements.push({'act':'prev','day':j,month:prev_month,year:prev_year});
                                         }
                                     }else{
                                         var dayOfWeek = $scope.current.first_day_of_week;
 
                                         for(var j=$scope.prev.total_days-dayOfWeek+2;j<=$scope.prev.total_days;j++){                                            
-                                            $scope.calendar_elements.push({'act':'prev','day':j});
+                                            $scope.calendar_elements.push({'act':'prev',day:j,month:prev_month,year:prev_year});
                                         }
                                         
                                         for(var j=dayOfWeek ; j <= 7;j++){
-                                            $scope.calendar_elements.push({'act':'current','day':(++k),'today':$scope.checkToday($scope.year,$scope.month,k+1),'holiday':$scope.checkHoliday($scope.year,$scope.month,k+1),'reservated':$scope.checkReservatedDays($scope.year,$scope.month,k+1)});
+                                            $scope.calendar_elements.push({'act':'current',day:(++k),month:$scope.month,year:$scope.year,'active':$scope.checkActive($scope.year,$scope.month,k),'holiday':$scope.checkHoliday($scope.year,$scope.month,k+1)});
                                         }
                                     }
                                     
                                     continue;
                                 }else{
                                     for(var j=0;j<7;j++){
-                                        $scope.calendar_elements.push({'act':(grey?'next':"current"),'day':(++k),'today':$scope.checkToday($scope.year,$scope.month,k+1),'holiday':$scope.checkHoliday($scope.year,$scope.month,k+1),'reservated':$scope.checkReservatedDays($scope.year,$scope.month,k+1)});
-                                        //console.log(k ,$scope.current.total_days);
-                                        
+                                        if(grey){   //следующий месяц
+                                            $scope.calendar_elements.push({'act':'next',day:(++k),month:next_month,year:next_year,'active':$scope.checkActive($scope.year,$scope.month,k),'holiday':$scope.checkHoliday($scope.year,$scope.month,k+1)});
+                                        }else{  //текущий месяц
+                                            $scope.calendar_elements.push({'act':"current",day:(++k),month:$scope.month,year:$scope.year,'active':$scope.checkActive($scope.year,$scope.month,k),'holiday':$scope.checkHoliday($scope.year,$scope.month,k+1)});
+                                        }
+                                                                                
                                         if(k == $scope.current.total_days){   //определяем следующий месяц                                            
                                             grey = true;
                                             k = 0;
@@ -135,10 +195,12 @@
                                     }
                                 }
                             }
-                            console.log($scope.calendar_elements);
+                            //console.log($scope.calendar_elements);
                         }
 
                         $scope.render = function(){
+                            $scope.getFilledDatas();
+                                                        
                             $('#calendar .c_box').css({'width':'500px','height':'500px'});
                             $scope.current.total_days = new Date($scope.year,$scope.month+1,0).getDate();   //получаем количество дней
 
@@ -165,6 +227,24 @@
                         }
 
                         $scope.render();
+                        
+                        
+                        
+                        $scope.editForm = function(event,id){
+                            console.log(id);
+                            $http({
+                                url:'/tasktable/edit_data/?id='+id,
+                                method:'GET',
+                            }).then(function(ret){
+                                console.log(ret.data);
+                                $scope.$broadcast('editData', {
+                                    data: ret.data
+                                });
+                                $('#editModal').modal('show');
+                            });
+                            event.preventDefault();
+                        }
+
                     }]);
                 </script>
                 <style>
@@ -211,10 +291,10 @@
                     }
                 </style>
                 
-                <div id="calendar" >                    
+                <div id="calendar">
                     <div class="c_box online">
                         <div class='header'>
-                            <div class="prev_button"></div><div class="current_date">{{current_date}}</div><div class="next_button"></div>
+                            <div ng-click="prevMonth()" class="prev_button"></div><div class="current_date">{{current_date}}</div><div ng-click="nextMonth()" class="next_button"></div>
                         </div>
                         <div class='c_dates'>
                             <div class='date_tags'>
@@ -222,8 +302,8 @@
                             </div>
                             
                             <div class="days_content">
-                                <div  ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.today}} {{item.holiday}} {{item.reservated}}'>
-                                    <div ng-click="loadData($event,item.day)" class="cell">{{item.day}}</div>
+                                <div  ng-repeat="item in calendar_elements" class='c_day {{item.act}} {{item.active ? "active":""}} {{item.holiday}} {{item.reservated?"reserved":""}}'>
+                                    <div ng-click="loadData($event,$index)" class="cell">{{item.day}}</div>
                                     <div ng-click="initForm($event,item.day)" class="add_btn"><span class="glyphicon glyphicon-plus-sign"></span></div>
                                 </div>
                             </div>
@@ -252,21 +332,19 @@
                         <tr data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
                             <td></td>
 
-                            <td class="username_td">
-                                {{item.message}}
-                            </td>
-
+                            <td class="username_td">{{item.message}}</td>
+                                
                             <td>{{item.lessons_name}}</td>
                                 
                             <td>
                                 <div class="color_block" style="background:#{{item.color}}"></div>
                             </td>
 
-                            <td>{{item.start|date:"HH:mm"}} {{item.end|date:"HH:mm"}}</td>
+                            <td>{{item.start*1000|date:"HH:mm"}} {{item.end*1000|date:"HH:mm"}}</td>
                                 
                             <td>
                                 <div ng-if="item.permanent == 1" style="font-size: 20px; cursor:pointer" ng-click="addException($event,item.id)" class="glyphicon glyphicon-remove-sign"></div>
-                                <a ng-click="editModal($event,item.id)" class="edit_tags_ico" href=""></a>
+                                <a ng-click="editForm($event,item.id)" class="edit_tags_ico" href=""></a>
                                 <a ng-click='showBlockModal($event,item.id)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>

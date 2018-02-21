@@ -1,6 +1,4 @@
-
-<div id="top_menu">
-    
+<div id="top_menu">    
     <?= $this->module('header') ?>
 
     <div class="page_menu">
@@ -162,7 +160,7 @@
             }
             
             $scope.setEnd = function(){
-                var parent = $('form');
+                var parent = $('#addModal form');
                 var arr = $('input[name=start]', parent).val().split(':');
 
                 var hours = arr[0];
@@ -183,7 +181,7 @@
                 //$('input[name=end]', parent).val(new_hours + ':' + new_minutes);
             }
             
-            $('.clockpicker_start').clockpicker({
+            $('#addModal .clockpicker_start').clockpicker({
                 placement: 'bottom',
                 align: 'left',
                 donetext: 'OK',
@@ -193,7 +191,7 @@
                 }
             });
 
-            $('.clockpicker').clockpicker({
+            $('#addModal .clockpicker').clockpicker({
                 placement: 'bottom',
                 align: 'left',
                 donetext: 'OK',
@@ -270,7 +268,6 @@
                                 <ul class="list-inline">
                                     <li>
                                         ПН
-                                        <!--<input type="checkbox" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">-->
                                          <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[1]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -278,7 +275,6 @@
                                     </li>
                                     <li>
                                         ВТ
-                                        <!--<input type="checkbox" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[2]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -286,7 +282,6 @@
                                     </li>
                                     <li>
                                         СР
-                                        <!--<input type="checkbox" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[3]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -294,7 +289,6 @@
                                     </li>
                                     <li>
                                         ЧТ
-                                        <!--<input type="checkbox" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[4]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -302,7 +296,6 @@
                                     </li>
                                     <li>
                                         ПТ
-                                        <!--<input type="checkbox" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[5]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -310,7 +303,6 @@
                                     </li>
                                     <li>
                                         СБ
-                                        <!--<input type="checkbox" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[6]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -318,7 +310,6 @@
                                     </li>
                                     <li>
                                         НД
-                                        <!--<input type="checkbox" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">-->
                                         <label class='checkbox'>
                                             <input type="checkbox" class="action_panel_triger" ng-model="form.permanent[7]" ng-true-value="'true'" ng-false-value="''">
                                             <div class='box'></div>
@@ -406,6 +397,238 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <input type="submit" class="btn btn-primary" value="Сохранить">
+                            </div>
+                        </div>
+                    </div>      
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+<script>
+    app.controller('editModalCtrl', ['$scope','$rootScope', '$http', function ($scope,$rootScope, $http){
+            $scope.form = {};
+            $scope.student_selects = [true];
+                    
+            $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
+            $scope.students_list = <?=$this->students ?json_encode($this->students):'{}'?>;
+            
+            $scope.$on('editData', function (event, ret){
+                console.log(ret.data); // Данные, которые нам прислали
+
+                $scope.form  = ret.data;
+                if($scope.form.terms){
+                    $scope.terms_list = $scope.form.terms;
+                }           
+            });
+            
+            $scope.addStudentForm = function($event){
+                $scope.student_selects.push(true);
+            }
+                        
+            $scope.submit = function (event){
+                $scope.form.color = $('#color_picker').val();
+                $scope.form.date = $('input[name=date]').val();
+                console.log($scope.form);
+                
+                $http({
+                    method: 'POST',
+                    url: location.href,
+                    data: $scope.form
+                }).then(function (ret) {
+                    console.log(ret.data);
+                    if (ret.data.status == 'success') {
+                        location.href = location.href;
+                    } else {
+                        console.log('ERROR');
+                    }
+                });
+
+                event.preventDefault();
+            }
+            
+            $scope.setEnd = function(){
+                var parent = $('#editModal form');
+                var arr = $('input[name=start]', parent).val().split(':');
+
+                var hours = arr[0];
+                var minutes = arr[1];
+
+                var d = new Date();
+
+                d.setHours(hours);
+                d.setMinutes(minutes);
+
+                var new_d = new Date(d.getTime() + 60 * 90 * 1000);
+
+                var new_hours = new_d.getHours();
+                var new_minutes = new_d.getMinutes();
+
+                $scope.form.end = new_hours + ':' + new_minutes;
+                $scope.$digest();
+                //$('input[name=end]', parent).val(new_hours + ':' + new_minutes);
+            }
+            
+            $('#editModal .clockpicker_start').clockpicker({
+                placement: 'bottom',
+                align: 'left',
+                donetext: 'OK',
+                autoclose: true,
+                afterDone: function(){
+                    $scope.setEnd(false);                    
+                }
+            });
+
+            $('#editModal .clockpicker').clockpicker({
+                placement: 'bottom',
+                align: 'left',
+                donetext: 'OK',
+                autoclose: true
+            });
+        }]);
+</script>
+
+
+<style>
+    #addModal .modal-dialog{
+        width:700px;
+    }
+</style>
+
+<div ng-controller="editModalCtrl" class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title font-header"><p><strong>Добавить в расписание</strong></p></h4>
+            </div>
+
+            <div class="modal-body">
+                <form class="form" action="" method="POST" ng-submit="submit($event)">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Дата</div>
+
+                            <div class="col-sm-8">
+                               <input type="text" name="date" class="datetimepicker form-control" value="" ng-model="date">
+                                
+                                <script>
+                                    $('document').ready(function(){
+                                        $(".datetimepicker").datetimepicker({
+                                            format: "YYYY-MM-DD",
+                                        });
+                                    });
+                                </script>
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Заметка</div>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="message" value="" ng-model="form.message">
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Цвет заметки</div>
+
+                            <div class="col-sm-8">
+                                <input type="text"  class="form-control jscolor {valueElement:'color_picker',value:'ffffff'}" value="">
+                                <input type="hidden" name="color" value="" id="color_picker">
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Предмет</div>
+
+                            <div class="col-sm-8">
+                                <select name="type" class="form-control" ng-model="form.type">
+                                    <option value="0">Без типа</option>
+                                    <option ng-repeat="item in lessons_list" value="{{item.id}}">{{item.name}}</option>
+                                </select>
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+              
+                    <style>
+                        .student_block .element:first-child .remove_student{
+                            display:none;
+                        }
+                        .student_block .form-group .remove_student{
+                            cursor:pointer;
+                            font-size:18px;
+                            margin-top:5px;
+                            color: red;
+                        }
+                    </style>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Студент</div>
+
+                            <div class="col-sm-8">
+                                <div class="student_block">
+                                    <div class="form-group element" ng-repeat="item in student_selects track by $index">
+                                        <div class="row">                                            
+                                            <div class="col-sm-10">
+                                                <select class="form-control" ng-model="form.students[$index]">
+                                                    <option>Пусто</option>
+                                                    <option ng-repeat="item in students_list" value="{{item.id}}">{{item.firstname}} {{item.lastname}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-2 text-center">
+                                                <span class="glyphicon glyphicon-remove remove_student"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="btn btn-primary add_student" ng-click="addStudentForm($event)">Добавить</div>
+
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Начало</div>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control clockpicker_start" name="start" value="" ng-model="form.start">
+                                <div class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">Окончание</div>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control clockpicker" name="end" value="" ng-model="form.end">
+                                <div class="error"><?= $this->m->error->end ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="submit" class="btn btn-primary" value="Редактировать">
                             </div>
                         </div>
                     </div>      

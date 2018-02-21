@@ -6,6 +6,91 @@ class Tasktable{
         $this->m =  $mainframe;        
     }
     
+    public function edit($id){  //TODO
+        $this->validation = true;
+        //получаем заявку
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_tasks`.* "
+                    . " FROM `tasktable_tasks` "
+                    . " WHERE `tasktable_tasks`.`id` = ".$id
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " LIMIT 1"
+                );
+        $this->m->_db->loadObject($task);
+        
+        if(!(int)$_POST['date']){
+            $this->validation = false;
+            $this->error->message = 'Вы должны ввести дату';
+        }
+        
+        $year = date("Y",strtotime($_POST['date']));
+        $month = date("m",strtotime($_POST['date']));
+        $day = date("d",strtotime($_POST['date']));
+        
+        $message = strip_tags(trim($_POST['message']));
+        
+        $start = $_POST['start'];
+        $end = $_POST['end'];
+        
+        $start_date = $year.'-'.$month.'-'.$day.' '.$start;
+        $end_date = $year.'-'.$month.'-'.$day.' '.$end;
+        
+        if(strtotime($end_date) < strtotime($start_date)){
+            $this->validation = false;
+            $this->error->date = 'Дата окончания не может быть раньше даты начала';
+        }
+        
+        if(!$this->validation){
+            return false;
+        }
+        
+        $row->id = $task->id;
+        $row->user_id = $this->m->_user->id;
+        $row->color = $_POST['color'];
+        $row->lesson = $_POST['type'];
+        $row->start = $start_date;
+        $row->end = $end_date;
+        $row->permanent = $_POST['permanent'] ? 1:0;
+        
+        if(strtotime($row->start) > time()){
+            $row->permanent_update = $row->start;
+        }
+        
+        //$row->permanent_update = $row->permanent ? $row->start : 0;
+        $row->message = $message;
+        $row->date = date('Y-m-d H:i:s');
+        
+        if($this->m->_db->updateObject('tasktable_tasks',$row,'id')){
+            xload('class.admin.tasktable_students');
+            $class = new Tasktable_students($this->m);
+            $class->removeStudents($row->id);
+            //получаем выбранных студентов
+            foreach($_POST['students'] as $item){
+                if($item != 0)$students[] = $item;
+            }
+            $students = array_unique($students);
+            foreach($students as $item)$class->addStudent($item,$row->id);
+        }
+    }
+    
+    public function getEditData($id){
+        $id = (int)$id;
+        if(!$id) return false;
+        
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_tasks`.* "
+                    . " FROM `tasktable_tasks` "
+                    . " WHERE `tasktable_tasks`.`id` = ".$id   
+                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    . " LIMIT 1"
+                );
+        $this->m->_db->loadObject($data);
+        
+        if(!$data) return false;
+        
+        return $data;
+    }
+    
     public function clearPermanent($id){
         $id = (int)$id;
         $date = date('Y-m-d 00:00:00',strtotime($_GET['date']));
@@ -137,7 +222,7 @@ class Tasktable{
                     . " WHERE `tasktable_tasks`.`status` = 1"
                     . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " AND `tasktable_tasks`.`permanent` = 1"
-                    . " AND `tasktable_tasks`.`status` = 1"                    
+                    //. " AND `tasktable_tasks`.`id` = 3"
                     . " GROUP BY start"
                 );
         $permanents = $this->m->_db->loadObjectList();
@@ -152,6 +237,7 @@ class Tasktable{
                 );
         //$permanent_exceptions = $this->m->_db->loadObjectList('timestamp');
         $permanent_exceptions_tmp = $this->m->_db->loadObjectList();
+        
         
         foreach($permanent_exceptions_tmp as $item){
             $permanent_exceptions[strtotime($item->date)][$item->task_id] = $item;            
@@ -179,18 +265,19 @@ class Tasktable{
                     }
                     
                     if(date('Y-m-d',$temp_date) == date("Y-m-d")){  //если проверяем сегодняшнюю дату
-                        
                         if(time() > strtotime($item->updated)){
-                            $temp_date += 60*60*24;    
+                            $temp_date += 60*60*24;
                             continue;
-                        }                        
+                        }
                     }
                     
-                    $permanents_dates[] = $temp_date;                    
+                    $permanents_dates[] = $temp_date;
+                    //$permanents_dates[] = date("Y-m-d",$temp_date);                    
                 }
                 
                 $temp_date += 60*60*24;
-            }            
+                //p(date("Y-m-d",$temp_date));
+            }
         }
         
         $this->m->_db->setQuery(
@@ -211,6 +298,7 @@ class Tasktable{
         if($data){
             foreach($data as $item){
                 $single_dates[] = strtotime($item->start);
+                //$single_dates[] = date("Y-m-d H:i:s",strtotime($item->start));
             }
         }
         
