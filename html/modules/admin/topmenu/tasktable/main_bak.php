@@ -471,7 +471,7 @@
                 });*/
                 
                 $scope.form.students = $scope.student_selects;
-                
+
                 $http({
                     method: 'POST',
                     url: '/tasktable/edit/',
@@ -483,7 +483,7 @@
                     } else {
                         console.log('ERROR');
                     }
-                });
+                }); 
 
                 event.preventDefault();
             }
