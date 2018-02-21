@@ -32,6 +32,10 @@
             
             event.preventDefault();
         }
+        
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);
+        }
     }]);
 </script>
 
@@ -92,7 +96,7 @@
                             <td><?=date('d M Y',strtotime($item->date))?></td>
                             <td>
                                 <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
-                                <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
+                                <a ng-click='remove($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>
                     <?php } ?>
@@ -103,65 +107,4 @@
             </nav>
         </div>
     </div>
-<!--
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                
-                    <div class="modal-header">
-                        <h5 class="modal-title">Редактировать Студента</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    
-                    <div class="modal-body">                        
-                        <form action='/' ng-submit='submit($event)'>
-                            <div class="form-group">
-                                <div class='row'>
-                                    <div class='col-sm-12'>
-                                        <label>Имя</label>
-                                    </div>
-                                    <div class='col-sm-12'>
-                                        <input type="text" class="form-control" ng-model="form.firstname">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class='row'>
-                                    <div class='col-sm-12'>
-                                        <label>Фамилия</label>
-                                    </div>
-                                    <div class='col-sm-12'>
-                                        <input type="text" class="form-control" ng-model="form.lastname">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class='row'>
-                                    <div class='col-sm-12'>
-                                        <label>Телефон</label>
-                                    </div>
-                                    <div class='col-sm-12'>
-                                        <input type="text" class="form-control" ng-model="form.phone">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class='row'>
-                                    <div class='col-sm-12'>
-                                        <input type="submit" class="btn btn-secondary" value='Подтвердить'>
-                                        <input name='id' value='{{form.id}}' type='hidden' class='form-control'>   
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>-->
 </div>
