@@ -46,18 +46,18 @@ class Tasktable{
         
         $row->id = $task->id;
         $row->user_id = $this->m->_user->id;
-        $row->color = $_POST['color'];
+        //$row->color = $_POST['color'];
         $row->lesson = $_POST['type'];
         $row->start = $start_date;
         $row->end = $end_date;
-        $row->permanent = $_POST['permanent'] ? 1:0;
+        //$row->permanent = $_POST['permanent'] ? 1:0;
         
         if(strtotime($row->start) > time()){
             $row->permanent_update = $row->start;
         }
         
         //$row->permanent_update = $row->permanent ? $row->start : 0;
-        $row->message = $message;
+        //$row->message = $message;
         $row->date = date('Y-m-d H:i:s');
         
         if($this->m->_db->updateObject('tasktable_tasks',$row,'id')){
@@ -85,6 +85,22 @@ class Tasktable{
                     . " LIMIT 1"
                 );
         $this->m->_db->loadObject($data);
+        
+        $data->date = date("Y-m-d",strtotime($data->date));
+        $data->start = date("H:i",strtotime($data->start));
+        $data->end = date("H:i",strtotime($data->end));
+        
+        //получаем студентов
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_task_students`.* "
+                    . " , `tasktable_students`.`firstname`"
+                    . " , `tasktable_students`.`lastname`"
+                    . " FROM `tasktable_task_students`"
+                    . " LEFT JOIN `tasktable_students` ON `tasktable_task_students`.`student_id` = `tasktable_students`.`id`"
+                    . " WHERE `tasktable_task_students`.`task_id` = ".$data->id
+                );
+        $students = $this->m->_db->loadObjectList();
+        $data->students = $students;
         
         if(!$data) return false;
         
@@ -308,7 +324,7 @@ class Tasktable{
         return $result;
     }
     
-    public function getData($date){        
+    public function getData($date){
         $start = date("Y-m-d 00:00:00",strtotime($date));
         $end = date("Y-m-d 23:59:59",strtotime($date));
         //p(date('N',strtotime($start)));
@@ -355,7 +371,6 @@ class Tasktable{
             $item->end = strtotime($item->end);
         }
         
-        
         if($ret){
             foreach($ret as $key=>$item){
                 if($item->ignore) unset($ret[$key]);
@@ -364,8 +379,23 @@ class Tasktable{
         
         if($ret){
             foreach($ret as $item){
-                $data[] = $item;
+                $ids[] = $item->id;
+                $data[$item->id] = $item;
             }
+        }
+        
+        //добавляем студентов к общему массиву
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_task_students`.* "
+                    . " , `tasktable_students`.`firstname`"
+                    . " , `tasktable_students`.`lastname`"
+                    . " FROM `tasktable_task_students`"
+                    . " LEFT JOIN `tasktable_students` ON `tasktable_students`.`id` = `tasktable_task_students`.`student_id`"
+                    . " WHERE `tasktable_task_students`.`task_id` IN (".implode(',',$ids).")"
+                );
+        $students = $this->m->_db->loadObjectList();        
+        foreach($students as $item){
+            $data[$item->task_id]->students[] = $item;
         }
                         
         return $data;
@@ -481,12 +511,14 @@ class Tasktable{
                 if($item != 0)$students[] = $item;
             }
             $students = array_unique($students);
+            
             foreach($students as $item){
-                $row->user_id = $this->m->_user->id;
-                $row->task_id = $row->id;
-                $row->student_id = $item;
-                $row->date = date("Y-m-d H:i:s");
-                $this->m->_db->insertObject('tasktable_students',$row);
+                //$row->user_id = $this->m->_user->id;
+                $student->task_id = $row->id;
+                $student->student_id = $item;
+                $student->date = date("Y-m-d H:i:s");
+                $this->m->_db->insertObject('tasktable_task_students',$student);
+                
             }
 
             //redirect('/?date='.date("Y-m-d",strtotime($start)));

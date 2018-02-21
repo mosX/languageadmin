@@ -84,8 +84,7 @@
                     break;                    
                 }
                 
-                
-                if($permanent_status ){
+                if($permanent_status){
                     //получаем текущий день недели
                     $tempDay = date("N",strtotime($start_date));
                     $tempTimestamp = strtotime($start_date);

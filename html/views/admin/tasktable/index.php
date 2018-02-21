@@ -1,5 +1,19 @@
 <script>
     app.controller('pageCtrl', ['$scope', '$http', function ($scope, $http) {
+        $scope.editForm = function(event,id){
+            console.log(id);
+            $http({
+                url:'/tasktable/edit_data/?id='+id,
+                method:'GET',
+            }).then(function(ret){
+                console.log(ret.data);
+                $scope.$broadcast('editData', {
+                    data: ret.data
+                });
+                $('#editModal').modal('show');
+            });
+            event.preventDefault();
+        }
 
     }]);
 </script>            
@@ -34,7 +48,7 @@
                         $scope.day = d.getDate();
                         
                         $scope.initForm = function(event,day){
-                            $rootScope.$broadcast('setDate',{day:day,month:$scope.month,year:$scope.year});
+                            $rootScope.$broadcast('setDate',{day:day,month:$scope.month+1,year:$scope.year});
                             event.preventDefault();
                         }
                         
@@ -229,22 +243,7 @@
                         $scope.render();
                         
                         
-                        
-                        $scope.editForm = function(event,id){
-                            console.log(id);
-                            $http({
-                                url:'/tasktable/edit_data/?id='+id,
-                                method:'GET',
-                            }).then(function(ret){
-                                console.log(ret.data);
-                                $scope.$broadcast('editData', {
-                                    data: ret.data
-                                });
-                                $('#editModal').modal('show');
-                            });
-                            event.preventDefault();
-                        }
-
+                       
                     }]);
                 </script>
                 <style>
@@ -321,9 +320,9 @@
                     <table class='table'>
                         <tr>
                             <th style="width:37px;"></th>
-                            <th style="width:350px;">Название</th>
+                            
                             <th>Предмет</th>
-                            <th>Цвет</th>                        
+                            <th>Студенты</th>                        
                             <th>Время</th>
                             
                             <th style="width:100px"></th>
@@ -331,13 +330,11 @@
                         
                         <tr data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
                             <td></td>
-
-                            <td class="username_td">{{item.message}}</td>
                                 
                             <td>{{item.lessons_name}}</td>
                                 
                             <td>
-                                <div class="color_block" style="background:#{{item.color}}"></div>
+                                <div ng-repeat="student in item.students">{{student.lastname}} {{student.firstname}}</div>
                             </td>
 
                             <td>{{item.start*1000|date:"HH:mm"}} {{item.end*1000|date:"HH:mm"}}</td>

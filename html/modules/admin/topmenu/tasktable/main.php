@@ -238,7 +238,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Заметка</div>
 
@@ -259,7 +259,7 @@
                                 <div class="error"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Постояное расписание</div>
@@ -417,14 +417,29 @@
                     
             $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
             $scope.students_list = <?=$this->students ?json_encode($this->students):'{}'?>;
+            $scope.form.students = [];
             
             $scope.$on('editData', function (event, ret){
                 console.log(ret.data); // Данные, которые нам прислали
-
-                $scope.form  = ret.data;
-                if($scope.form.terms){
-                    $scope.terms_list = $scope.form.terms;
-                }           
+                //
+                //$scope.form  = ret.data;
+                $scope.date = ret.data.date;
+                $scope.form.type = ret.data.lesson;
+                $scope.form.start = ret.data.start;
+                $scope.form.end = ret.data.end;
+                
+                if(ret.data.students){
+                    $scope.student_selects = [];
+                    
+                    for(var key in ret.data.students){
+                        $scope.student_selects.push(ret.data.students[key].student_id);
+                        console.log(ret.data.students[key].student_id);
+                        $scope.form.students.push(ret.data.students[key].student_id);
+                    }
+                }
+                
+                console.log($scope.form);
+                
             });
             
             $scope.addStudentForm = function($event){
@@ -529,7 +544,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Заметка</div>
 
@@ -550,7 +565,7 @@
                                 <div class="error"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                   
                     <div class="form-group">
                         <div class="row">
