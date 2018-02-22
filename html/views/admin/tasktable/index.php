@@ -328,7 +328,7 @@
                             <th style="width:100px"></th>
                         </tr>
                         
-                        <tr data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
+                        <tr ng-cloak data-id="{{item.id}}" ng-repeat="item in table_data track by $index">
                             <td></td>
                                 
                             <td>{{item.lessons_name}}</td>

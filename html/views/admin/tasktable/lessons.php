@@ -2,10 +2,14 @@
     app.controller('pageCtrl', ['$scope','$http',function($scope,$http){
         $scope.editModal = function(event,id){
             $http({
-                url:'/system/getdata/?id='+id,
-                method:'GET',
+                url:'/tasktable/lesson_edit_data/?id='+id,
+                method:'POST',
             }).then(function(ret){
-                $scope.form = ret.data;
+                //$scope.form = ret.data;
+                
+                $scope.$broadcast('editData', {
+                    data: ret.data
+                });
                 
                 $('#editModal').modal('show');
             });
@@ -101,44 +105,6 @@
             <nav class='pull-right'>
                 <?= $this->m->pagesNav ?>
             </nav>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form action='/' ng-submit='submit($event)'>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Редактировать пользователя {{form.email}}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    
-                    <div class="modal-body">                        
-                        <div class="form-group">
-                            <div class='row'>
-                                <div class='col-sm-12'>
-                                    <label>Роль</label>
-                                </div>
-                                <div class='col-sm-12'>
-                                    <select ng-model="form.role" class="form-control">
-                                        <option value="30">Оператор</option>
-                                        <option value="20">Супорт</option>
-                                        <option value="10">Админ</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <input name='id' value='{{form.id}}' type='hidden' class='form-control'>   
-                        <input type="submit" class="btn btn-secondary" value='Подтвердить'>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Отменить</button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 </div>

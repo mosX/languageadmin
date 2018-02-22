@@ -140,7 +140,7 @@
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('.answers_block .answer_item').each(function(){
+            $('#editQuestionModal .answers_block .answer_item').each(function(){
                 switch($(this).attr('data-act')){
                     case 'update':
                         $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
@@ -216,16 +216,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            Добавление ответов
+                        <div class="col-sm-6">                            
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
+                                    <div class="col-sm-12">
+                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Добавить Ответ</div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <!--<div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                             
@@ -288,7 +287,7 @@
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('.answers_block .answer_item').each(function(){
+            $('#addQuestionModal .answers_block .answer_item').each(function(){
                 if($('textarea',this).length > 0){
                     $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});                    
                 }else if($('select',this).length > 0){
@@ -296,6 +295,9 @@
                 }
             });
             
+            console.log($scope.form);
+            event.preventDefault();
+            return;
             $http({
                 method:'POST',
                 url:'/lessons/questions/',
@@ -370,15 +372,15 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            Добавление ответов
+                            
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
+                                    <div class="col-sm-12">
+                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Добавить Ответ</div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <!--<div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                             

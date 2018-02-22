@@ -120,14 +120,14 @@
 
 <script>
     app.controller('addModalCtrl', ['$scope','$rootScope', '$http', function ($scope,$rootScope, $http){
-            $scope.form = {};
-            $scope.student_selects = [true];
+            $scope.form = {type:'0'};
+            $scope.form.students = ["0"];
                     
             $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
             $scope.students_list = <?=$this->students ?json_encode($this->students):'{}'?>;
             
             $scope.addStudentForm = function($event){
-                $scope.student_selects.push(true);
+                $scope.form.students.push("0");
             }
             
             $rootScope.$on('setDate',function(event,data){
@@ -142,7 +142,7 @@
                 $scope.form.color = $('#color_picker').val();
                 $scope.form.date = $('input[name=date]').val();
                 console.log($scope.form);
-                
+                                
                 $http({
                     method: 'POST',
                     url: location.href,
@@ -179,6 +179,19 @@
                 $scope.form.end = new_hours + ':' + new_minutes;
                 $scope.$digest();
                 //$('input[name=end]', parent).val(new_hours + ':' + new_minutes);
+            }
+            
+             $scope.removeStudent = function(index){                
+                $scope.form.students[index] = null;
+                var temp = [];
+
+                for(var key in $scope.form.students){
+                    if(!$scope.form.students[key]) continue;
+
+                    temp.push($scope.form.students[key]);
+                }
+
+                $scope.form.students = temp;
             }
             
             $('#addModal .clockpicker_start').clockpicker({
@@ -260,6 +273,7 @@
                             </div>
                         </div>
                     </div>-->
+                    
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-4">Постояное расписание</div>
@@ -335,9 +349,7 @@
                     </div>
               
                     <style>
-                        .student_block .element:first-child .remove_student{
-                            display:none;
-                        }
+                   
                         .student_block .form-group .remove_student{
                             cursor:pointer;
                             font-size:18px;
@@ -351,16 +363,16 @@
 
                             <div class="col-sm-8">
                                 <div class="student_block">
-                                    <div class="form-group element" ng-repeat="item in student_selects track by $index">
+                                    <div class="form-group element" ng-repeat="item in form.students track by $index">
                                         <div class="row">                                            
                                             <div class="col-sm-10">
                                                 <select class="form-control" ng-model="form.students[$index]">
-                                                    <option>Пусто</option>
+                                                    <option value="0">Пусто</option>
                                                     <option ng-repeat="item in students_list" value="{{item.id}}">{{item.firstname}} {{item.lastname}}</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-2 text-center">
-                                                <span class="glyphicon glyphicon-remove remove_student"></span>
+                                                <span ng-click="removeStudent($index)" class="glyphicon glyphicon-remove remove_student"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -404,15 +416,14 @@
                 
             </div>
         </div>
-    </div>
-    
+    </div>    
 </div>
 
 
 
 <script>
     app.controller('editModalCtrl', ['$scope','$rootScope', '$http', function ($scope,$rootScope, $http){
-            $scope.form = {};
+            $scope.form = {type:'0'};
             $scope.student_selects = [true];
                     
             $scope.lessons_list = <?=$this->lessons ?json_encode($this->lessons):'{}'?>;
@@ -420,21 +431,21 @@
             $scope.form.students = [];
             
             $scope.$on('editData', function (event, ret){
-                console.log(ret.data); // Данные, которые нам прислали
-                //
+                console.log('EDIT DATA',ret.data); // Данные, которые нам прислали                
                 //$scope.form  = ret.data;
+                
                 $scope.date = ret.data.date;
+                $scope.form.id = ret.data.id;
                 $scope.form.type = ret.data.lesson;
                 $scope.form.start = ret.data.start;
                 $scope.form.end = ret.data.end;
                 
                 if(ret.data.students){
-                    $scope.student_selects = [];
+                    //$scope.student_selects = [];
+                    $scope.student_selects = ret.data.students;
                     
-                    for(var key in ret.data.students){
-                        $scope.student_selects.push(ret.data.students[key].student_id);
-                        console.log(ret.data.students[key].student_id);
-                        $scope.form.students.push(ret.data.students[key].student_id);
+                    for(var key in $scope.student_selects){
+                        $scope.student_selects[key].act = 'update';
                     }
                 }
                 
@@ -443,17 +454,27 @@
             });
             
             $scope.addStudentForm = function($event){
-                $scope.student_selects.push(true);
+                //$scope.student_selects.push(true);
+                $scope.student_selects.push({act:'insert'});
             }
                         
             $scope.submit = function (event){
-                $scope.form.color = $('#color_picker').val();
-                $scope.form.date = $('input[name=date]').val();
+                //$scope.form.color = $('#color_picker').val();
+                $scope.form.date = $('#editModal input[name=date]').val();
                 console.log($scope.form);
+                
+                //$scope.form.students = [];
+                /*$('#editModal .student_block .element').each(function(){
+                    if(!$('select option:selected',this).val()) return;
+                    
+                    $scope.form.students.push({act:$(this).attr('data-act'),id:$(this).attr('data-id'),student_id:$('select option:selected',this).val()});
+                });*/
+                
+                $scope.form.students = $scope.student_selects;
                 
                 $http({
                     method: 'POST',
-                    url: location.href,
+                    url: '/tasktable/edit/',
                     data: $scope.form
                 }).then(function (ret) {
                     console.log(ret.data);
@@ -487,6 +508,22 @@
                 $scope.form.end = new_hours + ':' + new_minutes;
                 $scope.$digest();
                 //$('input[name=end]', parent).val(new_hours + ':' + new_minutes);
+            }
+            $scope.removeStudent = function(index){
+                if($scope.student_selects[index].id){
+                    $scope.student_selects[index].act = 'delete';
+                }else{
+                    $scope.student_selects[index] = null;                
+                    var temp = [];
+
+                    for(var key in $scope.student_selects){
+                        if(!$scope.student_selects[key]) continue;
+
+                        temp.push($scope.student_selects[key]);
+                    }
+
+                    $scope.student_selects = temp;
+                }
             }
             
             $('#editModal .clockpicker_start').clockpicker({
@@ -582,9 +619,9 @@
                     </div>
               
                     <style>
-                        .student_block .element:first-child .remove_student{
+                        /*.student_block .element:first-child .remove_student{
                             display:none;
-                        }
+                        }*/
                         .student_block .form-group .remove_student{
                             cursor:pointer;
                             font-size:18px;
@@ -598,16 +635,16 @@
 
                             <div class="col-sm-8">
                                 <div class="student_block">
-                                    <div class="form-group element" ng-repeat="item in student_selects track by $index">
+                                    <div class="form-group element" data-act="{{item.act}}" data-id="{{item}}" ng-repeat="item in student_selects track by $index" ng-hide="item.act == 'delete'">
                                         <div class="row">                                            
                                             <div class="col-sm-10">
-                                                <select class="form-control" ng-model="form.students[$index]">
-                                                    <option>Пусто</option>
+                                                <select class="form-control" ng-model="student_selects[$index].student_id">
+                                                    <option value="0">Пусто</option>
                                                     <option ng-repeat="item in students_list" value="{{item.id}}">{{item.firstname}} {{item.lastname}}</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-2 text-center">
-                                                <span class="glyphicon glyphicon-remove remove_student"></span>
+                                                <span ng-click="removeStudent($index)" class="glyphicon glyphicon-remove remove_student"></span>
                                             </div>
                                         </div>
                                     </div>

@@ -140,48 +140,6 @@
             }
         }]);
 </script>
-<script>
-    /*function setEnd() {
-        parent = $('form');
-        var arr = $('input[name=start]', parent).val().split(':');
-
-        var hours = arr[0];
-        var minutes = arr[1];
-
-        var d = new Date();
-
-        d.setHours(hours);
-        d.setMinutes(minutes);
-
-        var new_d = new Date(d.getTime() + 60 * 90 * 1000);
-
-        var new_hours = new_d.getHours();
-        var new_minutes = new_d.getMinutes();
-
-        $('input[name=end]', parent).val(new_hours + ':' + new_minutes);
-    }*/
-
-    /*$('document').ready(function () {
-        $('.clockpicker_start').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true,
-            afterDone: function () {
-                console.log("after done");
-                setEnd(false);
-                //{{setEnd()}}
-            }
-        });
-
-        $('.clockpicker').clockpicker({
-            placement: 'bottom',
-            align: 'left',
-            donetext: 'OK',
-            autoclose: true
-        });
-    });*/
-</script>
 
 <div ng-controller="addModalCtrl" class="modal fade" id="addModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -189,6 +147,72 @@
             <div class="modal-header">
                 <button class="close" data-dismiss="modal">×</button>
                 <h4 class="modal-title font-header"><p><strong>Добавить предмет</strong></p></h4>
+            </div>
+
+            <div class="modal-body">
+                <form class="form" action="" method="POST" ng-submit="submit($event)">
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Название</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="name" value="" ng-model="form.name">
+                                <div class="error name_error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="submit" class="btn btn-primary" value="Сохранить">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    app.controller('editModalCtrl', ['$scope', '$http', function ($scope, $http) {
+            $scope.form = {};
+            
+            $scope.$on('editData', function (event, ret){
+                console.log(ret.data); // Данные, которые нам прислали
+
+                $scope.form  = ret.data;
+            });
+
+            $scope.submit = function (event) {
+                $http({
+                    method: 'POST',
+                    url: location.href,
+                    data: $scope.form
+                }).then(function (ret) {
+                    console.log(ret.data);
+                    if (ret.data.status == 'success') {
+                        location.href = location.href;
+                    } else {
+                        console.log('ERROR');
+                    }
+                });
+
+                event.preventDefault();
+            }
+        }]);
+</script>
+
+<div ng-controller="editModalCtrl" class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title font-header"><p><strong>Редактировать предмет</strong></p></h4>
             </div>
 
             <div class="modal-body">

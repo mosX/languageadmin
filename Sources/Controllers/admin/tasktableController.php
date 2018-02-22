@@ -17,6 +17,46 @@
             $tasktable->checkPermanents();
         }
         
+        public function lesson_edit_dataAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                $_POST = json_decode(file_get_contents('php://input'), true);
+                
+                $id = (int)$_GET['id'];
+                
+                $this->m->_db->setQuery(
+                            "SELECT `tasktable_lessons`.* "
+                            . " FROM `tasktable_lessons`"
+                            . " WHERE `tasktable_lessons`.`id` = ".$id
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($data);
+                
+                echo json_encode($data);
+            }
+        }
+        
+        public function student_edit_dataAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                $_POST = json_decode(file_get_contents('php://input'), true);
+                
+                $id = (int)$_GET['id'];
+                
+                $this->m->_db->setQuery(
+                            "SELECT `tasktable_students`.* "
+                            . " FROM `tasktable_students`"
+                            . " WHERE `tasktable_students`.`id` = ".$id
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($data);
+                
+                echo json_encode($data);
+            }
+        }
+        
         public function clear_permanentAction(){
             //xload('class.admin.tasktable');
             $tasktable = new Tasktable($this->m);
@@ -122,6 +162,25 @@
             }
         }
         
+        public function editAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                
+                $this->disableTemplate();
+                $this->disableView();
+                $_POST = json_decode(file_get_contents('php://input'), true);
+                
+                $tasktable = new Tasktable($this->m);
+                
+                $id = (int)$_POST['id'];
+                
+                if($tasktable->edit($id)){
+                    echo '{"status":"success"}';
+                }else{
+                    echo '{"status":"error"}';
+                }
+            }
+        }
+        
         public function edit_dataAction(){
             $this->disableTemplate();
             $this->disableView();
@@ -150,7 +209,16 @@
                 $row->name = strip_tags(trim($_POST['name']));
                 
                 if($id){    //UPDATE
-                    
+                    $this->m->_db->setQuery(
+                                "UPDATE `tasktable_lessons` SET `tasktable_lessons`.`name` = '".$row->name."'"
+                                . " WHERE `tasktable_lessons`.`id` = ".$id
+                                . " LIMIT 1"
+                            );
+                    if($this->m->_db->query()){
+                        echo '{"status":"success"}';
+                    }else{                        
+                        echo '{"status":"error"}';
+                    }
                 }else{      //ADD
                     $row->date = date("Y-m-d H:i:s");
                     if($this->m->_db->insertObject('tasktable_lessons',$row)){
@@ -181,7 +249,18 @@
                 $row->phone = strip_tags(trim($_POST['phone']));
                 
                 if($id){    //UPDATE
-                    
+                    $this->m->_db->setQuery(
+                                "UPDATE `tasktable_students` SET `tasktable_students`.`firstname` = '".$row->firstname."'"
+                                . " , `tasktable_students`.`lastname` = '".$row->lastname."'"
+                                . " , `tasktable_students`.`phone` = '".$row->phone."'"
+                                . " WHERE `tasktable_students`.`id` = ".$id
+                                . " LIMIT 1"
+                            );
+                    if($this->m->_db->query()){
+                        echo '{"status":"success"}';
+                    }else{
+                        echo '{"status":"error"}';    
+                    }                    
                 }else{      //ADD
                     $row->date = date("Y-m-d H:i:s");
                     if($this->m->_db->insertObject('tasktable_students',$row)){

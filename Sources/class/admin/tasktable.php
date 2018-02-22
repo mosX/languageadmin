@@ -41,6 +41,7 @@ class Tasktable{
         }
         
         if(!$this->validation){
+            
             return false;
         }
         
@@ -61,7 +62,37 @@ class Tasktable{
         $row->date = date('Y-m-d H:i:s');
         
         if($this->m->_db->updateObject('tasktable_tasks',$row,'id')){
-            xload('class.admin.tasktable_students');
+            //добавляем студентов
+            
+            if($_POST['students']){
+                foreach($_POST['students'] as $item){
+                    if($item['act'] == 'insert'){
+                        $student->student_id = (int)$item['student_id'];
+                        $student->task_id = (int)$row->id;
+                        $student->date = date('Y-m-d H:i:s');
+                        
+                        $this->m->_db->insertObject('tasktable_task_students',$student);
+                    }else if($item['act'] == 'update'){
+                        $this->m->_db->setQuery(
+                                    "UPDATE `tasktable_task_students` "
+                                    . " SET `tasktable_task_students`.`student_id` = ".(int)$item['student_id']
+                                    . " WHERE `tasktable_task_students`.`id` = ".(int)$item['id']
+                                    . " LIMIT 1"
+                                );
+                        $this->m->_db->query();
+                    }else if($item['act'] == 'delete'){
+                        $this->m->_db->setQuery(
+                                    "UPDATE `tasktable_task_students` "
+                                    . " SET `tasktable_task_students`.`status` = 0"
+                                    . " WHERE `tasktable_task_students`.`id` = ".(int)$item['id']
+                                    . " LIMIT 1"
+                                );
+                        $this->m->_db->query();
+                    }
+                }
+            }
+            
+            /*xload('class.admin.tasktable_students');
             $class = new Tasktable_students($this->m);
             $class->removeStudents($row->id);
             //получаем выбранных студентов
@@ -69,7 +100,13 @@ class Tasktable{
                 if($item != 0)$students[] = $item;
             }
             $students = array_unique($students);
-            foreach($students as $item)$class->addStudent($item,$row->id);
+            foreach($students as $item)$class->addStudent($item,$row->id);*/
+            
+            //echo '{"status":"success"}';
+            return true;
+        }else{
+            //echo '{"status":"error"}';
+            return false;
         }
     }
     
@@ -86,7 +123,7 @@ class Tasktable{
                 );
         $this->m->_db->loadObject($data);
         
-        $data->date = date("Y-m-d",strtotime($data->date));
+        $data->date = date("Y-m-d",strtotime($data->start));
         $data->start = date("H:i",strtotime($data->start));
         $data->end = date("H:i",strtotime($data->end));
         
@@ -98,6 +135,7 @@ class Tasktable{
                     . " FROM `tasktable_task_students`"
                     . " LEFT JOIN `tasktable_students` ON `tasktable_task_students`.`student_id` = `tasktable_students`.`id`"
                     . " WHERE `tasktable_task_students`.`task_id` = ".$data->id
+                    . " AND `tasktable_task_students`.`status` = 1"
                 );
         $students = $this->m->_db->loadObjectList();
         $data->students = $students;
@@ -392,14 +430,14 @@ class Tasktable{
                     . " FROM `tasktable_task_students`"
                     . " LEFT JOIN `tasktable_students` ON `tasktable_students`.`id` = `tasktable_task_students`.`student_id`"
                     . " WHERE `tasktable_task_students`.`task_id` IN (".implode(',',$ids).")"
+                    . " AND `tasktable_task_students`.`status` = 1"
                 );
-        $students = $this->m->_db->loadObjectList();        
+        $students = $this->m->_db->loadObjectList();
         foreach($students as $item){
             $data[$item->task_id]->students[] = $item;
         }
-                        
+
         return $data;
-    
     }
     
     public function checkPermanents(){
