@@ -6,7 +6,9 @@ class Tasktable{
         $this->m =  $mainframe;        
     }
     
-    public function edit($id){  //TODO
+    
+    
+    public function edit($id){
         $this->validation = true;
         //получаем заявку
         $this->m->_db->setQuery(
@@ -118,7 +120,7 @@ class Tasktable{
                     "SELECT `tasktable_tasks`.* "
                     . " FROM `tasktable_tasks` "
                     . " WHERE `tasktable_tasks`.`id` = ".$id   
-                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " LIMIT 1"
                 );
         $this->m->_db->loadObject($data);
@@ -159,7 +161,7 @@ class Tasktable{
                     "SELECT `tasktable_tasks`.* "
                     . " FROM `tasktable_tasks` "
                     . " WHERE `tasktable_tasks`.`id` = ".$id
-                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " AND `tasktable_tasks`.`permanent` = 1"
                     . " LIMIT 1"
                 );
@@ -177,7 +179,7 @@ class Tasktable{
                     "UPDATE `tasktable_tasks` "
                     . " SET `tasktable_tasks`.`status` = 0"
                     . " WHERE `tasktable_tasks`.`id` = ".$id
-                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " AND `tasktable_tasks`.`permanent` = 1"
                     . " LIMIT 1"
                 );
@@ -274,7 +276,7 @@ class Tasktable{
                     . " , `tasktable_tasks`.`end`"                    
                     . " FROM `tasktable_tasks` "                    
                     . " WHERE `tasktable_tasks`.`status` = 1"
-                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " AND `tasktable_tasks`.`permanent` = 1"
                     //. " AND `tasktable_tasks`.`id` = 3"
                     . " GROUP BY start"
@@ -287,7 +289,7 @@ class Tasktable{
                     . " FROM `tasktable_permanent_exceptions` "
                     . " WHERE `tasktable_permanent_exceptions`.`date` > '".$start."'"
                     . " AND `tasktable_permanent_exceptions`.`date` < '".$end."'"
-                    . " AND `tasktable_permanent_exceptions`.`user_id` = ".$this->m->_user->id 
+                    //. " AND `tasktable_permanent_exceptions`.`user_id` = ".$this->m->_user->id 
                 );
         //$permanent_exceptions = $this->m->_db->loadObjectList('timestamp');
         $permanent_exceptions_tmp = $this->m->_db->loadObjectList();
@@ -339,7 +341,7 @@ class Tasktable{
                     . " , UNIX_TIMESTAMP(start) as timestamp"
                     . " FROM `tasktable_tasks` "
                     . " WHERE `tasktable_tasks`.`status` = 1"
-                    . " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
+                    //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                     . " AND `tasktable_tasks`.`start` > '".$start."'"
                     . " AND `tasktable_tasks`.`end` < '".$end."'"
                     . " AND `tasktable_tasks`.`permanent` = 0"

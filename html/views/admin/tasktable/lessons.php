@@ -31,6 +31,10 @@
             });
             
             event.preventDefault();
+        }        
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);
+            
         }
     }]);
 </script>
@@ -96,7 +100,7 @@
                             <td><?=date('d M Y',strtotime($item->date))?></td>
                             <td>
                                 <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
-                                <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
+                                <a ng-click='remove($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>
                     <?php } ?>

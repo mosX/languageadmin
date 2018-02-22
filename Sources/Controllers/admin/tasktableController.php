@@ -17,6 +17,25 @@
             $tasktable->checkPermanents();
         }
         
+        public function delete_lessonAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $id = (int)$_GET['id'];
+            if(!$id) return false;
+            
+            $this->m->_db->setQuery(
+                        "UPDATE `tasktable_lessons` SET `tasktable_lessons`.`status` = 0"
+                        . " WHERE `tasktable_lessons`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            if($this->m->_db->query()){
+                echo '{"status":"success"}';
+            }else{
+                echo '{"status":"error"}';
+            }
+                    
+        }
+        
         public function lesson_edit_dataAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
