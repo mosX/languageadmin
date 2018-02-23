@@ -17,6 +17,42 @@
             $tasktable->checkPermanents();
         }
         
+        public function delete_studentAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $id = (int)$_GET['id'];
+            if(!$id) return false;
+            
+            $this->m->_db->setQuery(
+                        "UPDATE `tasktable_students` SET `tasktable_students`.`status` = 0"
+                        . " WHERE `tasktable_students`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            if($this->m->_db->query()){
+                echo '{"status":"success"}';
+            }else{
+                echo '{"status":"error"}';
+            }
+        }
+        
+        public function delete_taskAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $id = (int)$_GET['id'];
+            if(!$id) return false;
+            
+            $this->m->_db->setQuery(
+                        "UPDATE `tasktable_tasks` SET `tasktable_tasks`.`status` = 0"
+                        . " WHERE `tasktable_tasks`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            if($this->m->_db->query()){
+                echo '{"status":"success"}';
+            }else{
+                echo '{"status":"error"}';
+            }
+        }
+        
         public function delete_lessonAction(){
             $this->disableTemplate();
             $this->disableView();
@@ -32,8 +68,7 @@
                 echo '{"status":"success"}';
             }else{
                 echo '{"status":"error"}';
-            }
-                    
+            }                    
         }
         
         public function lesson_edit_dataAction(){

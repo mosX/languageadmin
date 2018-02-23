@@ -1,6 +1,8 @@
 <script>
     app.controller('pageCtrl', ['$scope','$http',function($scope,$http){        
-        
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);            
+        }
     }]);
 </script>
 
@@ -38,10 +40,7 @@
                     <?php foreach ($this->m->data as $item){ ?>
                         <tr data-id="<?=$item->id?>">
                             <td>
-                                <!--<label class='checkbox'>
-                                    <input type="checkbox" class="action_panel_triger">
-                                    <div class='box'></div>
-                                </label>-->
+                                
                             </td>
                             <td class="username_td">
                                 <?=$item->name?>
@@ -57,7 +56,7 @@
                             
                             <td>
                                 <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
-                                <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
+                                <a ng-click='remove($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>
                     <?php } ?>

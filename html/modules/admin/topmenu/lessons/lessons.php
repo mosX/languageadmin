@@ -126,7 +126,6 @@
     app.controller('lessonEditModalCtrl', ['$scope','$http',function($scope,$http){
         $scope.form = {};
         $scope.terms_list = [];
-        //$this->m->data->terms
 
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
@@ -139,7 +138,7 @@
         
         $scope.addTerm = function(){
             $scope.terms_list.push({'act':'insert'});
-        }
+        };
         
         $scope.submit = function(event){
             console.log($scope.form);
@@ -149,18 +148,19 @@
                 $scope.form.terms.push({'from':$('input[name=from]',this).val(),'to':$('input[name=to]',this).val(),'text':$('textarea[name=text]',this).val()});
             });
             
+            $scope.form.show_answers = $('#editLessonModal input[name=show_answers]')[0].checked;
+            
             $http({
                 method:'POST',
                 url:'/lessons/',
                 data:$scope.form
             }).then(function(ret){
-               console.log(ret.data);
+                console.log(ret.data);
                 if(ret.data.status == 'success'){
                     location.href = location.href;    
                 }else{
                     $scope.errors = ret.data.message;    
-                }
-                
+                }                
             });
             
             event.preventDefault();
@@ -206,7 +206,7 @@
                                     </div>
                                     <div class="col-sm-8">
                                         <label class='checkbox'>
-                                            <input type="checkbox" class="action_panel_triger" ng-checked="form.show_answers == 1" ng-model="form.show_answers">
+                                            <input type="checkbox" class="action_panel_triger" name='show_answers' ng-checked="form.show_answers == true" ng-model="form.show_answers">
                                             <div class='box'></div>
                                         </label>
                                         <div class="error name_error"></div>
@@ -315,6 +315,58 @@
                     <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    app.controller('deleteModalCtrl', ['$scope', '$http', function ($scope, $http) {
+        $scope.id = '';
+
+        $scope.$on('delete', function (event, id){
+            console.log(id); // Данные, которые нам прислали
+            $scope.id = id;
+            $('#deleteModal').modal('show');
+        });
+        
+        $scope.submit = function(event){
+            
+            $http({
+                url:'/lessons/delete_lesson/?id='+$scope.id,
+                method:'GET'
+            }).then(function(ret){
+                if(ret.data.status == 'success'){
+                    location.href = location.href;
+                }else{
+                    
+                }
+            });
+            event.preventDefault();
+        }
+    }]);
+</script>
+<div class="modal fade" ng-controller="deleteModalCtrl" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удалить Урок</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action='' method='POST' ng-submit="submit($event)">
+                <div class="modal-body">
+                    <p>Вы действительно хотите удалить предмет?</p>
+
+                    <p>Все данные, как-либо связанные с ним, будут удалены. Восстановить удалённые данные будет невозможно.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type='hidden' name='id' value=''>
+                    <input type="submit" class="btn btn-secondary" value='Подтвердить'>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Отменить</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

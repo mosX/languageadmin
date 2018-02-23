@@ -14,6 +14,11 @@
             });
             event.preventDefault();
         }
+        
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);
+            
+        }
 
     }]);
 </script>            
@@ -342,7 +347,7 @@
                             <td>
                                 <div ng-if="item.permanent == 1" style="font-size: 20px; cursor:pointer" ng-click="addException($event,item.id)" class="glyphicon glyphicon-remove-sign"></div>
                                 <a ng-click="editForm($event,item.id)" class="edit_tags_ico" href=""></a>
-                                <a ng-click='showBlockModal($event,item.id)' class="del_user_ico" href=""></a>
+                                <a ng-click='remove($event,item.id)' class="del_user_ico" href=""></a>
                             </td>
                         </tr>
                     </table>
