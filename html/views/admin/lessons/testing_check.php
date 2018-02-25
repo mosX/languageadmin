@@ -67,9 +67,15 @@
             }
         </style>
         <div class="content">
+            
             <?php foreach($this->m->data as $item){ ?>
                 <div class="question_block">
-                    <div class="question"><?=$item->value?></div>
+                    <div class="question">
+                        <?=$item->value?> 
+                        <?php if($item->time){ ?>
+                            <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                        <?php } ?>
+                    </div>
                     <?php foreach($item->answers as $answer){?>
                         <?php if($answer->correct && $answer->selected){ ?>
                             <div class="answer match"><?=$answer->text?></div>

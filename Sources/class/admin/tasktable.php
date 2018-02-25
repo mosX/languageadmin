@@ -6,8 +6,6 @@ class Tasktable{
         $this->m =  $mainframe;        
     }
     
-    
-    
     public function edit($id){
         $this->validation = true;
         //получаем заявку
@@ -435,6 +433,7 @@ class Tasktable{
                     . " AND `tasktable_task_students`.`status` = 1"
                 );
         $students = $this->m->_db->loadObjectList();
+        
         foreach($students as $item){
             $data[$item->task_id]->students[] = $item;
         }
@@ -442,8 +441,7 @@ class Tasktable{
         return $data;
     }
     
-    public function checkPermanents(){
-        
+    public function checkPermanents(){        
         //получаем все активные перманентные
         $this->m->_db->setQuery(
                     "SELECT `tasktable_tasks`.* "
@@ -452,10 +450,23 @@ class Tasktable{
                     . " AND `tasktable_tasks`.`status` = 1"
                     //. " AND `tasktable_tasks`.`user_id` = ".$this->m->_user->id
                 );
-        $data = $this->m->_db->loadObjectList();
+        $data = $this->m->_db->loadObjectList('id');
 
         foreach($data as $item)$ids[] = $item->id;
-
+        
+        //получаем студентов по данные таскам
+        $this->m->_db->setQuery(
+                    "SELECT `tasktable_task_students`.* "
+                    . " FROM `tasktable_task_students`"
+                    . " WHERE `tasktable_task_students`.`task_id` IN (".implode(',',$ids).")"
+                    . " AND `tasktable_task_students`.`status` = 1"
+                );
+        $students = $this->m->_db->loadObjectList();
+        
+        foreach($students as $item){    //добавляем студентов
+            $data[$item->task_id]->students[] = $item;
+        }
+        
         $this->m->_db->setQuery( //получаем исключения
                     "SELECT `tasktable_permanent_exceptions`.* "
                     . " , UNIX_TIMESTAMP(`tasktable_permanent_exceptions`.`date`) as timestamp"
@@ -522,7 +533,17 @@ class Tasktable{
                 
                 if($check) continue;
                 
-                $this->m->_db->insertObject('tasktable_tasks',$row);
+                if($this->m->_db->insertObject('tasktable_tasks',$row,'id')){
+                    //если добавилось то добавляем студентов                    
+                    foreach($item->students as $student_item){
+                        $student = new stdClass();
+                        $student->task_id = $row->id;
+                        $student->student_id = $student_item->student_id;
+                        $student->date = $student->date;
+                        
+                        $this->m->_db->insertObject('tasktable_task_students',$student);
+                    }
+                }
             }
             //обновляем поле permanent_update
             $this->m->_db->setQuery(
@@ -561,7 +582,6 @@ class Tasktable{
                 $student->student_id = $item;
                 $student->date = date("Y-m-d H:i:s");
                 $this->m->_db->insertObject('tasktable_task_students',$student);
-                
             }
 
             //redirect('/?date='.date("Y-m-d",strtotime($start)));

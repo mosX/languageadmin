@@ -107,18 +107,25 @@
             $answers = $this->m->_db->loadObjectList();
             
             foreach($answers as $item){
-                if($item->id == $result->results[$item->question_id]){
-                     $item->selected = 'true';
+                if(is_array($result->results[$item->question_id]['answer'])){
+                    if($item->id == $result->results[$item->question_id]['answer']){
+                        $data[$item->question_id]->time = $result->results[$item->question_id]['time'];
+                        $item->selected = 'true';
+                    }
+                }else{
+                    if($item->id == $result->results[$item->question_id]){
+                         $item->selected = 'true';
+                    }
                 }
                 
                 if($data[$item->question_id]->correct == $item->id){
                     $item->correct = 'true';
                 }
                 
-                
-                $data[$item->question_id]->answers[] = $item;                                
+                $data[$item->question_id]->answers[] = $item;
             }
             $this->m->data = $data;
+            
             //$this->m->testing = $data;
         }
         
