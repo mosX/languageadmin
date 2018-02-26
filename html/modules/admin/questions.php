@@ -61,7 +61,7 @@
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('.answers_block .answer_item').each(function(){
+            $('#addImageQuestionModal .answers_block .answer_item').each(function(){
                 if($('textarea',this).length > 0){
                     $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});                    
                 }else if($('select',this).length > 0){
@@ -202,7 +202,7 @@
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('.answers_block .answer_item').each(function(){
+            $('#addQuestionModal .answers_block .answer_item').each(function(){
                 if($('textarea',this).length > 0){
                     $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});                    
                 }else if($('select',this).length > 0){
@@ -362,7 +362,7 @@
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('.answers_block .answer_item').each(function(){
+            $('#editQuestionModal .answers_block .answer_item').each(function(){
                 switch($(this).attr('data-act')){
                     case 'update':
                         $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
