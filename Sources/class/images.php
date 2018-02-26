@@ -79,11 +79,14 @@ class Images{
     public function initImage($data, $path){
         $this->data = $data;
         
-        $this->validation = true;
-        $this->checkPath($path);  //создаем папку        
+        $this->validation = true;        
+        $this->checkPath($path);  //создаем папку                
         $this->validateFileType($this->data);   //проверяем допустимость типа файла        
+        var_dump($this->validation);
         $this->validateFileSize($this->data);   //проверяем на допустимый размер файла       
+        var_dump($this->validation);
         $this->generateFileName();  //формируем название файла
+        var_dump($this->validation);
         
         /*if($this->validation == true){
             $this->saveThumbs($data, array(array(65,44,'')));  //65 44
@@ -184,6 +187,7 @@ class Images{
     }
     
     protected function checkPath($path){
+        
         if(!@scandir($path)){
             if(!mkdir($path)){
                 $this->validation = false;
@@ -204,7 +208,7 @@ class Images{
         }
     }
     
-    protected function validateFileType($data){
+    protected function validateFileType($data){        
         
         switch($data['file']['type']){
             case 'image/jpeg': $this->format = 'jpg';break;

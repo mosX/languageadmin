@@ -144,10 +144,14 @@
                         </div>
                         
                         <div class="col-sm-6">
+                            Добавление ответов
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
                                     </div>
                                 </div>
                             </div>
@@ -157,9 +161,19 @@
                                     <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
                                         <div class="row">
                                             <div class="col-sm-10">
-                                                <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="/lessons/loadaddimage/"></iframe>
-                                                </div>
+                                                <textarea class="form-control" style="height: 40px;"></textarea>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="answer_item" data-act="select" ng-if="item.act == 'select'">
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <select class="form-control">
+                                                    <option ng-repeat="answer in answers" value="{{answer.id}}">{{answer.text}}</option>
+                                                </select>
                                             </div>
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer">
@@ -167,21 +181,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <script>
-                                    function editImage(filename,id){
-                                        console.log(filename);
-                                        if($('#addChannelModal').css('display') != 'none'){
-                                            $('#addChannelModal input[name=logo]').val(id);
-                                            $('#addChannelModal .preview_logo').attr('src',filename);
-                                        }else if($('#editChannelModal').css('display') != 'none'){
-                                            $('#editChannelModal input[name=logo]').val(id);
-                                            $('#editChannelModal .preview_logo').attr('src',filename);
-                                        }
-                                    }
-                                    function editError(error){
-
-                                    }
-                                </script>
                             </div>
                         </div>
                     </div>
@@ -284,15 +283,16 @@
                             </div>
                         </div>
                         
-                        <div class="col-sm-6">                            
+                        <div class="col-sm-6">
+                            Добавление ответов
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
                                     </div>
-                                    <!--<div class="col-sm-6">
+                                    <div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>-->
+                                    </div>
                                 </div>
                             </div>
                             
@@ -439,14 +439,15 @@
                             </div>
                         </div>
                         <div class="col-sm-6">
+                            Добавление ответов
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
                                     </div>
-                                    <!--<div class="col-sm-6">
+                                    <div class="col-sm-6">
                                         <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>-->
+                                    </div>
                                 </div>
                             </div>
                             

@@ -68,6 +68,37 @@
             }
         }
         
+        public function loadaddimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);                
+                $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+                
+                if($images->validation == true){
+                    $images->saveThumbs(array(100,100,''));
+                }
+                
+                if($images->validation == false){                    
+                    $this->m->status = 'error';
+                    $this->m->error = $images->error;
+                }else{
+                    /*xload('class.admin.channels');
+                    $channels = new Channels($this->m);*/
+
+                    $this->m->filename = $images->filename;
+                    $this->m->status = 'success';
+
+                    //$photos->unlinkOld(Auth::user()->ava,['thumb','small','']); //удалить старые файлы
+                    $this->m->logo_id = $channels->addLogo($this->m->filename);
+                    //p($this->m->logo_id);
+                    $this->m->filename = $channels->filename;
+                    //p($this->m->filename);
+                }
+            }
+        }
+        
         public function testing_checkAction(){
             $this->m->_db->setQuery(
                         "SELECT `testing_results`.* "
