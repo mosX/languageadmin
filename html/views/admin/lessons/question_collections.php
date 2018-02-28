@@ -29,7 +29,11 @@
             event.preventDefault();
         }
         
-        $scope.confirmDeleting = function(event){
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);
+        }
+        
+        /*$scope.confirmDeleting = function(event){
             $http({
                 url:'/channels/delete/?id='+$scope.channel_id,
                 method:'GET',
@@ -43,7 +47,7 @@
             });
             
             event.preventDefault();
-        }
+        }*/
         
         $scope.publish = function(event,id){
             var status = 0;
@@ -110,7 +114,7 @@
                         <tr data-id="<?=$item->id?>" class="<?=$item->user_id ? 'personal':''?>">
                             <td><?=$item->question_id?></td>
                                 
-                            <td class="username_td">
+                            <td class="username_td" style='overflow:hidden;'>
                                 <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
                             </td>
                             <td><?=$item->answer?></td>
@@ -118,7 +122,7 @@
                             
                             <td>
                                 <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
-                                <a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
+                                <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                             <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->status ? 'on':'off'?>"></div></td>
                         </tr>
@@ -130,38 +134,13 @@
             </nav>
         </div>
     </div>
-    
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Удалить Канал</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action='' method='POST' ng-submit="confirmDeleting($event)">
-                    <div class="modal-body">
-                        <p>Вы действительно хотите удалить «<span class="username">{{channel_name}}</span>»?</p>
-
-                        <p>Все данные, как-либо связанные с «{{channel_name}}», будут удалены. Восстановить удалённые данные будет возможно.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <input type='hidden' ng-model="channel_id" name='id' value=''>
-                        <input type="submit" class="btn btn-secondary" value='Подтвердить'>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Отменить</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 <script>
-    $( ".datepicker" ).datepicker({
+    /*$( ".datepicker" ).datepicker({
         dateFormat: 'yy-mm-dd',
         changeMonth: true,
         changeYear: true,
         startDate:'01-01-1996',
         firstDay: 1
-    });
+    });*/
 </script>

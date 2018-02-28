@@ -49,6 +49,65 @@
             }
         }
         
+        public function publishAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                
+                $id = (int)$_GET['id'];
+                if(!$id){
+                    echo '{"status":"error"}';
+                    return false;
+                }
+                
+                //получаем єтот урок что бы узнать текущее значение паблишеда
+                $this->m->_db->setQuery(
+                            "SELECT `lessons`.* "
+                            . " FROM `lessons` "
+                            . " WHERE `lessons`.`id` = ".(int)$id 
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($lesson);
+                
+                if(!$lesson){
+                    echo '{"status":"error"}';
+                    return false;
+                }
+                
+                $published = $lesson->published ? 0: 1;
+                
+                $this->m->_db->setQuery(
+                            "UPDATE `lessons` SET `lessons`.`published` = ".$published
+                            . " WHERE `lessons`.`id` = ".$id
+                            . " LIMIT 1"
+                        );
+                if($this->m->_db->query()){
+                    echo '{"status":"success","result":"'.$published.'"}';
+                }else{
+                    echo '{"status":"error"}';
+                }
+            }
+        }
+        
+        public function delete_question_collectionAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            if(!$id) return false;
+            
+            $this->m->_db->setQuery(
+                        "DELETE FROM `question_collections` "
+                        . " WHERE `question_collections`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            if($this->m->_db->query()){
+                echo '{"status":"success"}';
+            }else{                
+                echo '{"status":"error"}';
+            }
+        }
+        
         public function delete_lessonAction(){
             $this->disableTemplate();
             $this->disableView();
@@ -289,7 +348,7 @@
                             . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                             . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]
                         );
-                $this->m->data = $this->m->_db->loadObjectList();                
+                $this->m->data = $this->m->_db->loadObjectList();
             }
         }
         
@@ -400,7 +459,7 @@
                     
                     $this->m->_db->setQuery(
                                 "UPDATE `questions` "
-                                . " SET `questions`.`value` = '".$row->value."'"
+                                . " SET `questions`.`value` = ".$this->m->_db->Quote($row->value)
                                 . " , `questions`.`score` = '".$row->score."'"
                                 . " WHERE `questions`.`id` = ".(int)$id
                                 . " LIMIT 1"

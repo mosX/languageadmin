@@ -23,6 +23,25 @@
             $scope.$broadcast('delete', id);
         }
         
+        $scope.publish = function(event,id){
+            $http({
+                url:'/lessons/publish/?id='+id,
+                method:'POST',                
+            }).then(function(ret){
+                if(ret.data.status == 'success'){
+                    var parent = $(event.target).closest('td');
+                    
+                    if(ret.data.result == 1){
+                        $('.trigger',parent).removeClass('off').addClass('on');
+                    }else{
+                        $('.trigger',parent).addClass('off').removeClass('on');
+                    }
+                }else{
+                    console.log('ERROR',ret.data);
+                }
+                console.log(ret.data);
+            });
+        }
         /*$scope.deleteChannelConfrimation = function(event,id,name){
             $('#confirmModal').modal('show');
             $scope.channel_id = id;
@@ -112,7 +131,7 @@
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
-                            <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->status ? 'on':'off'?>"></div></td>
+                            <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->published ? 'on':'off'?>"></div></td>
                         </tr>
                     <?php } ?>
                 </table>                

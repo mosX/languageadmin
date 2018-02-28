@@ -129,7 +129,7 @@
 
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
-            
+            $scope.terms_list = [];
             $scope.form  = ret.data;
             if($scope.form.terms){
                 $scope.terms_list = $scope.form.terms;
