@@ -81,12 +81,9 @@ class Images{
         
         $this->validation = true;        
         $this->checkPath($path);  //создаем папку                
-        $this->validateFileType($this->data);   //проверяем допустимость типа файла        
-        var_dump($this->validation);
-        $this->validateFileSize($this->data);   //проверяем на допустимый размер файла       
-        var_dump($this->validation);
+        $this->validateFileType($this->data);   //проверяем допустимость типа файла                
+        $this->validateFileSize($this->data);   //проверяем на допустимый размер файла               
         $this->generateFileName();  //формируем название файла
-        var_dump($this->validation);
         
         /*if($this->validation == true){
             $this->saveThumbs($data, array(array(65,44,'')));  //65 44
@@ -94,7 +91,9 @@ class Images{
     }
     
     public function saveThumbs($thumbs){
+        
         foreach($thumbs as $item){
+            
             $this->thumbnail($this->data['file']['tmp_name'],$this->path . DIRECTORY_SEPARATOR . $item[2].$this->filename,$width = $item[0],$height = $item[1],$quality = 75); //пропорционально
         }
     }
@@ -187,9 +186,8 @@ class Images{
     }
     
     protected function checkPath($path){
-        
         if(!@scandir($path)){
-            if(!mkdir($path)){
+            if(!mkdir($path)){  
                 $this->validation = false;
                 $this->error = 'Данный путь не доступен';
                 return false;
@@ -208,8 +206,7 @@ class Images{
         }
     }
     
-    protected function validateFileType($data){        
-        
+    protected function validateFileType($data){
         switch($data['file']['type']){
             case 'image/jpeg': $this->format = 'jpg';break;
             case 'image/gif': $this->format = 'gif';break;

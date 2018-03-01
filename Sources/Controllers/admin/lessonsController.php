@@ -136,24 +136,21 @@
                 $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
                 
                 if($images->validation == true){
-                    $images->saveThumbs(array(100,100,''));
+                    $images->saveThumbs(array(array(200,200,'')));
                 }
                 
-                if($images->validation == false){                    
+                if($images->validation == false){
                     $this->m->status = 'error';
                     $this->m->error = $images->error;
                 }else{
-                    /*xload('class.admin.channels');
-                    $channels = new Channels($this->m);*/
-
                     $this->m->filename = $images->filename;
                     $this->m->status = 'success';
-
-                    //$photos->unlinkOld(Auth::user()->ava,['thumb','small','']); //удалить старые файлы
-                    $this->m->logo_id = $channels->addLogo($this->m->filename);
-                    //p($this->m->logo_id);
-                    $this->m->filename = $channels->filename;
-                    //p($this->m->filename);
+                    
+                    $image = new stdClass();
+                    $image->filename = $this->m->filename;
+                    $image->date = date("Y-m-d H:i:s");
+                    $this->m->_db->insertObject('images',$image,'id');
+                    $this->m->id = $image->id;
                 }
             }
         }

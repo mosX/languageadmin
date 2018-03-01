@@ -10,9 +10,8 @@ $config = array(
     "sendername" => "BinSecret",
     "smtp_host"  => "localhost",
     
-    
     "assets_path" =>'C:\USR\www\languageadmin\assets',
-    "assets_url" =>'http://newsmarttv.com/assets',
+    "assets_url" =>'http://languageadmin/assets',
 
     "paySystems" => array(
         'MVC-SP' => 'Visa/Mastercard',

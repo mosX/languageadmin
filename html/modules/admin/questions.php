@@ -101,7 +101,7 @@
     }]);
 </script>
 <style>
-    #addQuestionModal .modal-dialog{
+    #addImageQuestionModal .modal-dialog{
         width:900px;
     }
 </style>
@@ -151,14 +151,25 @@
                                     </div>
                                 </div>
                             </div>
-                            
+                            <style>
+                                #addImageQuestionModal .preview{
+                                    width:100px;
+                                    height:100px;
+                                    background: grey;
+                                }
+                            </style>
                             <div class="answers_block">
                                 <div class="form-group" ng-repeat="item in answers_list">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
+                                    <div class="answer_item" data-act="insert" data-index='{{$index}}' ng-if="item.act == 'insert'">
                                         <div class="row">
-                                            <div class="col-sm-10">
+                                            <div class="col-sm-5">
                                                 <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="/lessons/loadaddimage/"></iframe>
+                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/?index='+$index}}"></iframe>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <div class='preview'>
+                                                    <img src=''>
                                                 </div>
                                             </div>
                                             <div class="col-sm-2">
@@ -168,18 +179,12 @@
                                     </div>
                                 </div>
                                 <script>
-                                    function editImage(filename,id){
-                                        console.log(filename);
-                                        if($('#addChannelModal').css('display') != 'none'){
-                                            $('#addChannelModal input[name=logo]').val(id);
-                                            $('#addChannelModal .preview_logo').attr('src',filename);
-                                        }else if($('#editChannelModal').css('display') != 'none'){
-                                            $('#editChannelModal input[name=logo]').val(id);
-                                            $('#editChannelModal .preview_logo').attr('src',filename);
-                                        }
+                                    function editImage(filename,id,index){
+                                        var parent = $('#addImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
+                                        $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
                                     }
                                     function editError(error){
-
+                                        console.log('editError');
                                     }
                                 </script>
                             </div>
