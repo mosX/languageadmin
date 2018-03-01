@@ -194,7 +194,7 @@
             $answers = $this->m->_db->loadObjectList();
             
             foreach($answers as $item){
-                if(is_array($result->results[$item->question_id]['answer'])){
+                if(is_array($result->results[$item->question_id])){
                     if($item->id == $result->results[$item->question_id]['answer']){
                         $data[$item->question_id]->time = $result->results[$item->question_id]['time'];
                         $item->selected = 'true';
