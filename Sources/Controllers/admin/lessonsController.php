@@ -439,6 +439,67 @@
             }
         }
         
+        public function add_image_questionAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                $_POST = json_decode(file_get_contents('php://input'), true); 
+                
+                $id = (int)$_POST['id'];
+                $row->value = strip_tags(trim($_POST['value']));
+                $row->score = (int)$_POST['score'];
+                $row->type = 2;
+                $lesson_id = (int)$_POST['lesson_id'];
+                $answers  = $_POST['answers'];
+                
+                if($id){        //EDIT
+                
+                }else{
+                    if($this->m->_db->insertObject('questions',$row,'id')){
+                        foreach($answers as $item){     //добавляем вопросы
+                            if($item['act'] == 'insert'){   //добавляем новый
+                                $answer = new stdClass();
+                                $answer->image_id = (int)$item['value'];
+                                $answer->date = date("Y-m-d H:i:s");
+                                $this->m->_db->insertObject('answers',$answer,'id');
+                                
+                                $collection = new stdClass();
+                                $collection->answer_id = $answer->id;
+                                $collection->question_id = $row->id;
+                                
+                                $this->m->_db->insertObject('answer_collections',$collection,'id');
+                                
+                                if($item['correct'])$correct = $collection->id;
+                            }
+                        }
+                        
+                        //добавляем правильный ответ если он есть
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$row->id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
+                        
+                        //закрепляем за уроком если есть лессон айди
+                        if($lesson_id){
+                            $lesson = new stdClass();
+                            $lesson->question_id = $row->id;
+                            $lesson->lesson_id = $lesson_id;
+                            $this->m->_db->insertObject('question_collections',$lesson);
+                        }
+                        
+                        echo '{"status":"success"}';
+                    }else{
+                        
+                        echo '{"status":"error"}';
+                    }
+                }
+            }
+        }
+        
         public function questionsAction(){
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();

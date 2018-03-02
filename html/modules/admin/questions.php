@@ -62,16 +62,12 @@
         $scope.submit = function(event){
             $scope.form.answers = [];
             $('#addImageQuestionModal .answers_block .answer_item').each(function(){
-                if($('textarea',this).length > 0){
-                    $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});                    
-                }else if($('select',this).length > 0){
-                    $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
-                }
+                $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('input[name=image_id]',this).val()});                
             });
             
             $http({
                 method:'POST',
-                url:'/lessons/questions/',
+                url:'/lessons/add_image_question/',
                 data:$scope.form
             }).then(function(ret){
                console.log(ret.data);
@@ -165,6 +161,7 @@
                                             <div class="col-sm-5">
                                                 <div class="uploadFileBtn">Загрузить
                                                     <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/?index='+$index}}"></iframe>
+                                                    <input type="hidden" name="image_id" value="0">
                                                 </div>
                                             </div>
                                             <div class="col-sm-5">
@@ -182,6 +179,7 @@
                                     function editImage(filename,id,index){
                                         var parent = $('#addImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
                                         $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                                        $('input[name=image_id]',parent).val(id);
                                     }
                                     function editError(error){
                                         console.log('editError');
