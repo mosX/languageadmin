@@ -51,25 +51,56 @@
                 font-size: 16px;
                 font-weight:bolder;
             }
-            .question_block .answer{
+            .question_block[data-type="1"] .answer{
                 padding-left:20px;
                 height: 30px;
                 border-left:3px solid transparent;
             }
-            .question_block .correct{
+            .question_block[data-type="1"] .correct{
                 border-left:3px solid green;
             }
-            .question_block .selected{
+            .question_block[data-type="1"] .selected{
                 border-left:3px solid red;
             }
-            .question_block .match{
+            .question_block[data-type="1"] .match{
                 border-left:3px solid blue;
             }
         </style>
-        <div class="content">
+        
+        <style>
+            .question_block[data-type="2"]{
+                
+            }
             
+            .question_block[data-type="2"] .answer{
+                border:2px solid transparent;
+            }
+            .question_block[data-type="2"] .correct{
+                border:2px solid green;
+            }
+            .question_block[data-type="2"] .selected{
+                border:2px solid red;
+            }
+            .question_block[data-type="2"] .match{
+                border:2px solid blue;
+            }
+            
+            .question_block[data-type="2"] .answer{
+                width:100px;
+                height: 100px;
+                box-sizing: content-box;
+                display:inline-block;
+                margin-right: 20px;
+            }
+            .question_block[data-type="2"] .answer img{
+                max-width: 100px;
+                max-height: 100px;
+            }
+        </style>
+        
+        <div class="content">
             <?php foreach($this->m->data as $item){ ?>
-                <div class="question_block">
+                <div class="question_block" data-type="<?=$item->type?>">
                     <div class="question">
                         <?=$item->value?> 
                         <?php if($item->time){ ?>
@@ -77,15 +108,29 @@
                         <?php } ?>
                     </div>
                     <?php foreach($item->answers as $answer){?>
-                        <?php if($answer->correct && $answer->selected){ ?>
-                            <div class="answer match"><?=$answer->text?></div>
-                        <?php }else if($answer->correct){ ?>
-                            <div class="answer correct"><?=$answer->text?></div>
-                        <?php }else if($answer->selected){ ?>
-                            <div class="answer selected"><?=$answer->text?></div>
+                        <?php if($item->type == 1){ ?>
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match"><?=$answer->text?></div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><?=$answer->text?></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><?=$answer->text?></div>
+                            <?php }else{ ?>
+                                <div class="answer"><?=$answer->text?></div>
+                            <?php } ?>
                         <?php }else{ ?>
-                            <div class="answer"><?=$answer->text?></div>
-                        <?php } ?>                        
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match">
+                                    <img src="/assets/images/<?=$answer->filename?>">
+                                </div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><img src="/assets/images/<?=$answer->filename?>"></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><img src="/assets/images/<?=$answer->filename?>"></div>
+                            <?php }else{ ?>
+                                <div class="answer"><img src="/assets/images/<?=$answer->filename?>"></div>
+                            <?php } ?>
+                        <?php } ?>
                     <?php } ?>
                 </div>
             <?php } ?>

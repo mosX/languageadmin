@@ -121,13 +121,14 @@
 <div id="header">
     <ul class='menu'>
          <li class='dropdown-toggle <?=in_array($this->_controller, ['collections','genres','radio','logos','cms','channels','banners','pages','epg']) ? 'active':''?>'>
-            <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="">Обучение</a>
+            <a class='' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="">Тестирование    </a>
             <div class="dropdown-menu">
                 <ul>
                     <li><a href="/lessons/results/">Результаты</a></li>
                     <li><a href="/lessons/">Уроки</a></li>
                     <li><a href="/lessons/questions/">Вопросы</a></li>
                     <li><a href="/lessons/answers/">Ответы</a></li>
+                    <li><a href="/lessons/images/">Изображения</a></li>
                     <hr style='display:block; margin:auto;border:1px solid #384648;margin-top:8px;margin-bottom:0px; width:180px;'/>
                 </ul>
             </div>

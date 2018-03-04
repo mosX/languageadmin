@@ -5,6 +5,8 @@
             $this->m->addCSS('jquery-ui.min');
         }
         
+        
+        
         public function indexAction(){
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -47,6 +49,15 @@
                         );
                 $this->m->data = $this->m->_db->loadObjectList();
             }
+        }
+        
+        public function imagesAction(){
+            $this->m->_db->setQuery(
+                        "SELECT `images`.* "
+                        . " FROM `images` "
+                        . " WHERE `images`.`status` = 1"
+                    );
+            $this->m->data = $this->m->_db->loadObjectList();            
         }
         
         public function publishAction(){
@@ -127,6 +138,34 @@
             }
         }
         
+        public function loadeditimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);                
+                $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+                
+                if($images->validation == true){
+                    $images->saveThumbs(array(array(200,200,'')));
+                }
+                
+                if($images->validation == false){
+                    $this->m->status = 'error';
+                    $this->m->error = $images->error;
+                }else{
+                    $this->m->filename = $images->filename;
+                    $this->m->status = 'success';
+                    
+                    $image = new stdClass();
+                    $image->filename = $this->m->filename;
+                    $image->date = date("Y-m-d H:i:s");
+                    $this->m->_db->insertObject('images',$image,'id');
+                    $this->m->id = $image->id;
+                }
+            }
+        }
+        
         public function loadaddimageAction(){
             $this->disableTemplate();
             
@@ -173,6 +212,7 @@
                         "SELECT `question_collections`.* "
                         . " , `questions`.`value`"
                         . " , `questions`.`correct`"
+                        . " , `questions`.`type`"
                         . " FROM `question_collections`"
                         . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
                         . " WHERE `question_collections`.`lesson_id` = ".(int)$result->lesson_id
@@ -187,8 +227,10 @@
             $this->m->_db->setQuery(
                         "SELECT `answer_collections`.* "
                         . " , `answers`.`text`"
+                        . " , `images`.`filename`"
                         . " FROM `answer_collections` "
                         . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
                         . " WHERE `answer_collections`.`question_id` IN (".  implode(',', $ids).")"
                     );
             $answers = $this->m->_db->loadObjectList();
@@ -226,6 +268,37 @@
                         . " ORDER BY `id` DESC"
                     );
             $this->m->data = $this->m->_db->loadObjectList();
+        }
+        
+        public function question_image_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            
+            $this->m->_db->setQuery(
+                        "SELECT `questions`.* "
+                        . " FROM `questions` "
+                        . " WHERE `questions`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
+            
+            //получаем список ответов для селекта
+            $this->m->_db->setQuery(
+                        "SELECT `answer_collections`.* "
+                        . " , `answers`.`text`"
+                        . " , `images`.`id` as image_id"
+                        . " , `images`.`filename`"
+                    
+                        . " FROM `answer_collections` "
+                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
+                        . " WHERE `answer_collections`.`question_id` = ".$id                        
+                    );
+            $data->answers = $this->m->_db->loadObjectList();
+            
+            echo json_encode($data);
         }
         
         public function question_dataAction(){
@@ -338,6 +411,7 @@
                             . " , `questions`.`value`"
                             . " , `questions`.`correct`"
                             . " , `questions`.`score`"
+                            . " , `questions`.`type`"
                             . " , `answers`.`text` as answer"
                             . " FROM `question_collections`"
                             . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
@@ -453,7 +527,42 @@
                 $answers  = $_POST['answers'];
                 
                 if($id){        //EDIT
-                
+                    $this->m->_db->setQuery(
+                                "UPDATE `questions` "
+                                . " SET `questions`.`value` = ".$this->m->_db->Quote($row->value)
+                                . " , `questions`.`score` = '".$row->score."'"
+                                . " WHERE `questions`.`id` = ".(int)$id
+                                . " LIMIT 1"
+                            );
+                    
+                    if($this->m->_db->query()){
+                        foreach($answers as $item){     //добавляем вопросы
+                            
+                            switch($item['act']){
+                                case 'update':
+                                        //нужно получить ансвет айди по колекшн айди
+                                        $this->m->_db->setQuery(
+                                                    "SELECT `answer_collections`.`answer_id` as id"
+                                                    . " FROM `answer_collections`"
+                                                    . " WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $answer_id = $this->m->_db->loadResult();                                                                
+                                        if($answer_id){
+                                            $this->m->_db->setQuery(
+                                                    "UPDATE `answers` SET `answers`.`image_id` = '".$item['value']."'"
+                                                    . " WHERE `answers`.`id` = ".(int)$answer_id
+                                                    . " LIMIT 1"
+                                                );
+                                            $this->m->_db->query();
+                                        }
+                                        if($item['correct'])$correct = $item['id'];                                        
+                                    break;
+                            }
+                            
+                            echo '{"status":"success"}';
+                        }
+                    }
                 }else{
                     if($this->m->_db->insertObject('questions',$row,'id')){
                         foreach($answers as $item){     //добавляем вопросы

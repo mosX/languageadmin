@@ -8,13 +8,13 @@
     <?php if($this->m->status == 'success'){ ?>
         <script type="text/javascript">
             (function(){
-                parent.addImage('<?=$this->m->config->assets_url?>/images/<?=$this->m->filename?>',<?=$this->m->id?>,'<?=$_GET['index']?>');
+                parent.editImage('<?=$this->m->config->assets_url?>/images/<?=$this->m->filename?>',<?=$this->m->id?>,'<?=$_GET['index']?>');
             })();
         </script>
     <?php }else if($status == 'error'){ ?>
         <script type="text/javascript">
             (function(){
-                parent.addError(<?=$this->m->error?>);
+                parent.editError(<?=$this->m->error?>);
             })();
         </script>
     <?php } ?>

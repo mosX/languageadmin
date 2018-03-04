@@ -52,6 +52,196 @@
     </div>
 </div>
 
+<style>
+    #editImageQuestionModal .modal-dialog{
+        width:900px;
+    }
+</style>
+<script>
+    app.controller('imageQuestionEditModalCtrl', ['$scope','$http',function($scope,$http){
+        $scope.form = {};
+        $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
+        $scope.answers_list = [];   //для создания новых елементов
+
+        $scope.$on('editImageData', function (event, ret){
+            console.log(ret.data); // Данные, которые нам прислали
+            
+            $scope.form  = ret.data;
+            $scope.answer_edit = ret.data.answers;
+            console.log($scope.answer_edit);
+        });
+        
+        $scope.createAnswer = function(event){
+            console.log('createAnswer');
+            $scope.answers_list.push({act:'insert'});
+            
+            event.preventDefault();
+        }
+        
+        $scope.selectAnswer = function(event){
+            console.log('selectAnswer');
+            $scope.answers_list.push({act:'select'});
+            
+            event.preventDefault();
+        }
+        
+        $scope.submit = function(event){
+            $scope.form.answers = [];
+            $('#editImageQuestionModal .answers_block .answer_item').each(function(){
+                $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
+                /*switch($(this).attr('data-act')){
+                    case 'update':
+                        $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
+                        break;
+                    case 'insert':
+                        $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
+                        break;
+                    case 'select':
+                        $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
+                        break;
+                }*/
+            });
+            
+            console.log($scope.form);
+            
+            $http({
+                method:'POST',
+                url:'/lessons/add_image_question/',
+                data:$scope.form
+            }).then(function(ret){
+               console.log(ret.data);
+                if(ret.data.status == 'success'){
+                    location.href = location.href;
+                }else{
+                    console.log('ERROR');
+                }
+            });
+            
+            event.preventDefault();
+        }    
+    }]);
+</script>
+<style>
+    #addImageQuestionModal .modal-dialog{
+        width:900px;
+    }
+</style>
+<div ng-controller="imageQuestionEditModalCtrl" class="modal fade" id="editImageQuestionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title font-header"><p><strong>Редактировать Вопрос Картинкой</strong></p></h4>
+            </div>
+
+            <div class="modal-body">
+                <form action="" method="POST" ng-submit="submit($event)">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Вопрос</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" ng-model="form.value" style="height: 80px;"></textarea>
+                                        <div class="error name_error"></div>
+                                    </div>
+                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Балы</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" ng-model="form.score">
+                                        <div class="error name_error"></div>
+                                    </div>
+                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <style>
+                                #editImageQuestionModal .preview{
+                                    width:100px;
+                                    height:100px;
+                                    background: grey;
+                                }
+                            </style>
+                            <div class="answers_block">
+                                <div class="form-group" ng-repeat="item in answer_edit">
+                                    <div class="answer_item" data-act="update" data-index='{{$index}}'>
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="uploadFileBtn">Загрузить
+                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/?index='+$index}}"></iframe>
+                                                    <input type="hidden" name="image_id" value="{{item.image_id}}">
+                                                    <input type="hidden" class="id" name="id" value="{{item.id}}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <div class='preview' style="background:url('/assets/images/{{item.filename}}') no-repeat center center; background-size:cover">
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" ng-repeat="item in answers_list">
+                                    <div class="answer_item" data-act="update" data-index='{{$index}}'>
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div class="uploadFileBtn">Загрузить
+                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/?index='+$index}}"></iframe>
+                                                    <input type="hidden" name="image_id" value="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <div class='preview' style="background:url('/assets/images/{{item.filename}}') no-repeat center center; background-size:cover">
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <script>
+                                    function editImage(filename,id,index){
+                                        var parent = $('#editImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
+                                        $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                                        $('input[name=image_id]',parent).val(id);
+                                    }
+                                    function editError(error){
+                                        console.log('editError');
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
+                    <input type="hidden" name="id" value="" ng-model="form.id">     
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     app.controller('imageQuestionModalCtrl', ['$scope','$http',function($scope,$http){
@@ -176,12 +366,12 @@
                                     </div>
                                 </div>
                                 <script>
-                                    function editImage(filename,id,index){
+                                    function addImage(filename,id,index){
                                         var parent = $('#addImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
                                         $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
                                         $('input[name=image_id]',parent).val(id);
                                     }
-                                    function editError(error){
+                                    function addError(error){
                                         console.log('editError');
                                     }
                                 </script>
