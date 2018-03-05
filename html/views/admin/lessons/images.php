@@ -67,19 +67,19 @@
                     </li>
                 </ul>
                 <style>
-                    .table .personal {        
+                    .table .personal {
                         background : #f8faff;
                         font-weight: bolder;
                     }
                     .table img{
                         max-width:100px;max-height: 100px;
-                        
                     }
                 </style>
                 <table class="table">
                     <tr>
                         <th style="width:60px;">ID</th>
                         <th>Изображение</th>
+                        <th>Ответы</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px;"></th>
                     </tr>
@@ -89,7 +89,7 @@
                             <td><?=$item->id?></td>
                                 
                             <td class="username_td"><img src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>"></td>
-                            
+                            <td><?=$item->answers ? $item->answers : ''?></td>
                             <td>
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>

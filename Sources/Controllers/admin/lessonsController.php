@@ -5,8 +5,6 @@
             $this->m->addCSS('jquery-ui.min');
         }
         
-        
-        
         public function indexAction(){
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -54,12 +52,53 @@
         public function imagesAction(){
             $this->m->_db->setQuery(
                         "SELECT `images`.* "
+                        . " , COUNT(`answers`.`id`) as answers"
                         . " FROM `images` "
+                        . " LEFT JOIN `answers` ON `answers`.`image_id` = `images`.`id`"
                         . " WHERE `images`.`status` = 1"
+                        . " GROUP BY `images`.`id`"
                     );
-            $this->m->data = $this->m->_db->loadObjectList();            
+            $this->m->data = $this->m->_db->loadObjectList();
         }
         
+        public function publish_questionAction(){
+            $this->disableTemplate();
+                $this->disableView();
+                
+                $id = (int)$_GET['id'];
+                if(!$id){
+                    echo '{"status":"error"}';
+                    return false;
+                }
+                
+                //получаем єтот урок что бы узнать текущее значение паблишеда
+                $this->m->_db->setQuery(
+                            "SELECT `question_collections`.* "
+                            . " FROM `question_collections` "
+                            . " WHERE `question_collections`.`id` = ".(int)$id 
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($question);
+                
+                if(!$question){
+                    echo '{"status":"error"}';
+                    return false;
+                }
+                
+                $published = $question->published ? 0: 1;
+                
+                $this->m->_db->setQuery(
+                            "UPDATE `question_collections` SET `question_collections`.`published` = ".$published
+                            . " WHERE `question_collections`.`id` = ".$id
+                            . " LIMIT 1"
+                        );
+                if($this->m->_db->query()){
+                    echo '{"status":"success","result":"'.$published.'"}';
+                }else{
+                    echo '{"status":"error"}';
+                }
+        }
+            
         public function publishAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -144,24 +183,40 @@
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 xload('class.images');
                 $images = new Images($this->m);                
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                        );
+                $this->m->_db->loadObject($image);
+                
                 $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
-                
-                if($images->validation == true){
-                    $images->saveThumbs(array(array(200,200,'')));
-                }
-                
-                if($images->validation == false){
-                    $this->m->status = 'error';
-                    $this->m->error = $images->error;
-                }else{
-                    $this->m->filename = $images->filename;
-                    $this->m->status = 'success';
-                    
-                    $image = new stdClass();
-                    $image->filename = $this->m->filename;
-                    $image->date = date("Y-m-d H:i:s");
-                    $this->m->_db->insertObject('images',$image,'id');
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
                     $this->m->id = $image->id;
+                }else{
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(200,200,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
                 }
             }
         }
@@ -171,25 +226,42 @@
             
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 xload('class.images');
-                $images = new Images($this->m);                
-                $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+                $images = new Images($this->m);
                 
-                if($images->validation == true){
-                    $images->saveThumbs(array(array(200,200,'')));
-                }
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                        );
+                $this->m->_db->loadObject($image);
                 
-                if($images->validation == false){
-                    $this->m->status = 'error';
-                    $this->m->error = $images->error;
-                }else{
-                    $this->m->filename = $images->filename;
-                    $this->m->status = 'success';
-                    
-                    $image = new stdClass();
-                    $image->filename = $this->m->filename;
-                    $image->date = date("Y-m-d H:i:s");
-                    $this->m->_db->insertObject('images',$image,'id');
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
                     $this->m->id = $image->id;
+                }else{
+                    $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(200,200,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
                 }
             }
         }
@@ -413,10 +485,13 @@
                             . " , `questions`.`score`"
                             . " , `questions`.`type`"
                             . " , `answers`.`text` as answer"
+                            . " , `images`.`filename`"
                             . " FROM `question_collections`"
                             . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
                             . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
+                            
                             . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                            . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
                             . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]
                         );
                 $this->m->data = $this->m->_db->loadObjectList();
@@ -558,10 +633,33 @@
                                         }
                                         if($item['correct'])$correct = $item['id'];                                        
                                     break;
+                                case 'insert':
+                                        $answer = new stdClass();
+                                        $answer->image_id = (int)$item['value'];
+                                        $answer->date = date("Y-m-d H:i:s");
+                                        $this->m->_db->insertObject('answers',$answer,'id');
+                                        
+                                        $collection = new stdClass();
+                                        $collection->answer_id = $answer->id;
+                                        $collection->question_id = $id;
+                                        
+                                        $this->m->_db->insertObject('answer_collections',$collection,'id');
+
+                                        if($item['correct'])$correct = $collection->id;
+                                    break;
                             }
-                            
-                            echo '{"status":"success"}';
                         }
+                        
+                        //добавляем правильный ответ если он есть
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
+                        echo '{"status":"success"}';
                     }
                 }else{
                     if($this->m->_db->insertObject('questions',$row,'id')){

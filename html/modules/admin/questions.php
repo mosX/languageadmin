@@ -68,12 +68,17 @@
             
             $scope.form  = ret.data;
             $scope.answer_edit = ret.data.answers;
+            for(var key in $scope.answer_edit){
+                $scope.answer_edit[key].act = 'update';
+            }
             console.log($scope.answer_edit);
         });
         
         $scope.createAnswer = function(event){
             console.log('createAnswer');
-            $scope.answers_list.push({act:'insert'});
+            //$scope.answers_list.push({act:'insert'});
+            
+            $scope.answer_edit.push({'act':'insert','images_id':'0','id':'0'});
             
             event.preventDefault();
         }
@@ -88,18 +93,8 @@
         $scope.submit = function(event){
             $scope.form.answers = [];
             $('#editImageQuestionModal .answers_block .answer_item').each(function(){
-                $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
-                /*switch($(this).attr('data-act')){
-                    case 'update':
-                        $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
-                        break;
-                    case 'insert':
-                        $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
-                        break;
-                    case 'select':
-                        $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
-                        break;
-                }*/
+                var act = $(this).attr('data-act');
+                $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
             });
             
             console.log($scope.form);
@@ -181,16 +176,16 @@
                             </style>
                             <div class="answers_block">
                                 <div class="form-group" ng-repeat="item in answer_edit">
-                                    <div class="answer_item" data-act="update" data-index='{{$index}}'>
+                                    <div class="answer_item" data-act="{{item.act}}" data-index='{{$index}}'>
                                         <div class="row">
-                                            <div class="col-sm-5">
+                                            <div class="col-sm-4">
                                                 <div class="uploadFileBtn">Загрузить
                                                     <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/?index='+$index}}"></iframe>
                                                     <input type="hidden" name="image_id" value="{{item.image_id}}">
                                                     <input type="hidden" class="id" name="id" value="{{item.id}}">
                                                 </div>
                                             </div>
-                                            <div class="col-sm-5">
+                                            <div class="col-sm-4">
                                                 <div class='preview' style="background:url('/assets/images/{{item.filename}}') no-repeat center center; background-size:cover">
                                                     
                                                 </div>
@@ -198,11 +193,14 @@
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer" ng-checked="form.correct == item.id">
                                             </div>
+                                            <div class="col-sm-2">
+                                                <div class="glyphicon glyphicon-remove"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="form-group" ng-repeat="item in answers_list">
+                                <!--<div class="form-group" ng-repeat="item in answers_list">
                                     <div class="answer_item" data-act="update" data-index='{{$index}}'>
                                         <div class="row">
                                             <div class="col-sm-5">
@@ -221,7 +219,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>-->
                                 <script>
                                     function editImage(filename,id,index){
                                         var parent = $('#editImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        

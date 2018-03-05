@@ -70,7 +70,7 @@
             if($(event.target).hasClass('off')) status = 1;
             
             $http({
-                url:'/channels/publish/?id='+id+'&status='+status,
+                url:'/lessons/publish_question/?id='+id,
                 type:'GET',
             }).then(function(ret){
                 if(ret.data.status == 'success'){
@@ -133,7 +133,12 @@
                             <td class="username_td" style='overflow:hidden;'>
                                 <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
                             </td>
-                            <td><?=$item->answer?></td>
+                            
+                            <?php if($item->type == 1){ ?>
+                                <td><?=$item->answer?></td>
+                            <?php }else if($item->type == 2){ ?>
+                                <td><img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>"></td>
+                            <?php } ?>
                             <td><?=$item->score?></td>
                             
                             <td>
@@ -144,7 +149,7 @@
                                 <?php } ?>
                                 <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
-                            <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->status ? 'on':'off'?>"></div></td>
+                            <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->published ? 'on':'off'?>"></div></td>
                         </tr>
                     <?php } ?>
                 </table>                
