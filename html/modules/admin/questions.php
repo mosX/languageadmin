@@ -58,10 +58,16 @@
     }
 </style>
 <script>
-    app.controller('imageQuestionEditModalCtrl', ['$scope','$http',function($scope,$http){
+    app.controller('imageQuestionEditModalCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
         $scope.form = {};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
         $scope.answers_list = [];   //для создания новых елементов
+        
+        $scope.selectedItem = {};   //активный объект в случае если мы выбираем картинки из существующих
+        
+        $rootScope.$on('selectImage',function(event,ret){
+            console.log("IMAGE ",ret);
+        });
 
         $scope.$on('editImageData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
@@ -90,6 +96,13 @@
             event.preventDefault();
         }
         
+        $scope.selectImage = function(event,item){
+            $scope.selectedItem = item;
+            
+            console.log('!!!!!!!!',item);
+            $rootScope.$emit('showSelectImagePanel',item);
+        }
+        
         $scope.submit = function(event){
             $scope.form.answers = [];
             $('#editImageQuestionModal .answers_block .answer_item').each(function(){
@@ -116,11 +129,7 @@
         }    
     }]);
 </script>
-<style>
-    #addImageQuestionModal .modal-dialog{
-        width:900px;
-    }
-</style>
+
 <div ng-controller="imageQuestionEditModalCtrl" class="modal fade" id="editImageQuestionModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -173,6 +182,9 @@
                                     height:100px;
                                     background: grey;
                                 }
+                                #editImageQuestionModal .answer_item[data-act="delete"]{
+                                    display:none;
+                                }
                             </style>
                             <div class="answers_block">
                                 <div class="form-group" ng-repeat="item in answer_edit">
@@ -181,12 +193,15 @@
                                             <div class="col-sm-4">
                                                 <div class="uploadFileBtn">Загрузить
                                                     <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/?index='+$index}}"></iframe>
-                                                    <input type="hidden" name="image_id" value="{{item.image_id}}">
-                                                    <input type="hidden" class="id" name="id" value="{{item.id}}">
                                                 </div>
+                                                
+                                                <div ng-click="selectImage($event,item)" class="btn btn-primary">Выбрать</div>
+                                                <input type="hidden" name="image_id" value="{{item.image_id}}">
+                                                <input type="hidden" class="id" name="id" value="{{item.id}}">                                                
                                             </div>
                                             <div class="col-sm-4">
-                                                <div class='preview' style="background:url('/assets/images/{{item.filename}}') no-repeat center center; background-size:cover">
+                                                
+                                                <div class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover">
                                                     
                                                 </div>
                                             </div>
@@ -194,32 +209,12 @@
                                                 <input type="radio" name="answer" ng-checked="form.correct == item.id">
                                             </div>
                                             <div class="col-sm-2">
-                                                <div class="glyphicon glyphicon-remove"></div>
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <!--<div class="form-group" ng-repeat="item in answers_list">
-                                    <div class="answer_item" data-act="update" data-index='{{$index}}'>
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/?index='+$index}}"></iframe>
-                                                    <input type="hidden" name="image_id" value="0">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-5">
-                                                <div class='preview' style="background:url('/assets/images/{{item.filename}}') no-repeat center center; background-size:cover">
-                                                    
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>-->
+
                                 <script>
                                     function editImage(filename,id,index){
                                         var parent = $('#editImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
@@ -239,6 +234,98 @@
             </div>
         </div>
     </div>
+</div>
+
+<style>
+    #select_image_overflow{
+        display:none;
+        cursor:pointer;
+        z-index:1051;
+        position:fixed;
+        background: transparent;
+        top:0px;
+        left:0px;
+        right:0px;
+        bottom:0px;
+    }
+    #select_image_panel{
+        position:fixed;
+        z-index:1052;
+        width:500px;
+        top:0px;
+        bottom:0px;
+        right:-500px;
+        background: white;
+        border-left: 2px solid black;
+        overflow:auto;
+        padding:0px 25px
+    }
+    #select_image_panel .item{
+        margin:auto;
+        margin-bottom:20px;
+        cursor:pointer;
+    }
+    #select_image_panel img{
+        max-width: 100%;
+    }
+</style>
+<script>
+    app.controller('selectImagePanelCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
+        $scope.activeObject = {};
+        
+        $scope.showPanel = function(){
+            if($scope.images == undefined){
+                $http({
+                    url:'/lessons/get_images_list/',
+                    type:'GET'
+                }).then(function(ret){
+                    console.log(ret.data);
+                    $scope.images = ret.data;
+                });
+            }
+            
+            $('#select_image_panel').animate({'right':'0px'},600,function(){
+               $('#select_image_overflow').css({'display':'block'});
+            });            
+        };        
+        //$scope.showPanel();
+        
+        $rootScope.$on('showSelectImagePanel',function(event,ret){
+            console.log("showSelectImagePanel",ret);
+            $scope.activeObject = ret;
+            
+            $scope.showPanel();
+        });
+        
+        $scope.hidePanel = function(event){
+            $('#select_image_panel').animate({'right':'-500px'},600,function(){
+               $('#select_image_overflow').css({'display':'none'});
+            });
+            if(event) event.preventDefault();
+        }
+        
+        $scope.selectImage = function(item){
+            $rootScope.$emit('selectImage',item);
+            $scope.activeObject.filename = item.filename;
+            $scope.activeObject.image_id = item.id;
+            $scope.hidePanel();
+        }
+    }]);
+</script>
+<div  ng-controller="selectImagePanelCtrl">
+    
+    <div id="select_image_panel" >
+        <div class="select_container">
+            <div class="row">
+                <div class="col-sm-4" ng-repeat="item in images">
+                    <div class="item" ng-click="selectImage(item)">
+                        <img src="{{'<?=$this->config->assets_url?>/images/'+item.filename}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="select_image_overflow" ng-click="hidePanel($event)"></div>
 </div>
 
 <script>

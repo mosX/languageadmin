@@ -588,6 +588,17 @@
             }
         }
         
+        public function get_images_listAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            $this->m->_db->setQuery(
+                        "SELECT `images`.* "
+                        . " FROM `images` WHERE `images`.`status` = 1"                       
+                    );
+            $data = $this->m->_db->loadObjectList();
+            echo json_encode($data);
+        }
+        
         public function add_image_questionAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -647,6 +658,16 @@
 
                                         if($item['correct'])$correct = $collection->id;
                                     break;
+                                case 'delete':
+                                        $this->m->_db->setQuery(
+                                                    "DELETE FROM `answer_collections` WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $this->m->_db->query();
+                                        
+                                        if($item['correct'])$correct = '';
+                                    break;    
+                                    
                             }
                         }
                         

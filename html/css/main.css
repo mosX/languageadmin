@@ -22,7 +22,13 @@ body{
  font-style:normal
 }
 
-
+.delete_element{
+    display:inline-block;
+    vertical-align: middle;
+    color: red;
+    font-size: 20px;
+    cursor:pointer;
+}
 
 .scroller{
     opacity:0;
