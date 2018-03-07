@@ -3,6 +3,25 @@
         $scope.remove = function(event,id){
             $scope.$broadcast('delete', id);            
         }
+        
+        $scope.publish = function(event,id){
+            $http({
+                url:'/feedback/publish/?id='+id,
+                method:'GET'
+            }).then(function(ret){
+                if(ret.data.status == 'success'){
+                    var parent = $(event.target).closest('td');
+                    
+                    if(ret.data.result == 1){
+                        $('.trigger',parent).removeClass('off').addClass('on');
+                    }else{
+                        $('.trigger',parent).addClass('off').removeClass('on');
+                    }
+                }else{
+                    console.log('Error');
+                }
+            });
+        }
     }]);
 </script>
 
@@ -35,6 +54,7 @@
                         <th>Телефон</th>
                         <th>Created At</th>
                         <th style="width:100px"></th>
+                        <th style="width:60px"></th>
                     </tr>
 
                     <?php foreach ($this->m->data as $item){ ?>
@@ -58,7 +78,9 @@
                                 <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click='remove($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
                             </td>
+                            <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->unread ? 'on':'off'?>"></div></td>
                         </tr>
+                        
                     <?php } ?>
                 </table>
             </div>

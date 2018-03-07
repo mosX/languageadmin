@@ -191,8 +191,44 @@
             
         }
     </style>
+    
+    <style>
+        .mail_ico{
+            background: url('/html/images/mail_ico.png') no-repeat center center;
+            background-size: cover;
+            width:40px;
+            height: 40px;
+            margin-top:10px;
+            position:relative;
+            display:block;
+            cursor: pointer;
+        }
+        .mail_ico .unreads{
+            font-weight:bolder;
+            position:absolute;
+            background: white;
+            
+            border-radius: 50%;
+            width:25px;            
+            height: 25px;
+            text-align: center;
+            padding-top:2px;
+            color:#a91b22;
+            left:-7px;
+            top:-7px;
+        }
+    </style>
+    
     <div class='right_panel'>
         <ul>
+            <li class='divider'></li>
+            <li>
+                <a href='/feedback/' class='mail_ico'>
+                    <?php if($this->unreaded_mail){ ?>
+                        <div class='unreads'><?=(int)$this->unreaded_mail?></div>
+                    <?php } ?>
+                </a>
+            </li>
             <li class='divider'></li>
             <li class='language dropdown-toggle' data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                 <a href=''><img src='/html/images/United-States.png'></a>

@@ -622,17 +622,11 @@
             
             $scope.form  = ret.data;
             $scope.answer_edit = ret.data.answers;
-            
-            for(var key in $scope.answer_edit){
-                $scope.answer_edit[key].act = 'update';
-            }
         });
         
         $scope.createAnswer = function(event){
             console.log('createAnswer');
-            //$scope.answers_list.push({act:'insert'});
-            
-            $scope.answer_edit.push({'act':'insert'});
+            $scope.answers_list.push({act:'insert'});
             
             event.preventDefault();
         }
@@ -647,15 +641,27 @@
         $scope.submit = function(event){
             $scope.form.answers = [];
             $('#editQuestionModal .answers_block .answer_item').each(function(){
-                var act = $(this).attr('data-act');
-                $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
+                switch($(this).attr('data-act')){
+                    case 'update':
+                        $scope.form.answers.push({'act':'update','correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
+                        break;
+                    case 'insert':
+                        $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
+                        break;
+                    case 'select':
+                        $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
+                        break;
+                }
             });
+            
+            console.log($scope.form);
             
             $http({
                 method:'POST',
                 url:'/lessons/questions/',
                 data:$scope.form
             }).then(function(ret){
+               console.log(ret.data);
                 if(ret.data.status == 'success'){
                     location.href = location.href;
                 }else{
@@ -665,14 +671,12 @@
             
             event.preventDefault();
         }
+        
     }]);
 </script>
 <style>
     #editQuestionModal .modal-dialog{
         width:900px;
-    }
-    #editQuestionModal .answer_item[data-act="delete"]{
-        display:none;
     }
 </style>
 <div ng-controller="questionEditModalCtrl" class="modal fade" id="editQuestionModal" tabindex="-1" role="dialog">
@@ -726,24 +730,20 @@
                             
                             <div class="answers_block">
                                 <div class="form-group" ng-repeat="item in answer_edit">
-                                    <div class="answer_item" data-act="{{item.act}}">
+                                    <div class="answer_item" data-act="update">
                                         <div class="row">
-                                            <div class="col-sm-8">
+                                            <div class="col-sm-10">
                                                 <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
                                                 <input type='hidden' class='id' value='{{item.id}}'>
                                             </div>
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer" ng-checked="form.correct == item.id">
                                             </div>
-                                            
-                                            <div class="col-sm-2">
-                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                    
-                                <!--<div class="form-group" ng-repeat="item in answers_list">
+                                <div class="form-group" ng-repeat="item in answers_list">
                                     <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
                                         <div class="row">
                                             <div class="col-sm-10">
@@ -767,7 +767,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>-->
+                                </div>
                             </div>
                         </div>
                     </div>

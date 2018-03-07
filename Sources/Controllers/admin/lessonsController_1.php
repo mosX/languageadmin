@@ -6,13 +6,9 @@
         }
         
         public function indexAction(){
-            xload('class.admin.lessons');
-            $lessons = new Lessons($this->m);
-                
-            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
-                
                 $_POST = json_decode(file_get_contents('php://input'), true);
                 
                 $id = (int)$_POST['id'];
@@ -23,20 +19,33 @@
                 $row->terms = serialize($_POST['terms']);
                 
                 if($id){        //EDIT
-                    if($lessons->updateMain($id,$row)){
+                    $this->m->_db->setQuery(
+                                "UPDATE `lessons` SET `lessons`.`name` = '".$row->name."'"
+                                . " , `lessons`.`show_answers` = '".(int)$row->show_answers."'"
+                                . " , `lessons`.`description` = '".$row->description."'"
+                                . ($row->terms ? " , `lessons`.`terms` = '".$row->terms."'" : '')
+                                . " WHERE `lessons`.`id` = ".(int)$id
+                                . " LIMIT 1"
+                            );
+                    if($this->m->_db->query()){
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD
-                    if($lessons->addNew($row)){
+                    if($this->m->_db->insertObject('lessons',$row)){
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';
                     }
                 }
             }else{
-                $this->m->data = $lessons->getData();
+                $this->m->_db->setQuery(
+                            "SELECT `lessons`.* "
+                            . " FROM `lessons`"
+                            . " WHERE `lessons`.`status` = 1"
+                        );
+                $this->m->data = $this->m->_db->loadObjectList();
             }
         }
         
@@ -95,13 +104,35 @@
                 $this->disableTemplate();
                 $this->disableView();
                 
-                xload('class.admin.lessons');
-                $lessons = new Lessons($this->m);
                 $id = (int)$_GET['id'];
+                if(!$id){
+                    echo '{"status":"error"}';
+                    return false;
+                }
                 
-                $result = new stdClass();   //сюда запишем результат апдейта
-                if($lessons->updatePublishing($id,$result)){
-                    echo '{"status":"success","result":"'.$result->published.'"}';
+                //получаем єтот урок что бы узнать текущее значение паблишеда
+                $this->m->_db->setQuery(
+                            "SELECT `lessons`.* "
+                            . " FROM `lessons` "
+                            . " WHERE `lessons`.`id` = ".(int)$id 
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($lesson);
+                
+                if(!$lesson){
+                    echo '{"status":"error"}';
+                    return false;
+                }
+                
+                $published = $lesson->published ? 0: 1;
+                
+                $this->m->_db->setQuery(
+                            "UPDATE `lessons` SET `lessons`.`published` = ".$published
+                            . " WHERE `lessons`.`id` = ".$id
+                            . " LIMIT 1"
+                        );
+                if($this->m->_db->query()){
+                    echo '{"status":"success","result":"'.$published.'"}';
                 }else{
                     echo '{"status":"error"}';
                 }
@@ -111,8 +142,6 @@
         public function delete_question_collectionAction(){
             $this->disableTemplate();
             $this->disableView();
-            
-            
             
             $id = (int)$_GET['id'];
             if(!$id) return false;
@@ -133,12 +162,15 @@
             $this->disableTemplate();
             $this->disableView();
             
-            xload('class.admin.lessons');
-            $lessons = new Lessons($this->m);
-            
             $id = (int)$_GET['id'];
+            if(!$id) return false;
             
-            if($lessons->removeGiven($id)){
+            $this->m->_db->setQuery(
+                        "UPDATE `lessons` SET `lessons`.`status` = 0"
+                        . " WHERE `lessons`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            if($this->m->_db->query()){
                 echo '{"status":"success"}';
             }else{
                 echo '{"status":"error"}';
@@ -314,18 +346,23 @@
             $this->disableTemplate();
             $this->disableView();
             
-            xload('class.admin.questions');                
-            $questions = new Questions($this->m);
-            
             $id = (int)$_GET['id'];
-            $data = $questions->getGiven($id);
+            
+            $this->m->_db->setQuery(
+                        "SELECT `questions`.* "
+                        . " FROM `questions` "
+                        . " WHERE `questions`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
             
             //получаем список ответов для селекта
             $this->m->_db->setQuery(
                         "SELECT `answer_collections`.* "
                         . " , `answers`.`text`"
                         . " , `images`.`id` as image_id"
-                        . " , `images`.`filename`"                    
+                        . " , `images`.`filename`"
+                    
                         . " FROM `answer_collections` "
                         . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                         . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
@@ -340,17 +377,21 @@
             $this->disableTemplate();
             $this->disableView();
             
-            xload('class.admin.questions');                
-            $questions = new Questions($this->m);
-            
             $id = (int)$_GET['id'];
             
-            $data = $questions->getGiven($id);
+            $this->m->_db->setQuery(
+                        "SELECT `questions`.* "
+                        . " FROM `questions` "
+                        . " WHERE `questions`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
             
             //получаем список ответов для селекта
             $this->m->_db->setQuery(
                         "SELECT `answer_collections`.* "
                         . " , `answers`.`text`"
+                        
                         . " FROM `answer_collections` "
                         . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                         . " WHERE `answer_collections`.`question_id` = ".$id                        
@@ -383,11 +424,13 @@
             
             $id = (int)$_GET['id'];
             
-            xload('class.admin.lessons');
-            $lessons = new Lessons($this->m);
-            
-            $data = $lessons->getGiven($id);
-            
+            $this->m->_db->setQuery(
+                        "SELECT `lessons`.* "
+                        . " FROM `lessons` "
+                        . " WHERE `lessons`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
             $data->terms = unserialize($data->terms);
             
             echo json_encode($data);
@@ -560,10 +603,6 @@
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
-                
-                xload('class.admin.questions');                
-                $questions = new Questions($this->m);
-                
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
                 $id = (int)$_POST['id'];
@@ -574,7 +613,15 @@
                 $answers  = $_POST['answers'];
                 
                 if($id){        //EDIT
-                    if($questions->updateMain($id,$row->value,$row->score)){
+                    $this->m->_db->setQuery(
+                                "UPDATE `questions` "
+                                . " SET `questions`.`value` = ".$this->m->_db->Quote($row->value)
+                                . " , `questions`.`score` = '".$row->score."'"
+                                . " WHERE `questions`.`id` = ".(int)$id
+                                . " LIMIT 1"
+                            );
+                    
+                    if($this->m->_db->query()){
                         foreach($answers as $item){     //добавляем вопросы
                             
                             switch($item['act']){
@@ -624,12 +671,19 @@
                             }
                         }
                         
-                        $questions->updateCorrect($id, $correct);
-                        
+                        //добавляем правильный ответ если он есть
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
                         echo '{"status":"success"}';
                     }
                 }else{
-                    if($questions->addNew($row)){
+                    if($this->m->_db->insertObject('questions',$row,'id')){
                         foreach($answers as $item){     //добавляем вопросы
                             if($item['act'] == 'insert'){   //добавляем новый
                                 $answer = new stdClass();
@@ -647,7 +701,15 @@
                             }
                         }
                         
-                        $questions->updateCorrect($id, $correct);
+                        //добавляем правильный ответ если он есть
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$row->id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
                         
                         //закрепляем за уроком если есть лессон айди
                         if($lesson_id){
@@ -667,12 +729,12 @@
         }
         
         public function questionsAction(){
-            xload('class.admin.questions');                
-            $questions = new Questions($this->m);
-                
              if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
+                
+                xload('class.admin.questions');                
+                $questions = new Questions($this->m);
                 
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
@@ -728,17 +790,33 @@
                                         $this->m->_db->query();
                                         
                                     break;
+                                    
+                                /*case 'select':
+                                        $collection->answer_id = (int)$item['value'];
+                                        $collection->question_id = $id;
+                                        $this->m->_db->insertObject('answer_collections',$collection,'id');
+
+                                        if($item['correct'])$correct = $collection->id;
+                                    break;*/
                             }
                         }
                         
-                        $questions->updateCorrect($id,$correct);
+                        //добавляем правильный ответ если он есть 
+                        if($correct){   //$correct єто айдишник в ансвер коллектионс
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();                            
+                        }
                         
                         echo '{"status":"success"}';
                     }else{
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD
-                    if($questions->addNew($row)){
+                    if($this->m->_db->insertObject('questions',$row,'id')){
                         foreach($answers as $item){     //добавляем вопросы
                             if($item['act'] == 'insert'){   //добавляем новый
                                 $answer = new stdClass();
@@ -762,7 +840,15 @@
                             }
                         }
                         
-                        $questions->updateCorrect($row->id,$correct);
+                        //добавляем правильный ответ если он есть
+                        if($correct){
+                            $this->m->_db->setQuery(
+                                        "UPDATE `questions` SET `questions`.`correct` = ".(int)$correct
+                                        . " WHERE `questions`.`id` = ".$row->id
+                                        . " LIMIT 1"
+                                    );
+                            $this->m->_db->query();
+                        }
                         
                         //закрепляем за уроком если есть лессон айди
                         if($lesson_id){
@@ -779,7 +865,16 @@
                     }
                 }
             }else{
-                $this->m->data = $questions->getData();
+                $this->m->_db->setQuery(
+                            "SELECT `questions`.* "
+                            . " , COUNT(`answer_collections`.`id`) as answers"
+                            . " FROM `questions` "
+                            . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"
+                            . " WHERE `questions`.`status` = 1"
+                            . " GROUP by `questions`.`id`"
+                            . " ORDER BY `id` DESC"
+                        );
+                $this->m->data = $this->m->_db->loadObjectList();
                 
                 $this->m->_db->setQuery(
                             "SELECT `answers`.`id` "
@@ -790,5 +885,24 @@
                 $this->m->answers = $this->m->_db->loadObjectList();
             }
         }
+        
+       /* public function getdataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $id = (int)$_GET['id'];
+            
+            $this->m->_db->setQuery(
+                        "SELECT `lessons`.* "
+                        . " FROM `lessons` "
+                        . " WHERE `lessons`.`id` = ".$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($data);
+            
+            echo json_encode($data);
+        }*/
+        
+        
     }
 ?>

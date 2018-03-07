@@ -22,7 +22,7 @@ class mainframe {
     public $_jsparams = array();
     public $_stylesheet = array();
 
-    function run() {        
+    function run(){
         session_start();
         $this->parsePath();
         $this->setConfig();
@@ -36,10 +36,21 @@ class mainframe {
       /*  if (is_object($this->_user) && $this->_user->id > 0) {
             $this->_islogin = true;
         }*/
+        
+        $this->getUnreadedMail();
     
         $this->setPermissions();
         $this->page();
         $this->output();
+    }
+    public function getUnreadedMail(){
+        $this->_db->setQuery(
+                    "SELECT COUNT(`feedback`.`id`) "
+                    . " FROM `feedback` "
+                    . " WHERE `feedback`.`status` = 1"
+                    . " AND `feedback`.`unread` = 1"                
+                );
+        $this->unreaded_mail = $this->_db->loadResult();
     }
 
     public function setPermissions(){
