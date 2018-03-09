@@ -54,40 +54,19 @@
         
         public function publish_questionAction(){
             $this->disableTemplate();
-                $this->disableView();
-                
-                $id = (int)$_GET['id'];
-                if(!$id){
-                    echo '{"status":"error"}';
-                    return false;
-                }
-                
-                //получаем єтот урок что бы узнать текущее значение паблишеда
-                $this->m->_db->setQuery(
-                            "SELECT `question_collections`.* "
-                            . " FROM `question_collections` "
-                            . " WHERE `question_collections`.`id` = ".(int)$id 
-                            . " LIMIT 1"
-                        );
-                $this->m->_db->loadObject($question);
-                
-                if(!$question){
-                    echo '{"status":"error"}';
-                    return false;
-                }
-                
-                $published = $question->published ? 0: 1;
-                
-                $this->m->_db->setQuery(
-                            "UPDATE `question_collections` SET `question_collections`.`published` = ".$published
-                            . " WHERE `question_collections`.`id` = ".$id
-                            . " LIMIT 1"
-                        );
-                if($this->m->_db->query()){
-                    echo '{"status":"success","result":"'.$published.'"}';
-                }else{
-                    echo '{"status":"error"}';
-                }
+            $this->disableView();
+
+            xload('class.admin.questionCollections');
+            $questionCollections = new QuestionCollections($this->m);
+
+            $id = (int)$_GET['id'];                                
+            $result= new stdClass();
+
+            if($questionCollections->updatePublishing($id, $result)){
+                echo '{"status":"success","result":"'.$result->published.'"}';
+            }else{
+                echo '{"status":"error"}';
+            }
         }
             
         public function publishAction(){
@@ -112,17 +91,11 @@
             $this->disableTemplate();
             $this->disableView();
             
-            
+            xload('class.admin.questionCollections');
+            $questionCollections = new QuestionCollections($this->m);
             
             $id = (int)$_GET['id'];
-            if(!$id) return false;
-            
-            $this->m->_db->setQuery(
-                        "DELETE FROM `question_collections` "
-                        . " WHERE `question_collections`.`id` = ".$id
-                        . " LIMIT 1"
-                    );
-            if($this->m->_db->query()){
+            if($questionCollections->removeGiven($id)){
                 echo '{"status":"success"}';
             }else{                
                 echo '{"status":"error"}';
@@ -247,19 +220,10 @@
             
             $result->results = unserialize($result->results);
             
-            //получаем вопросы
-            $this->m->_db->setQuery(
-                        "SELECT `question_collections`.* "
-                        . " , `questions`.`value`"
-                        . " , `questions`.`correct`"
-                        . " , `questions`.`type`"
-                        . " FROM `question_collections`"
-                        . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
-                        . " WHERE `question_collections`.`lesson_id` = ".(int)$result->lesson_id
-                    );
+            xload('class.admin.questionCollections');
+            $questionCollections = new QuestionCollections($this->m);
             
-            $data = $this->m->_db->loadObjectList('question_id');
-            //$this->m->testing = $result;
+            $data = $questionCollections->getGivenLesson($result->lesson_id);
             
             foreach($data as $item)$ids[] = $item->question_id;
             
@@ -396,6 +360,9 @@
         public function question_collectionsAction(){
             $this->m->lesson_id = $this->m->_path[2];
             
+            xload('class.admin.questionCollections');
+            $questionCollections = new QuestionCollections($this->m);
+            
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
@@ -404,54 +371,25 @@
                 //UPD использовалось для добавления вопроса из селекта по одному
                 $row->question_id = (int)$_POST['question'];
                 $row->lesson_id = (int)$this->m->_path[2];
-                
-                //проверяем или не было добавлено ранее
-                $this->m->_db->setQuery(
-                            "SELECT `question_collections`.`id` "
-                            . " FROM `question_collections` "
-                            . " WHERE `question_collections`.`question_id` = ".$row->question_id
-                            . " AND `question_collections`.`lesson_id` = ".$row->lesson_id
-                            . " LIMIT 1"                        
-                        );
-                $check = $this->m->_db->loadResult();
+            
+                $check = $questionCollections->getGiven(null,$row->question_id,$row->lesson_id);
                 
                 if($check){
                     echo '{"status":"error"}';
                     return false;
                 }
                     
-                if($this->m->_db->insertObject('question_collections',$row)){
+                if($questionCollections->addNew($row)){
                     echo '{"status":"success"}';
                 }else{
                     echo '{"status":"error"}';
                 }
             }else{
-                //получаем все вопросы для селекта
-                $this->m->_db->setQuery(
-                            "SELECT `questions`.* "
-                             . " FROM `questions` "
-                            . " WHERE `questions`.`status` = 1"
-                            . " ORDER BY `id` DESC"
-                        );
-                $this->m->list = $this->m->_db->loadObjectList();
+                xload('class.admin.questions');
+                $questions = new Questions($this->m);
                 
-                $this->m->_db->setQuery(
-                            "SELECT `question_collections`.* "
-                            . " , `questions`.`value`"
-                            . " , `questions`.`correct`"
-                            . " , `questions`.`score`"
-                            . " , `questions`.`type`"
-                            . " , `answers`.`text` as answer"
-                            . " , `images`.`filename`"
-                            . " FROM `question_collections`"
-                            . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
-                            . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
-                            
-                            . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
-                            . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
-                            . " WHERE `question_collections`.`lesson_id` = ".(int)$this->m->_path[2]
-                        );
-                $this->m->data = $this->m->_db->loadObjectList();
+                $this->m->list = $questions->getList();                
+                $this->m->data = $questionCollections->getData($this->m->_path[2]);
             }
         }
         

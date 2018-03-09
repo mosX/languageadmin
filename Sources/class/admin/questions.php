@@ -41,6 +41,19 @@ class Questions{
         }        
     }
     
+    public function getList(){
+        //получаем все вопросы для селекта
+        $this->m->_db->setQuery(
+                    "SELECT `questions`.* "
+                     . " FROM `questions` "
+                    . " WHERE `questions`.`status` = 1"
+                    . " ORDER BY `id` DESC"
+                );
+        $data = $this->m->_db->loadObjectList();
+        
+        return $data;
+    }
+    
     public function getData(){
         $this->m->_db->setQuery(
                     "SELECT `questions`.* "
