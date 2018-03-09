@@ -58,8 +58,10 @@ class Questions{
         $this->m->_db->setQuery(
                     "SELECT `questions`.* "
                     . " , COUNT(`answer_collections`.`id`) as answers"
+                    . " , COUNT(`question_collections`.`id`) as lessons"
                     . " FROM `questions` "
                     . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"
+                    . " LEFT JOIN `question_collections` ON `question_collections`.`question_id` = `questions`.`id`"
                     . " WHERE `questions`.`status` = 1"
                     . " GROUP by `questions`.`id`"
                     . " ORDER BY `id` DESC"

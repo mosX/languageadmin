@@ -476,8 +476,11 @@
             }else{
                 $this->m->_db->setQuery(
                             "SELECT `answers`.* "
+                            . " , COUNT(`answer_collections`.`id`) as questions"
                             . " FROM `answers` "
+                            . " LEFT JOIN `answer_collections` ON `answer_collections`.`answer_id` = `answers`.`id`"
                             . " WHERE `answers`.`status` = 1"
+                            . " GROUP BY `answers`.`id`"
                         );
                 $this->m->data = $this->m->_db->loadObjectList();
             }
@@ -605,7 +608,7 @@
         }
         
         public function questionsAction(){
-            xload('class.admin.questions');                
+            xload('class.admin.questions');
             $questions = new Questions($this->m);
                 
              if($_SERVER['REQUEST_METHOD'] == 'POST'){

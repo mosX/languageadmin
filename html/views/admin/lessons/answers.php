@@ -98,6 +98,7 @@
                     <tr>
                         <th style="width:60px;">ID</th>
                         <th>ОТВЕТ</th>
+                        <th>В Вопросах</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px;"></th>
                     </tr>
@@ -107,6 +108,7 @@
                             <td><?=$item->id?></td>
                                 
                             <td class="username_td"><?=$item->text?></td>
+                            <td><?=$item->questions?></td>
                             
                             <td>
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
@@ -123,7 +125,7 @@
         </div>
     </div>
     
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <!--<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -146,14 +148,5 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div>-->
 </div>
-<script>
-    $( ".datepicker" ).datepicker({
-        dateFormat: 'yy-mm-dd',
-        changeMonth: true,
-        changeYear: true,
-        startDate:'01-01-1996',
-        firstDay: 1
-    });
-</script>

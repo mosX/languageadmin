@@ -100,6 +100,7 @@
                         <th style="width:60px;">ID</th>
                         <th>ВОПРОС</th>
                         <th>ОТВЕТОВ</th>
+                        <th>В Уроках</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px"></th>
                     </tr>
@@ -110,6 +111,7 @@
                             
                             <td><a href="/lessons/answer_collections/<?=$item->id?>"><?=$item->value?></a></td>
                             <td><?=(int)$item->answers?></td>
+                            <td><?=(int)$item->lessons?></td>
                                 
                             <td>
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
