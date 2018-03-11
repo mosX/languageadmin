@@ -6,6 +6,48 @@ class Questions{
         $this->m =  $mainframe;        
     }
     
+    public function addNormal($answers,$question_id){
+        foreach($answers as $item){     //добавляем вопросы
+            if($item['act'] == 'insert'){   //добавляем новый
+                $answer = new stdClass();
+                $answer->text = $item['value'];
+                $answer->date = date("Y-m-d H:i:s");
+                $this->m->_db->insertObject('answers',$answer,'id');
+
+                $collection = new stdClass();
+                $collection->answer_id = $answer->id;
+                $collection->question_id = $question_id;
+
+                $this->m->_db->insertObject('answer_collections',$collection,'id');
+
+                if($item['correct'])$correct = $collection->id;
+            }
+        }
+
+        $this->updateCorrect($question_id,$correct);
+    }
+    
+    public function addImage($answers,$question_id){
+        foreach($answers as $item){     //добавляем вопросы
+            if($item['act'] == 'insert'){   //добавляем новый
+                $answer = new stdClass();
+                $answer->image_id = (int)$item['value'];
+                $answer->date = date("Y-m-d H:i:s");
+                $this->m->_db->insertObject('answers',$answer,'id');
+
+                $collection = new stdClass();
+                $collection->answer_id = $answer->id;
+                $collection->question_id = $question_id;
+
+                $this->m->_db->insertObject('answer_collections',$collection,'id');
+
+                if($item['correct'])$correct = $collection->id;
+            }
+        }
+
+        $this->updateCorrect($question_id, $correct);
+    }
+    
     public function updateMain($id,$value,$score){      //обновляем основный параметры вопроса
         $this->m->_db->setQuery(
                     "UPDATE `questions` "

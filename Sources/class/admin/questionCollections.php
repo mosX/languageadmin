@@ -39,6 +39,7 @@ class QuestionCollections{
                     . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                     . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
+                    . " ORDER BY `id` DESC"
                 );
         $data = $this->m->_db->loadObjectList();
         

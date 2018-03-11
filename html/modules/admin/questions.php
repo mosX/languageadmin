@@ -190,7 +190,7 @@
                                         <div class="row">
                                             <div class="col-sm-4">
                                                 <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/?index='+$index}}"></iframe>
+                                                    <iframe id="hiddenIframeUpload" src="{{'/questions/loadeditimage/?index='+$index}}"></iframe>
                                                 </div>
                                                 
                                                 <div ng-click="selectImage($event,item)" class="btn btn-primary">Выбрать</div>
@@ -327,21 +327,38 @@
 </div>
 
 <script>
-    app.controller('imageQuestionModalCtrl', ['$scope','$http',function($scope,$http){
+    app.controller('questionModalCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
         $scope.form = {answers:[],score:1,lesson_id:<?=(int)$this->lesson_id?>,mode:'1'};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
         $scope.answers_list = [];   //для создания новых елементов
         $scope.answers_list[1] = [];
         
+        $scope.selectedItem = {};   //активный объект в случае если мы выбираем картинки из существующих
+        
         $scope.submit = function(event){
-            $scope.form.answers = [];
-            $('#addImageQuestionModal .answers_block .answer_item').each(function(){
-                $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('input[name=image_id]',this).val()});                
-            });
+            $scope.form.answers = [];            
+            switch(parseInt($scope.form.mode)){
+                case 1 :                     
+                    $('#addQuestionModal .answers_block .answer_item').each(function(){
+                        console.log($('textarea',this));
+                        $scope.form.answers.push({act:'insert',correct:$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
+                    });
+                    break;
+                case 2:
+                    $('#addQuestionModal .answers_block .answer_item').each(function(){
+                        $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('input[name=image_id]',this).val()});                
+                    });
+                    break;
+            }
             
+            /*console.log($scope.form);
+            
+            event.preventDefault();
+            return false;*/
             $http({
                 method:'POST',
-                url:'/lessons/add_image_question/',
+                //url:'/lessons/add_image_question/',
+                url:'/questions/add/',
                 data:$scope.form
             }).then(function(ret){
                console.log(ret.data);
@@ -362,6 +379,13 @@
             event.preventDefault();
         }
         
+        $scope.selectImage = function(event,item){
+            $scope.selectedItem = item;
+            
+            console.log('!!!!!!!!',item);
+            $rootScope.$emit('showSelectImagePanel',item);
+        }
+        
         /*$scope.selectAnswer = function(event){
             console.log('selectAnswer');
             $scope.answers_list.push({act:'select'});
@@ -378,11 +402,11 @@
     }]);
 </script>
 <style>
-    #addImageQuestionModal .modal-dialog{
+    #addQuestionModal .modal-dialog{
         width:900px;
     }
 </style>
-<div ng-controller="imageQuestionModalCtrl" class="modal fade" id="addImageQuestionModal" tabindex="-1" role="dialog">
+<div ng-controller="questionModalCtrl" class="modal fade" id="addQuestionModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -404,7 +428,7 @@
                                             <option value="1">Выбор Ответа</option>
                                             <option value="2">Выбор Изображения</option>
                                             <option value="3">Пропущенное слово</option>
-                                            <option value="4">Написать слово</option>
+                                            <option value="4">Написать перевод</option>
                                         </select>
                                     </div>                                    
                                 </div>
@@ -447,7 +471,7 @@
                             </div>
                             <div class="answers_block" ng-if="form.mode == '1'">
                                 <div class="form-group" ng-repeat="item in answers_list[1]">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
+                                    <div class="answer_item">
                                         <div class="row">
                                             <div class="col-sm-10">
                                                 <textarea class="form-control" style="height: 40px;"></textarea>
@@ -461,7 +485,7 @@
                             </div>
                             <div class="answers_block" ng-if="form.mode == '3'">
                                 <div class="form-group" ng-repeat="item in answers_list[3]">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
+                                    <div class="answer_item">
                                         <div class="row">
                                             <div class="col-sm-10">
                                                 <textarea class="form-control" style="height: 40px;"></textarea>
@@ -475,7 +499,7 @@
                             </div>
                             <div class="answers_block" ng-if="form.mode == '4'">
                                 <div class="form-group" ng-repeat="item in answers_list[4]">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
+                                    <div class="answer_item">
                                         <div class="row">
                                             <div class="col-sm-10">
                                                 <textarea class="form-control" style="height: 40px;"></textarea>
@@ -490,25 +514,25 @@
                             
                             <div class="answers_block" ng-if="form.mode == '2'">
                                 <style>
-                                    #addImageQuestionModal .preview{
+                                    #addQuestionModal .preview{
                                         width:100px;
                                         height:100px;
                                         background: grey;
                                     }
                                 </style>
                                 <div class="form-group" ng-repeat="item in answers_list[2]">
-                                    <div class="answer_item" data-act="insert" data-index='{{$index}}' ng-if="item.act == 'insert'">
+                                    <div class="answer_item" data-index='{{$index}}'>
                                         <div class="row">
                                             <div class="col-sm-5">
                                                 <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/?index='+$index}}"></iframe>
-                                                    <input type="hidden" name="image_id" value="0">
+                                                    <iframe id="hiddenIframeUpload" src="{{'/questions/loadaddimage/?index='+$index}}"></iframe>                                                    
                                                 </div>
+                                                <div ng-click="selectImage($event,item)" class="btn btn-primary">Выбрать</div>
+                                                <input type="hidden" name="image_id" value="0">                                                
                                             </div>
                                             <div class="col-sm-5">
-                                                <div class='preview'>
-                                                    
-                                                </div>
+                                                <div class='preview' ng-if="!item.filename"></div>
+                                                <div ng-if="item.filename" ng-cloak class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover"></div>
                                             </div>
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer">
@@ -518,7 +542,7 @@
                                 </div>
                                 <script>
                                     function addImage(filename,id,index){
-                                        var parent = $('#addImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
+                                        var parent = $('#addQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
                                         $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
                                         $('input[name=image_id]',parent).val(id);
                                     }
@@ -537,146 +561,6 @@
     </div>
 </div>
 
-
-<script>
-    app.controller('questionModalCtrl', ['$scope','$http',function($scope,$http){
-        $scope.form = {answers:[],score:1,lesson_id:<?=(int)$this->lesson_id?>};
-        $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
-        $scope.answers_list = [];   //для создания новых елементов
-        
-        $scope.submit = function(event){
-            $scope.form.answers = [];
-            $('#addQuestionModal .answers_block .answer_item').each(function(){
-                if($('textarea',this).length > 0){
-                    $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});                    
-                }else if($('select',this).length > 0){
-                    $scope.form.answers.push({'act':'select','correct':$('input[type=radio]',this)[0].checked,value:$('select option:selected',this).val()});
-                }
-            });
-            
-            $http({
-                method:'POST',
-                url:'/lessons/questions/',
-                data:$scope.form
-            }).then(function(ret){
-               console.log(ret.data);
-                if(ret.data.status == 'success'){
-                    location.href = location.href;
-                }else{
-                    console.log('ERROR');
-                }
-            });
-            
-            event.preventDefault();
-        }
-        
-        $scope.createAnswer = function(event){
-            console.log('createAnswer');
-            $scope.answers_list.push({act:'insert'});
-            
-            event.preventDefault();
-        }
-        
-        $scope.selectAnswer = function(event){
-            console.log('selectAnswer');
-            $scope.answers_list.push({act:'select'});
-            
-            event.preventDefault();
-        }
-    }]);
-</script>
-<style>
-    #addQuestionModal .modal-dialog{
-        width:900px;
-    }
-</style>
-<div ng-controller="questionModalCtrl" class="modal fade" id="addQuestionModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" data-dismiss="modal">×</button>
-                <h4 class="modal-title font-header"><p><strong>Добавить Новий Вопрос</strong></p></h4>
-            </div>
-
-            <div class="modal-body">
-                <form action="" method="POST" ng-submit="submit($event)">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <label>Вопрос</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <textarea class="form-control" ng-model="form.value" style="height: 80px;"></textarea>
-                                        <div class="error name_error"></div>
-                                    </div>
-                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <label>Балы</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" ng-model="form.score">
-                                        <div class="error name_error"></div>
-                                    </div>
-                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-sm-6">                            
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
-                                    </div>
-                                    <!--<div class="col-sm-6">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>-->
-                                </div>
-                            </div>
-                            
-                            <div class="answers_block">
-                                <div class="form-group" ng-repeat="item in answers_list">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
-                                        <div class="row">
-                                            <div class="col-sm-10">
-                                                <textarea class="form-control" style="height: 40px;"></textarea>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <input type="radio" name="answer">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="answer_item" data-act="select" ng-if="item.act == 'select'">
-                                        <div class="row">
-                                            <div class="col-sm-10">
-                                                <select class="form-control">
-                                                    <option ng-repeat="answer in answers" value="{{answer.id}}">{{answer.text}}</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <input type="radio" name="answer">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
-                    
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <script>
     app.controller('questionEditModalCtrl', ['$scope','$http',function($scope,$http,$userinfo){
         $scope.form = {};
@@ -693,6 +577,8 @@
                 $scope.answer_edit[key].act = 'update';
             }
         });
+        
+       
         
         $scope.createAnswer = function(event){
             console.log('createAnswer');

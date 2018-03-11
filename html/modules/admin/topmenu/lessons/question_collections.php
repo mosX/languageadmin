@@ -107,7 +107,6 @@
                 <svg><use xlink:href="#controls--button-more"></use></svg>
             </a>
             <a data-toggle="modal" data-target="#selectQuestionModal" class="button add_deal">Выбрать Вопрос</a>
-            <a data-toggle="modal" data-target="#addImageQuestionModal" class="button add_deal">+ Вопрос Изображения</a>
             <a data-toggle="modal" data-target="#addQuestionModal" class="button add_deal">+ Вопрос</a>
         </div>
     </div>

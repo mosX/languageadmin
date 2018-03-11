@@ -118,7 +118,7 @@
             }
         }
         
-        /*public function loadeditimageAction(){
+        public function loadeditimageAction(){
             $this->disableTemplate();
             
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -160,9 +160,9 @@
                     }
                 }
             }
-        }*/
+        }
         
-        /*public function loadaddimageAction(){
+        public function loadaddimageAction(){
             $this->disableTemplate();
             
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -205,7 +205,7 @@
                     }
                 }
             }
-        }*/
+        }
         
         public function testing_checkAction(){
             $this->m->_db->setQuery(
@@ -570,7 +570,7 @@
                         echo '{"status":"success"}';
                     }
                 }else{
-                    /*if($questions->addNew($row)){
+                    if($questions->addNew($row)){
                         foreach($answers as $item){     //добавляем вопросы
                             if($item['act'] == 'insert'){   //добавляем новый
                                 $answer = new stdClass();
@@ -602,7 +602,7 @@
                     }else{
                         
                         echo '{"status":"error"}';
-                    }*/
+                    }
                 }
             }
         }
@@ -679,7 +679,7 @@
                         echo '{"status":"error"}';
                     }
                 }else{          //ADD
-                    /*if($questions->addNew($row)){
+                    if($questions->addNew($row)){
                         foreach($answers as $item){     //добавляем вопросы
                             if($item['act'] == 'insert'){   //добавляем новый
                                 $answer = new stdClass();
@@ -717,7 +717,7 @@
                     }else{
                         
                         echo '{"status":"error"}';
-                    }*/
+                    }
                 }
             }else{
                 $this->m->data = $questions->getData();
