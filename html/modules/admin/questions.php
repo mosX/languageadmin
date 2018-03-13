@@ -1,4 +1,4 @@
-<script>
+<!--<script>
     app.controller('selectQuestionModalCtrl', ['$scope','$http',function($scope,$http){
                 
         $scope.submit = function(event){
@@ -47,8 +47,10 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 
+
+<!--
 <style>
     #editImageQuestionModal .modal-dialog{
         width:900px;
@@ -232,7 +234,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 
 <style>
     #select_image_overflow{
@@ -259,6 +261,8 @@
         padding:0px 25px
     }
     #select_image_panel .item{
+        width:100px;
+        height: 100px;
         margin:auto;
         margin-bottom:20px;
         cursor:pointer;
@@ -310,8 +314,7 @@
         }
     }]);
 </script>
-<div  ng-controller="selectImagePanelCtrl">
-    
+<div  ng-controller="selectImagePanelCtrl">    
     <div id="select_image_panel" >
         <div class="select_container">
             <div class="row">
@@ -562,7 +565,7 @@
 </div>
 
 <script>
-    app.controller('questionEditModalCtrl', ['$scope','$http',function($scope,$http,$userinfo){
+    app.controller('questionEditModalCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
         $scope.form = {};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
         $scope.answers_list = [];   //для создания новых елементов
@@ -570,15 +573,16 @@
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
             
+            $scope.mode = ret.data.type;
             $scope.form  = ret.data;
             $scope.answer_edit = ret.data.answers;
             
             for(var key in $scope.answer_edit){
                 $scope.answer_edit[key].act = 'update';
             }
+            
+            $('#editQuestionModal').modal('show');
         });
-        
-       
         
         $scope.createAnswer = function(event){
             console.log('createAnswer');
@@ -589,23 +593,43 @@
             event.preventDefault();
         }
         
-        $scope.selectAnswer = function(event){
+        $scope.selectImage = function(event,item){
+            $scope.selectedItem = item;
+            
+            console.log('!!!!!!!!',item);
+            $rootScope.$emit('showSelectImagePanel',item);
+        }
+        
+        /*$scope.selectAnswer = function(event){
             console.log('selectAnswer');
             $scope.answers_list.push({act:'select'});
             
             event.preventDefault();
-        }
+        }*/
         
         $scope.submit = function(event){
             $scope.form.answers = [];
-            $('#editQuestionModal .answers_block .answer_item').each(function(){
-                var act = $(this).attr('data-act');
-                $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
-            });
+            
+            switch(parseInt($scope.mode)){
+                case 1:
+                    $('#editQuestionModal .answers_block .answer_item').each(function(){
+                        var act = $(this).attr('data-act');
+                        $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
+                    });
+                break;
+                case 2:
+                    
+                    $('#editQuestionModal .answers_block .answer_item').each(function(){
+                        var act = $(this).attr('data-act');
+                        $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
+                    });
+                break;
+            }
+            
             
             $http({
                 method:'POST',
-                url:'/lessons/questions/',
+                url:'/questions/edit/',
                 data:$scope.form
             }).then(function(ret){
                 if(ret.data.status == 'success'){
@@ -677,7 +701,7 @@
                             </div>
                             
                             <div class="answers_block">
-                                <div class="form-group" ng-repeat="item in answer_edit">
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 1">
                                     <div class="answer_item" data-act="{{item.act}}">
                                         <div class="row">
                                             <div class="col-sm-8">
@@ -694,32 +718,50 @@
                                         </div>
                                     </div>
                                 </div>
-                                   
-                                <!--<div class="form-group" ng-repeat="item in answers_list">
-                                    <div class="answer_item" data-act="insert" ng-if="item.act == 'insert'">
+                                
+                                <style>
+                                    #editQuestionModal .preview{
+                                        width:100px;
+                                        height:100px;
+                                        background: grey;
+                                    }
+                                </style>
+                                
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 2">
+                                    <div class="answer_item" data-act="{{item.act}}" data-index='{{$index}}'>
                                         <div class="row">
-                                            <div class="col-sm-10">
-                                                <textarea class="form-control" style="height: 40px;"></textarea>
+                                            <div class="col-sm-4">
+                                                <div class="uploadFileBtn">Загрузить
+                                                    <iframe id="hiddenIframeUpload" src="{{'/questions/loadeditimage/?index='+$index}}"></iframe>
+                                                </div>
+                                                
+                                                <div ng-click="selectImage($event,item)" class="btn btn-primary">Выбрать</div>
+                                                <input type="hidden" name="image_id" value="{{item.image_id}}">
+                                                <input type="hidden" class="id" name="id" value="{{item.id}}">                                                
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover"></div>
                                             </div>
                                             <div class="col-sm-2">
                                                 <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="answer_item" data-act="select" ng-if="item.act == 'select'">
-                                        <div class="row">
-                                            <div class="col-sm-10">
-                                                <select class="form-control">
-                                                    <option ng-repeat="answer in answers" value="{{answer.id}}">{{answer.text}}</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>-->
+                                    <script>
+                                        function editImage(filename,id,index){
+                                            var parent = $('#editQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
+                                            $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                                            $('input[name=image_id]',parent).val(id);
+                                        }
+                                        function editError(error){
+                                            console.log('editError');
+                                        }
+                                    </script>                                    
+                                </div>
                             </div>
                         </div>
                     </div>

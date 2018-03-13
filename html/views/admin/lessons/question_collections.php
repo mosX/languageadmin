@@ -1,6 +1,5 @@
 <script>
-
-    app.controller('pageCtrl', ['$scope','$http',function($scope,$http,$userinfo){
+    app.controller('pageCtrl', ['$scope','$http',function($scope,$http){
         console.log('START PAGE CONTROLLER');
         $scope.channel_id  = null;
         $scope.channel_name  = null;
@@ -9,14 +8,14 @@
             console.log(id);
             console.log('edit FORM');
             $http({
-                url:'/lessons/question_data/?id='+id,
+                url:'/questions/question_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editQuestionModal').modal('show');
+                
             });
             event.preventDefault();
         }
@@ -122,6 +121,7 @@
                         <th>Вопрос</th>
                         <th>Ответ</th>
                         <th>Балов</th>
+                        <th>Ответов</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px;"></th>
                     </tr>
@@ -140,13 +140,15 @@
                                 <td><img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>"></td>
                             <?php } ?>
                             <td><?=$item->score?></td>
+                            <td><?=$item->answers?></td>
                             
                             <td>
-                                <?php if($item->type == 1){ ?>
+                                <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
+                                <!--<?php if($item->type == 1){ ?>
                                     <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
                                 <?php }else{ ?>
                                     <a ng-click="editImageForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
-                                <?php } ?>
+                                <?php } ?>-->
                                 <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                             <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->published ? 'on':'off'?>"></div></td>

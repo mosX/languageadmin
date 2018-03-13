@@ -25,21 +25,33 @@ class QuestionCollections{
     
     public function getData($lesson_id){
         $this->m->_db->setQuery(
+                    "SELECT COUNT(`question_collections`.`id`)"
+                    . " FROM `question_collections`"
+                    . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
+                );
+        $this->m->total = $this->m->_db->loadResult(); 
+        
+        $xNav = new xNav("/lessons/question_collections/".$this->m->_path[2], $this->m->total, "GET");
+        $xNav->limit = 50;
+        $this->m->pagesNav = $xNav->showPages();
+        
+        $this->m->_db->setQuery(
                     "SELECT `question_collections`.* "
                     . " , `questions`.`value`"
                     . " , `questions`.`correct`"
                     . " , `questions`.`score`"
                     . " , `questions`.`type`"
                     . " , `answers`.`text` as answer"
-                    . " , `images`.`filename`"
+                    . " , `images`.`filename`"                    
+                    . " , (SELECT COUNT(`answer_collections`.`id`) FROM `answer_collections` WHERE `answer_collections`.`question_id` = `questions`.`id`) as answers"
                     . " FROM `question_collections`"
                     . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
                     . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
-
                     . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                     . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
-                    . " ORDER BY `id` DESC"
+                    . " ORDER BY `questions`.`id` DESC"
+                    . " LIMIT ".$xNav->limit." OFFSET ".$xNav->start.""
                 );
         $data = $this->m->_db->loadObjectList();
         
@@ -74,14 +86,65 @@ class QuestionCollections{
         }
     }
     
-    public function removeGiven($id){
-        if(!(int)$id) return false;
+    public function removeGiven($id,$question_id=null){
+        //if(!(int)$id) return false;
+        if($id){
+            //получаем айди вопроса
+            $this->m->_db->setQuery(
+                        "SELECT `question_collections`.* "
+                        . " FROM `question_collections` "
+                        . " WHERE `question_collections`.`id` = ".(int)$id
+                        . " LIMIT 1"
+                    );
+            $this->m->_db->loadObject($collection);
+            
+            $question_id = $collection->question_id;
+        }
         
+        //получаем коллекции ответов и ответы по данному вопросу
         $this->m->_db->setQuery(
+                    "SELECT `answer_collections`.* "
+                    . " FROM `answer_collections`"                    
+                    . " WHERE `answer_collections`.`question_id` = ".$question_id
+                );
+        $answers = $this->m->_db->loadObjectList();
+        
+        foreach($answers as $item){
+            $this->m->_db->setQuery(    
+                "DELETE FROM `answer_collections` "
+                . " WHERE `answer_collections`.`id` = ".$item->id
+                . " LIMIT 1"
+            );
+            $this->m->_db->query();
+            
+            $this->m->_db->setQuery(    
+                "DELETE FROM `answers` "
+                . " WHERE `answers`.`id` = ".$item->answer_id
+                . " LIMIT 1"
+            );
+            $this->m->_db->query();
+        }
+        
+        $this->m->_db->setQuery(    
+            "DELETE FROM `questions` "
+            . " WHERE `questions`.`id` = ".$question_id
+            . " LIMIT 1"
+        );
+        $this->m->_db->query();
+                
+        if($id){
+            $this->m->_db->setQuery(
                 "DELETE FROM `question_collections` "
                 . " WHERE `question_collections`.`id` = ".$id
                 . " LIMIT 1"
             );
+        }else if($question_id){
+            $this->m->_db->setQuery(
+                "DELETE FROM `question_collections` "
+                . " WHERE `question_collections`.`question_id` = ".$id
+                //. " LIMIT 1"
+            );
+        }
         return $this->m->_db->query() ? true: false;
     }
     public function getGivenLesson($lesson_id){

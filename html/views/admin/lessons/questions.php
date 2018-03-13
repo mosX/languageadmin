@@ -7,19 +7,19 @@
         $scope.editForm = function(event,id){
             console.log(id);
             $http({
-                url:'/lessons/question_data/?id='+id,
+                url:'/questions/question_data/?id='+id,
                 method:'GET',
             }).then(function(ret){
                 console.log(ret.data);
                 $scope.$broadcast('editData', {
                     data: ret.data
                 });
-                $('#editQuestionModal').modal('show');
+                //$('#editQuestionModal').modal('show');
             });
             event.preventDefault();
         }
         
-        $scope.deleteChannelConfrimation = function(event,id,name){
+        /*$scope.deleteChannelConfrimation = function(event,id,name){
             $('#confirmModal').modal('show');
             $scope.channel_id = id;
             $scope.channel_name = name;
@@ -41,6 +41,10 @@
             });
             
             event.preventDefault();
+        }*/
+        
+        $scope.remove = function(event,id){
+            $scope.$broadcast('delete', id);
         }
         
         $scope.publish = function(event,id){
@@ -115,7 +119,8 @@
                                 
                             <td>
                                 <a ng-click="editForm($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
-                                <a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
+                                <!--<a ng-click="deleteChannelConfrimation($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>-->
+                                <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                         </tr>
                     <?php } ?>

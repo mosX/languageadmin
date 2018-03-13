@@ -53,9 +53,9 @@
         display:inline-block;
         vertical-align: top;
     }
+    
     #header .right_panel ul li .logout{
         position:relative;
-        
         display:block;        
         width:60px;
         height: 60px;;

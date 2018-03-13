@@ -9,6 +9,81 @@
             
         }
         
+        public function question_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            xload('class.admin.questions');                
+            $questions = new Questions($this->m);
+            
+            $id = (int)$_GET['id'];
+            
+            $data = $questions->getGiven($id);
+                        
+            //получаем список ответов для селекта
+            $this->m->_db->setQuery(
+                        "SELECT `answer_collections`.* "
+                        . " , `answers`.`text`"
+                        . " , `images`.`id` as image_id"
+                        . " , `images`.`filename`"                    
+                        . " FROM `answer_collections` "
+                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
+                        . " WHERE `answer_collections`.`question_id` = ".$id                        
+                    );
+            $data->answers = $this->m->_db->loadObjectList();
+            
+            echo json_encode($data);
+        }
+        
+        public function delete_question_collectionAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            xload('class.admin.questionCollections');
+            $questionCollections = new QuestionCollections($this->m);
+            
+            $id = (int)$_GET['id'];
+            $question_id = (int)$_GET['question_id'];
+            if($questionCollections->removeGiven($id,$question_id)){
+                echo '{"status":"success"}';
+            }else{                
+                echo '{"status":"error"}';
+            }
+        }
+        
+        
+        public function editAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            $_POST = json_decode(file_get_contents('php://input'), true); 
+            
+            $id = (int)$_POST['id'];
+            $row->value = strip_tags(trim($_POST['value']));
+            $row->score = (int)$_POST['score'];
+            $lesson_id = (int)$_POST['lesson_id'];
+            $answers  = $_POST['answers'];
+            
+            xload('class.admin.questions');
+            $questions = new Questions($this->m);
+            
+            if($questions->updateMain($id,$row->value,$row->score)){
+                switch($_POST['type']){
+                    case 1:$questions->editNormal($answers,$id);break;
+                    case 2:$questions->editImage($answers,$id);break;
+                    case 3:$questions->editNormal($answers,$id);break;
+                    case 4:$questions->editNormal($answers,$id);break;
+                    case 5:$questions->editNormal($answers,$id);break;
+                }
+
+                //$questions->updateCorrect($id,$correct);
+
+                echo '{"status":"success"}';
+            }else{
+                echo '{"status":"error"}';
+            }
+        }
         
         public function addAction(){
             $this->disableTemplate();
@@ -169,7 +244,7 @@
         }
         
         
-        public function question_image_dataAction(){
+        /*public function question_image_dataAction(){
             $this->disableTemplate();
             $this->disableView();
             
@@ -193,33 +268,11 @@
             $data->answers = $this->m->_db->loadObjectList();
             
             echo json_encode($data);
-        }
+        }*/
         
-        public function question_dataAction(){
-            $this->disableTemplate();
-            $this->disableView();
-            
-            xload('class.admin.questions');                
-            $questions = new Questions($this->m);
-            
-            $id = (int)$_GET['id'];
-            
-            $data = $questions->getGiven($id);
-            
-            //получаем список ответов для селекта
-            $this->m->_db->setQuery(
-                        "SELECT `answer_collections`.* "
-                        . " , `answers`.`text`"
-                        . " FROM `answer_collections` "
-                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
-                        . " WHERE `answer_collections`.`question_id` = ".$id                        
-                    );
-            $data->answers = $this->m->_db->loadObjectList();
-            
-            echo json_encode($data);
-        }
+       
         
-        public function add_image_questionAction(){
+        /*public function add_image_questionAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
                 $this->disableView();
@@ -327,9 +380,9 @@
                     }
                 }
             }
-        }
+        }*/
         
-        public function questionsAction(){
+       /* public function questionsAction(){
             xload('class.admin.questions');
             $questions = new Questions($this->m);
                 
@@ -452,6 +505,6 @@
                         );
                 $this->m->answers = $this->m->_db->loadObjectList();
             }
-        }
+        }*/
     }
 ?>
