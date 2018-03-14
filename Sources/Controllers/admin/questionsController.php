@@ -167,6 +167,7 @@
                             "SELECT `images`.* "
                             . " FROM `images` "
                             . " WHERE `images`.`hash` = '".$hash."'"
+                            . " AND `images`.`type` = 1"
                         );
                 $this->m->_db->loadObject($image);
                 
@@ -190,6 +191,7 @@
                         $image = new stdClass();
                         $image->filename = $this->m->filename;
                         $image->hash = $hash;
+                        $image->type = 1;
                         $image->date = date("Y-m-d H:i:s");
                         $this->m->_db->insertObject('images',$image,'id');
                         $this->m->id = $image->id;
@@ -211,6 +213,7 @@
                             "SELECT `images`.* "
                             . " FROM `images` "
                             . " WHERE `images`.`hash` = '".$hash."'"
+                            . " AND `images`.`type` = 1"
                         );
                 $this->m->_db->loadObject($image);
                 

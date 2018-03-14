@@ -141,7 +141,7 @@
         };
         
         $scope.submit = function(event){
-            console.log($scope.form);
+            //console.log($scope.form);
             $scope.form.terms = [];
             
             $('#editLessonModal .terms_block .item').each(function(){                
@@ -149,6 +149,7 @@
             });
             
             $scope.form.show_answers = $('#editLessonModal input[name=show_answers]')[0].checked;
+            $scope.form.poster_id = $('#editLessonModal input[name=poster_id]').val();
             
             $http({
                 method:'POST',
@@ -226,7 +227,53 @@
                                     <div ng-show="errors.description" class="error">{{errors.description}}</div>
                                 </div>
                             </div>
+                            
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Язык</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="form.language">
+                                            <option value="eng">Английский</option>
+                                            <option value="pl">Польский</option>
+                                        </select>
+                                    </div>                                    
+                                </div>
+                            </div>
+                             <style>
+                                #editLessonModal .preview{
+                                    width:200px;
+                                    height:100px;
+                                    background: grey;
+                                }
+                            </style>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Постер</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="uploadFileBtn">Загрузить
+                                            <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/'}}"></iframe>
+                                        </div>
+                                        <input type="hidden" name="poster_id" value="0">
+                                        
+                                        <div class='preview' ng-if="!item.filename"></div>
+                                        <!--<div ng-if="item.filename" ng-cloak class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover"></div>-->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        <script>
+                            function editImage(filename,id){
+                                $('#editLessonModal .preview').css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                                $('#editLessonModal input[name=poster_id]').val(id);
+                            }
+                            function editError(error){
+                                console.log('editError');
+                            }
+                        </script>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <div class="btn btn-primary" ng-click="addTerm($event)">Добавить Условие</div>                                    
@@ -311,6 +358,52 @@
                             <div ng-show="errors.description" class="error">{{errors.description}}</div>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Язык</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="form.language">
+                                    <option value="eng">Английский</option>
+                                    <option value="pl">Польский</option>
+                                </select>
+                            </div>                                    
+                        </div>
+                    </div>
+                     <style>
+                        #addLessonModal .preview{
+                            width:200px;
+                            height:100px;
+                            background: grey;
+                        }
+                    </style>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label>Постер</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="uploadFileBtn">Загрузить
+                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/'}}"></iframe>
+                                </div>
+                                <input type="hidden" name="poster_id" value="0">
+
+                                <div class='preview'></div>
+                                <!--<div ng-if="item.filename" ng-cloak class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover"></div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        function editImage(filename,id){
+                            $('#editLessonModal .preview').css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                            $('#editLessonModal input[name=poster_id]').val(id);
+                        }
+                        function editError(error){
+                            console.log('editError');
+                        }
+                    </script>
 
                     <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
                 </form>

@@ -17,6 +17,8 @@
                 
                 $id = (int)$_POST['id'];
                 $row->name = strip_tags(trim($_POST['name']));
+                $row->poster_id = (int)$_POST['poster_id'];
+                $row->language = trim($_POST['language']);
                 $row->description = strip_tags(trim($_POST['description']));
                 $row->show_answers = $_POST['show_answers'] ? 1 : 0;
                 
@@ -37,6 +39,99 @@
                 }
             }else{
                 $this->m->data = $lessons->getData();
+            }
+        }
+        
+        public function loadeditimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);                
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                            . " AND `images`.`type` = 2"
+                        );
+                $this->m->_db->loadObject($image);
+                
+                $images->initImage($_FILES, $this->m->config->assets_path.DS.'posters');
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
+                    $this->m->id = $image->id;
+                }else{
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(400,400,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->type = 2;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
+                }
+            }
+        }
+        
+        public function loadaddimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                            . " AND `images`.`type` = 2"
+                        );
+                $this->m->_db->loadObject($image);
+                
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
+                    $this->m->id = $image->id;
+                }else{
+                    $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(400,400,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $image->type = 2;
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
+                }
             }
         }
         

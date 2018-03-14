@@ -8,7 +8,7 @@
     <?php if($this->m->status == 'success'){ ?>
         <script type="text/javascript">
             (function(){
-                parent.editImage('<?=$this->m->config->assets_url?>/images/<?=$this->m->filename?>',<?=$this->m->id?>,'<?=$_GET['index']?>');
+                parent.editImage('<?=$this->m->config->assets_url?>/posters/<?=$this->m->filename?>',<?=$this->m->id?>,'<?=$_GET['index']?>');
             })();
         </script>
     <?php }else if($status == 'error'){ ?>
