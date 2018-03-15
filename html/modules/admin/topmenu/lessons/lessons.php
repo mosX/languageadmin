@@ -128,7 +128,7 @@
         $scope.terms_list = [];
 
         $scope.$on('editData', function (event, ret){
-            console.log(ret.data); // Данные, которые нам прислали
+            
             $scope.terms_list = [];
             $scope.form  = ret.data;
             if($scope.form.terms){
@@ -257,10 +257,10 @@
                                         <div class="uploadFileBtn">Загрузить
                                             <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/'}}"></iframe>
                                         </div>
-                                        <input type="hidden" name="poster_id" value="0">
+                                        <input type="hidden" name="poster_id" value="{{form.poster_id?form.poster_id:'0'}}">
                                         
-                                        <div class='preview' ng-if="!item.filename"></div>
-                                        <!--<div ng-if="item.filename" ng-cloak class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover"></div>-->
+                                        <div class='preview' ng-if="!form.filename"></div>
+                                        <div ng-if="form.filename" ng-cloak class='preview' style="background:url(/assets/posters/{{form.filename}}) no-repeat center center; background-size:cover"></div>
                                     </div>
                                 </div>
                             </div>
@@ -309,6 +309,8 @@
         $scope.form = {};
         
         $scope.submit = function(event){
+            $scope.form.poster_id = $('#addLessonModal input[name=poster_id]').val();    
+            
             $http({
                 method:'POST',
                 url:'/lessons/',
@@ -372,7 +374,7 @@
                             </div>                                    
                         </div>
                     </div>
-                     <style>
+                    <style>
                         #addLessonModal .preview{
                             width:200px;
                             height:100px;
@@ -386,7 +388,7 @@
                             </div>
                             <div class="col-sm-8">
                                 <div class="uploadFileBtn">Загрузить
-                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadeditimage/'}}"></iframe>
+                                    <iframe id="hiddenIframeUpload" src="{{'/lessons/loadaddimage/'}}"></iframe>
                                 </div>
                                 <input type="hidden" name="poster_id" value="0">
 
@@ -396,11 +398,11 @@
                         </div>
                     </div>
                     <script>
-                        function editImage(filename,id){
-                            $('#editLessonModal .preview').css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
-                            $('#editLessonModal input[name=poster_id]').val(id);
+                        function addImage(filename,id){
+                            $('#addLessonModal .preview').css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                            $('#addLessonModal input[name=poster_id]').val(id);
                         }
-                        function editError(error){
+                        function addError(error){
                             console.log('editError');
                         }
                     </script>
