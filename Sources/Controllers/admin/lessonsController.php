@@ -528,7 +528,7 @@
                                                     . " LIMIT 1"
                                                 );
                                         $answer_id = $this->m->_db->loadResult();                                                                
-                                        if($answer_id){
+                                        if($answer_id){ 
                                             $this->m->_db->setQuery(
                                                     "UPDATE `answers` SET `answers`.`image_id` = '".$item['value']."'"
                                                     . " WHERE `answers`.`id` = ".(int)$answer_id
