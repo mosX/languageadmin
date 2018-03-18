@@ -184,11 +184,12 @@ class Questions{
         $this->updateCorrect($question_id, $correct);
     }
     
-    public function updateMain($id,$value,$score){      //обновляем основный параметры вопроса
+    public function updateMain($id,$value,$score,$audio_id){      //обновляем основный параметры вопроса
         $this->m->_db->setQuery(
                     "UPDATE `questions` "
                     . " SET `questions`.`value` = ".$this->m->_db->Quote($value)
                     . " , `questions`.`score` = '".(int)$score."'"
+                    . " , `questions`.`audio_id` = ".(int)$audio_id
                     . " WHERE `questions`.`id` = ".(int)$id
                     . " LIMIT 1"
                 );
@@ -247,25 +248,29 @@ class Questions{
         $this->m->_db->setQuery(
                     "SELECT `questions`.* "
                     . " , COUNT(`answer_collections`.`id`) as answers"
-                    //. " , COUNT(`question_collections`.`id`) as lessons"
                     . " , (SELECT COUNT(`question_collections`.`id`) FROM `question_collections` WHERE `question_collections`.`question_id` = `questions`.`id`) as lessons"
+                    //. " , `audios`.`description`"
+                    //. " , `audios`.`filename`"
                     . " FROM `questions` "
                     . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"
-                    //. " LEFT JOIN `question_collections` ON `question_collections`.`question_id` = `questions`.`id`"
+                    //. " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id` "
                     . " WHERE `questions`.`status` = 1"
                     . " GROUP by `questions`.`id`"
                     . " ORDER BY `questions`.`id` DESC"
                     . " LIMIT ".$xNav->limit." OFFSET ".$xNav->start.""
                 );
         $data = $this->m->_db->loadObjectList();
-        
+        //p($data);
         return $data;
     }
     
     public function getGiven($id){
         $this->m->_db->setQuery(
                     "SELECT `questions`.* "
+                    . " , `audios`.`filename`"
+                    . " , `audios`.`description` as audio_description"
                     . " FROM `questions` "
+                    . " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
                     . " WHERE `questions`.`id` = ".$id
                     . " LIMIT 1"
                 );

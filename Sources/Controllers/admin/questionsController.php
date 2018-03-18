@@ -62,13 +62,29 @@
             $id = (int)$_POST['id'];
             $row->value = strip_tags(trim($_POST['value']));
             $row->score = (int)$_POST['score'];
+            $row->audio_id = (int)$_POST['audio_id'];
+            
+            $description = strip_tags(trim($_POST['audio_description']));
+            
+            $type = $_POST['type'];
             $lesson_id = (int)$_POST['lesson_id'];
             $answers  = $_POST['answers'];
             
             xload('class.admin.questions');
             $questions = new Questions($this->m);
             
-            if($questions->updateMain($id,$row->value,$row->score)){
+            if($questions->updateMain($id,$row->value,$row->score,$row->audio_id)){
+                if($type == 5 || $type == 6){
+                    //обновляем описание аудиофайла    
+                    $this->m->_db->setQuery(
+                                "UPDATE `audios` SET `audios`.`description` = '".$description."'"
+                                . " WHERE `audios`.`id` = ".$row->audio_id
+                                . " LIMIT 1"
+                            );
+                    $this->m->_db->query();
+                    
+                }
+                
                 switch($_POST['type']){
                     case 1:$questions->editNormal($answers,$id);break;
                     case 2:$questions->editImage($answers,$id);break;
@@ -95,6 +111,10 @@
             $row->value = strip_tags(trim($_POST['value']));
             $row->score = (int)$_POST['score'];
             $row->type = (int)$_POST['mode'];
+            $row->audio_id = (int)$_POST['audio_id'];
+            
+            $description = strip_tags(trim($_POST['audio_description']));
+            
             $lesson_id = (int)$_POST['lesson_id'];
             $answers  = $_POST['answers'];
             
@@ -102,12 +122,26 @@
             $questions = new Questions($this->m);
             
             if($questions->addNew($row)){
+                if($row->type == 5 || $row->type == 6){
+                    //обновляем описание аудиофайла    
+                    $this->m->_db->setQuery(
+                                "UPDATE `audios` SET `audios`.`description` = '".$description."'"
+                                . " WHERE `audios`.`id` = ".$row->audio_id
+                                . " LIMIT 1"
+                            );
+                    $this->m->_db->query();
+                }
+                
                 switch($_POST['mode']){
                     case 1:$questions->addNormal($answers,$row->id);break;
                     case 2:$questions->addImage($answers,$row->id);break;
                     case 3:$questions->addNormal($answers,$row->id);break;
                     case 4:$questions->addNormal($answers,$row->id);break;
                     case 5:$questions->addNormal($answers,$row->id);break;
+                    case 6:$questions->addNormal($answers,$row->id);break;
+                    //case 5:$questions->addAudio($answers,$row->id);break;
+                    //case 5:$questions->addAudio($answers,$row->id);break;
+                    
                 }
                 
                 //закрепляем за уроком если есть лессон айди
@@ -151,6 +185,60 @@
                 echo '{"status":"success","result":"'.$result->published.'"}';
             }else{
                 echo '{"status":"error"}';
+            }
+        }
+        
+        public function loadeditaudioAction(){
+            $this->loadaddaudioAction();
+        }
+        
+        public function loadaddaudioAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                
+                $this->m->_db->setQuery(
+                            "SELECT `audios`.* "
+                            . " FROM `audios`"
+                            . " WHERE `audios`.`hash` = '".$hash."'"
+                            . " AND `audios`.`status` = 1"
+                            . " LIMIT 1"
+                        );
+                $this->m->_db->loadObject($audio);
+                
+                if($audio){
+                    $this->m->filename = $audio->filename;                    
+                    $this->m->status = 'success';                    
+                    $this->m->id = $audio->id;
+                    return;
+                }
+                
+                switch($_FILES['file']['type']){
+                    case 'audio/mpeg': $this->format = 'mp3';break;
+                    default:
+                        $this->validation = false;
+                        $this->error = "Не правильный формат аудио";
+                        return false;
+                }
+                
+                $filename = $hash.'.'.$this->format;
+                
+                move_uploaded_file($_FILES['file']['tmp_name'], $this->m->config->assets_path.DS.'audios' . DIRECTORY_SEPARATOR . $filename);
+                
+                $row->filename = $filename;
+                $row->hash = $hash;
+                $row->date = date("Y-m-d H:i:s");
+                if($this->m->_db->insertObject('audios',$row,'id')){
+                    $this->m->filename = $row->filename;
+                    
+                    $this->m->status = 'success';                    
+                    $this->m->id = $row->id;
+                }else{
+                    
+                    echo '{"status":"error"}';
+                }
             }
         }
                 

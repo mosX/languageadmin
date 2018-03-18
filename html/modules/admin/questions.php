@@ -1,241 +1,3 @@
-<!--<script>
-    app.controller('selectQuestionModalCtrl', ['$scope','$http',function($scope,$http){
-                
-        $scope.submit = function(event){
-            $http({
-                url:location.href,
-                method:'POST',
-                data:{'question':$scope.question_id}
-            }).then(function(ret){               
-                if(ret.data.status == 'success'){
-                    location.href = location.href;
-                }
-            });
-            event.preventDefault();
-        }        
-    }]);
-</script>
-<div ng-controller="selectQuestionModalCtrl" class="modal fade" id="selectQuestionModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" data-dismiss="modal">×</button>
-                <h4 class="modal-title font-header"><p><strong>Добавить Новий Вопрос</strong></p></h4>
-            </div>
-
-            <div class="modal-body">
-                <form action="" method="POST" ng-submit="submit($event)">                    
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label>Вопрос</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <select class="form-control" ng-model="question_id">
-                                    <?php foreach($this->list as $item){ ?>
-                                        <option value="<?=$item->id?>"><?=$item->value?></option>
-                                    <?php } ?>
-                                </select>
-                                <div class="error name_error"></div>
-                            </div>
-                            <div ng-show="errors.name" class="error">{{errors.name}}</div>
-                        </div>
-                    </div>
-
-                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>-->
-
-
-<!--
-<style>
-    #editImageQuestionModal .modal-dialog{
-        width:900px;
-    }
-</style>
-
-<script>
-    app.controller('imageQuestionEditModalCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
-        $scope.form = {};
-        $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
-        $scope.answers_list = [];   //для создания новых елементов
-        
-        $scope.selectedItem = {};   //активный объект в случае если мы выбираем картинки из существующих
-        
-        $rootScope.$on('selectImage',function(event,ret){
-            console.log("IMAGE ",ret);
-        });
-
-        $scope.$on('editImageData', function (event, ret){
-            console.log(ret.data); // Данные, которые нам прислали
-            
-            $scope.form  = ret.data;
-            $scope.answer_edit = ret.data.answers;
-            for(var key in $scope.answer_edit){
-                $scope.answer_edit[key].act = 'update';
-            }
-            console.log($scope.answer_edit);
-        });
-        
-        $scope.createAnswer = function(event){
-            console.log('createAnswer');
-            //$scope.answers_list.push({act:'insert'});
-            
-            $scope.answer_edit.push({'act':'insert','images_id':'0','id':'0'});
-            
-            event.preventDefault();
-        }
-        
-        $scope.selectAnswer = function(event){
-            console.log('selectAnswer');
-            $scope.answers_list.push({act:'select'});
-            
-            event.preventDefault();
-        }
-        
-        $scope.selectImage = function(event,item){
-            $scope.selectedItem = item;
-            
-            console.log('!!!!!!!!',item);
-            $rootScope.$emit('showSelectImagePanel',item);
-        }
-        
-        $scope.submit = function(event){
-            $scope.form.answers = [];
-            $('#editImageQuestionModal .answers_block .answer_item').each(function(){
-                var act = $(this).attr('data-act');
-                $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
-            });
-            
-            console.log($scope.form);
-            
-            $http({
-                method:'POST',
-                url:'/lessons/add_image_question/',
-                data:$scope.form
-            }).then(function(ret){
-               console.log(ret.data);
-                if(ret.data.status == 'success'){
-                    location.href = location.href;
-                }else{
-                    console.log('ERROR');
-                }
-            });
-            
-            event.preventDefault();
-        }    
-    }]);
-</script>
-
-<div ng-controller="imageQuestionEditModalCtrl" class="modal fade" id="editImageQuestionModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" data-dismiss="modal">×</button>
-                <h4 class="modal-title font-header"><p><strong>Редактировать Вопрос Картинкой</strong></p></h4>
-            </div>
-
-            <div class="modal-body">
-                <form action="" method="POST" ng-submit="submit($event)">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <label>Вопрос</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <textarea class="form-control" ng-model="form.value" style="height: 80px;"></textarea>
-                                        <div class="error name_error"></div>
-                                    </div>
-                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <label>Балы</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" ng-model="form.score">
-                                        <div class="error name_error"></div>
-                                    </div>
-                                    <div ng-show="errors.name" class="error">{{errors.name}}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Создать</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <style>
-                                #editImageQuestionModal .preview{
-                                    width:100px;
-                                    height:100px;
-                                    background: grey;
-                                }
-                                #editImageQuestionModal .answer_item[data-act="delete"]{
-                                    display:none;
-                                }
-                            </style>
-                            <div class="answers_block">
-                                <div class="form-group" ng-repeat="item in answer_edit">
-                                    <div class="answer_item" data-act="{{item.act}}" data-index='{{$index}}'>
-                                        <div class="row">
-                                            <div class="col-sm-4">
-                                                <div class="uploadFileBtn">Загрузить
-                                                    <iframe id="hiddenIframeUpload" src="{{'/questions/loadeditimage/?index='+$index}}"></iframe>
-                                                </div>
-                                                
-                                                <div ng-click="selectImage($event,item)" class="btn btn-primary">Выбрать</div>
-                                                <input type="hidden" name="image_id" value="{{item.image_id}}">
-                                                <input type="hidden" class="id" name="id" value="{{item.id}}">                                                
-                                            </div>
-                                            <div class="col-sm-4">
-                                                
-                                                <div class='preview' style="background:url(/assets/images/{{item.filename}}) no-repeat center center; background-size:cover">
-                                                    
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <script>
-                                    function editImage(filename,id,index){
-                                        var parent = $('#editImageQuestionModal .answers_block .answer_item[data-index='+index+']');                                        
-                                        $('.preview',parent).css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
-                                        $('input[name=image_id]',parent).val(id);
-                                    }
-                                    function editError(error){
-                                        console.log('editError');
-                                    }
-                                </script>
-                            </div>
-                        </div>
-                    </div>
-                    <input value="Применить" class="btn btn-primary" type="submit" style="margin-bottom:15px;">
-                    <input type="hidden" name="id" value="" ng-model="form.id">     
-                </form>
-            </div>
-        </div>
-    </div>
-</div>-->
-
 <style>
     #select_image_overflow{
         display:none;
@@ -271,6 +33,7 @@
         max-width: 100%;
     }
 </style>
+
 <script>
     app.controller('selectImagePanelCtrl', ['$scope','$rootScope','$http',function($scope,$rootScope,$http){
         $scope.activeObject = {};
@@ -314,7 +77,7 @@
         }
     }]);
 </script>
-<div  ng-controller="selectImagePanelCtrl">    
+<div  ng-controller="selectImagePanelCtrl">
     <div id="select_image_panel" >
         <div class="select_container">
             <div class="row">
@@ -336,14 +99,18 @@
         $scope.answers_list = [];   //для создания новых елементов
         $scope.answers_list[1] = [];
         
+        $scope.mode = 'text';   //audio
+        
         $scope.selectedItem = {};   //активный объект в случае если мы выбираем картинки из существующих
         
         $scope.submit = function(event){
             $scope.form.answers = [];            
+            
             switch(parseInt($scope.form.mode)){
-                case 1 :                     
+                case 1:case 5:case 6:case 3 :case 4:
+                    $scope.form.audio_id = $('#addQuestionModal input[name=audio_id]').val();
                     $('#addQuestionModal .answers_block .answer_item').each(function(){
-                        console.log($('textarea',this));
+                        
                         $scope.form.answers.push({act:'insert',correct:$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
                     });
                     break;
@@ -395,11 +162,23 @@
             
             event.preventDefault();
         }*/
+            
+        $scope.listen = function(event){
+            var url = $(event.target).attr('data-src');
+            var audio = new Audio(url);
+            audio.play();
+        }
         
         $scope.changeMode = function(){
             console.log($scope.form.mode);
             if($scope.answers_list[$scope.form.mode] == undefined){
                $scope.answers_list[$scope.form.mode] = []; 
+            }
+            
+            if($scope.form.mode == 5 || $scope.form.mode == 6){
+                $scope.mode = 'audio';
+            }else{
+                $scope.mode = 'text';
             }
         }
     }]);
@@ -432,12 +211,50 @@
                                             <option value="2">Выбор Изображения</option>
                                             <option value="3">Пропущенное слово</option>
                                             <option value="4">Написать перевод</option>
+                                            <option value="5">Прослушать и выбрать</option>
+                                            <option value="6">Прослушать и написать</option>
                                         </select>
                                     </div>                                    
                                 </div>
                             </div>
                             
-                            <div class="form-group">
+                            <div class="form-group" ng-if='mode=="audio"'>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Аудио</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="uploadFileBtn">Загрузить
+                                            <iframe id="hiddenIframeUpload" src="{{'/questions/loadaddaudio/'}}"></iframe>
+                                            <input type="hidden" name="audio_id" value="">
+                                        </div>
+                                        <div style="display:none" ng-click="listen($event)" data-src="" class="btn btn-primary listen_btn">Слушать</div>
+                                        <script>
+                                            function addAudio(filename,id,index){
+                                                console.log('!!',filename,id);
+                                                $('#addQuestionModal input[name=audio_id]').val(id);
+                                                $('#addQuestionModal .listen_btn').attr('data-src',filename).css({'display':'inline-block'});
+                                            }
+                                            function addAudioError(error){
+                                                console.log('editError');
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" ng-if='mode == "audio"'>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Описание</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" name="audio_description" ng-model="form.audio_description">                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" ng-if='mode == "text"'>
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <label>Вопрос</label>
@@ -474,6 +291,35 @@
                             </div>
                             <div class="answers_block" ng-if="form.mode == '1'">
                                 <div class="form-group" ng-repeat="item in answers_list[1]">
+                                    <div class="answer_item">
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" style="height: 40px;"></textarea>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="answers_block" ng-if="form.mode == '5'">
+                                <div class="form-group" ng-repeat="item in answers_list[5]">
+                                    <div class="answer_item">
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" style="height: 40px;"></textarea>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="answers_block" ng-if="form.mode == '6'">
+                                <div class="form-group" ng-repeat="item in answers_list[6]">
                                     <div class="answer_item">
                                         <div class="row">
                                             <div class="col-sm-10">
@@ -569,6 +415,8 @@
         $scope.form = {};
         $scope.answers = <?=$this->answers ? json_encode($this->answers): '[]'?>;   //для селекта
         $scope.answers_list = [];   //для создания новых елементов
+        
+        $scope.mode = 'text';
 
         $scope.$on('editData', function (event, ret){
             console.log(ret.data); // Данные, которые нам прислали
@@ -576,6 +424,13 @@
             $scope.mode = ret.data.type;
             $scope.form  = ret.data;
             $scope.answer_edit = ret.data.answers;
+            console.log($scope.answer_edit);
+            
+            if($scope.form.type == 5 || $scope.form.type == 6){
+                $scope.type = 'audio';
+            }else{
+                $scope.type = 'text';
+            }
             
             for(var key in $scope.answer_edit){
                 $scope.answer_edit[key].act = 'update';
@@ -606,12 +461,19 @@
             
             event.preventDefault();
         }*/
+    
+        $scope.listen = function(event){
+            var url = $(event.target).attr('data-src');
+            var audio = new Audio(url);
+            audio.play();
+        }
         
         $scope.submit = function(event){
             $scope.form.answers = [];
             
             switch(parseInt($scope.mode)){
-                case 1:
+                case 1:case 5:case 6:
+                    $scope.form.audio_id = $('#editQuestionModal input[name=audio_id]').val();
                     $('#editQuestionModal .answers_block .answer_item').each(function(){
                         var act = $(this).attr('data-act');
                         $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
@@ -663,7 +525,7 @@
                 <form action="" method="POST" ng-submit="submit($event)">
                     <div class="row">
                         <div class="col-sm-6">
-                            <div class="form-group">
+                            <div class="form-group" ng-if='type=="text"'>
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <label>Вопрос</label>
@@ -675,6 +537,54 @@
                                     <div ng-show="errors.name" class="error">{{errors.name}}</div>
                                 </div>
                             </div>
+                            
+                            <div class="form-group" ng-if='type=="audio"'>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Аудио</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="uploadFileBtn">Загрузить
+                                            <iframe id="hiddenIframeUpload" src="{{'/questions/loadeditaudio/'}}"></iframe>
+                                            <input type="hidden" name="audio_id" value="{{form.audio_id}}">
+                                        </div>
+                                        
+                                        <div  ng-click="listen($event)" data-src="{{'/assets/audios/'+form.filename}}" class="btn btn-primary listen_btn">Слушать</div>
+                                        <script>
+                                            function editAudio(filename,id,index){
+                                                console.log('!!',filename,id);
+                                                $('#editQuestionModal input[name=audio_id]').val(id);
+                                                $('#editQuestionModal .listen_btn').attr('data-src',filename).css({'display':'inline-block'});
+                                            }
+                                            function editAudioError(error){
+                                                console.log('editError');
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" ng-if='type == "audio"'>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Описание</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" name="audio_description" ng-model="form.audio_description">                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <script>
+                                function editAudio(filename,id,index){
+                                    console.log('!!',filename,id);
+                                    $('#editQuestionModal input[name=audio_id]').val(id);
+                                    $('#editQuestionModal .listen_btn').attr('data-src',filename).css({'display':'inline-block'});
+                                }
+                                function editAudioError(error){
+                                    console.log('editError');
+                                }
+                            </script>
+                            
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -702,6 +612,42 @@
                             
                             <div class="answers_block">
                                 <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 1">
+                                    <div class="answer_item" data-act="{{item.act}}">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 5">
+                                    <div class="answer_item" data-act="{{item.act}}">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 6">
                                     <div class="answer_item" data-act="{{item.act}}">
                                         <div class="row">
                                             <div class="col-sm-8">
