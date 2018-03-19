@@ -138,6 +138,8 @@
                                 <td><?=$item->answer?></td>
                             <?php }else if($item->type == 2){ ?>
                                 <td><img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>"></td>
+                            <?php }else{ ?>
+                                <td><?=$item->answer?></td>
                             <?php } ?>
                             <td><?=$item->score?></td>
                             <td><?=$item->answers?></td>

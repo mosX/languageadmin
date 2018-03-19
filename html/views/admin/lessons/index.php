@@ -109,6 +109,7 @@
                         <th style="width:60px;">ID</th>
                         <th>НАЗВАНИЕ</th>
                         <th>ОПИСАНИЕ</th>
+                        <th>ЯЗЫК</th>
                         <th style="width:100px;"></th>                        
                         <th style='width:70px;'></th>
                     </tr>
@@ -125,6 +126,9 @@
                             
                             <td class="username_td">
                                 <?=$item->description?>
+                            </td>
+                            <td class="username_td">
+                                <?=$item->language?>
                             </td>
                             
                             <td>

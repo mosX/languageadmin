@@ -48,7 +48,9 @@ class Lessons{
     public function getGiven($id){
         $this->m->_db->setQuery(
                     "SELECT `lessons`.* "
+                    . " , `images`.`filename`"
                     . " FROM `lessons` "
+                    . " LEFT JOIN `images` ON `images`.`id` = `lessons`.`poster_id`"
                     . " WHERE `lessons`.`id` = ".(int)$id 
                     . " LIMIT 1"
                 );
