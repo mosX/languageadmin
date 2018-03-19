@@ -17,8 +17,6 @@
                 
                 $id = (int)$_POST['id'];
                 $row->name = strip_tags(trim($_POST['name']));
-                $row->poster_id = (int)$_POST['poster_id'];
-                $row->language = trim($_POST['language']);
                 $row->description = strip_tags(trim($_POST['description']));
                 $row->show_answers = $_POST['show_answers'] ? 1 : 0;
                 
@@ -39,99 +37,6 @@
                 }
             }else{
                 $this->m->data = $lessons->getData();
-            }
-        }
-        
-        public function loadeditimageAction(){
-            $this->disableTemplate();
-            
-            if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                xload('class.images');
-                $images = new Images($this->m);                
-                
-                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
-                //проверяем Хеш
-                $this->m->_db->setQuery(
-                            "SELECT `images`.* "
-                            . " FROM `images` "
-                            . " WHERE `images`.`hash` = '".$hash."'"
-                            . " AND `images`.`type` = 2"
-                        );
-                $this->m->_db->loadObject($image);
-                
-                $images->initImage($_FILES, $this->m->config->assets_path.DS.'posters');
-                if($image){
-                    $this->m->filename = $image->filename;
-                    $this->m->status = 'success';                    
-                    $this->m->id = $image->id;
-                }else{
-                    if($images->validation == true){
-                        $images->saveThumbs(array(array(400,400,'')));
-                    }
-
-                    if($images->validation == false){
-                        $this->m->status = 'error';
-                        $this->m->error = $images->error;
-                    }else{
-                        $this->m->filename = $images->filename;
-                        $this->m->status = 'success';
-
-                        $image = new stdClass();
-                        $image->filename = $this->m->filename;
-                        $image->hash = $hash;
-                        $image->type = 2;
-                        $image->date = date("Y-m-d H:i:s");
-                        $this->m->_db->insertObject('images',$image,'id');
-                        $this->m->id = $image->id;
-                    }
-                }
-            }
-        }
-        
-        public function loadaddimageAction(){
-            $this->disableTemplate();
-            
-            if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                xload('class.images');
-                $images = new Images($this->m);
-                
-                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
-                //проверяем Хеш
-                $this->m->_db->setQuery(
-                            "SELECT `images`.* "
-                            . " FROM `images` "
-                            . " WHERE `images`.`hash` = '".$hash."'"
-                            . " AND `images`.`type` = 2"
-                        );
-                $this->m->_db->loadObject($image);
-                
-                if($image){
-                    $this->m->filename = $image->filename;
-                    $this->m->status = 'success';                    
-                    $this->m->id = $image->id;
-                }else{
-                    $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
-
-                    if($images->validation == true){
-                        $images->saveThumbs(array(array(400,400,'')));
-                    }
-
-                    if($images->validation == false){
-                        $this->m->status = 'error';
-                        $this->m->error = $images->error;
-                    }else{
-                        $this->m->filename = $images->filename;
-                        $this->m->status = 'success';
-
-                        $image = new stdClass();
-                        $image->filename = $this->m->filename;
-                        $image->hash = $hash;
-                        $image->date = date("Y-m-d H:i:s");
-                        $image->type = 2;
-                        $this->m->_db->insertObject('images',$image,'id');
-                        $this->m->id = $image->id;
-                    }
-                }
             }
         }
         
@@ -182,7 +87,7 @@
             }
         }
         
-        /*public function delete_question_collectionAction(){
+        public function delete_question_collectionAction(){
             $this->disableTemplate();
             $this->disableView();
             
@@ -195,7 +100,7 @@
             }else{                
                 echo '{"status":"error"}';
             }
-        }*/
+        }
         
         public function delete_lessonAction(){
             $this->disableTemplate();
@@ -212,7 +117,96 @@
                 echo '{"status":"error"}';
             }
         }
-               
+        
+        public function loadeditimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);                
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                        );
+                $this->m->_db->loadObject($image);
+                
+                $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
+                    $this->m->id = $image->id;
+                }else{
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(200,200,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
+                }
+            }
+        }
+        
+        public function loadaddimageAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                        );
+                $this->m->_db->loadObject($image);
+                
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';                    
+                    $this->m->id = $image->id;
+                }else{
+                    $images->initImage($_FILES, $this->m->config->assets_path.DS.'images');
+
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(200,200,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
+                }
+            }
+        }
+        
         public function testing_checkAction(){
             $this->m->_db->setQuery(
                         "SELECT `testing_results`.* "
@@ -280,7 +274,7 @@
             $this->m->data = $this->m->_db->loadObjectList();
         }
         
-        /*public function question_image_dataAction(){
+        public function question_image_dataAction(){
             $this->disableTemplate();
             $this->disableView();
             
@@ -304,7 +298,31 @@
             $data->answers = $this->m->_db->loadObjectList();
             
             echo json_encode($data);
-        }*/
+        }
+        
+        public function question_dataAction(){
+            $this->disableTemplate();
+            $this->disableView();
+            
+            xload('class.admin.questions');                
+            $questions = new Questions($this->m);
+            
+            $id = (int)$_GET['id'];
+            
+            $data = $questions->getGiven($id);
+            
+            //получаем список ответов для селекта
+            $this->m->_db->setQuery(
+                        "SELECT `answer_collections`.* "
+                        . " , `answers`.`text`"
+                        . " FROM `answer_collections` "
+                        . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
+                        . " WHERE `answer_collections`.`question_id` = ".$id                        
+                    );
+            $data->answers = $this->m->_db->loadObjectList();
+            
+            echo json_encode($data);
+        }
         
         public function answers_dataAction(){
             $this->disableTemplate();
@@ -350,6 +368,7 @@
                 $this->disableView();
                 $_POST = json_decode(file_get_contents('php://input'), true); 
                 
+                //UPD использовалось для добавления вопроса из селекта по одному
                 $row->question_id = (int)$_POST['question'];
                 $row->lesson_id = (int)$this->m->_path[2];
             
@@ -456,24 +475,12 @@
                 }
             }else{
                 $this->m->_db->setQuery(
-                    "SELECT COUNT(`answers`.`id`)"
-                    . " FROM `answers`"
-                    . " WHERE `answers`.`status` = 1"
-                );
-                $this->m->total = $this->m->_db->loadResult(); 
-
-                $xNav = new xNav("/lessons/answers/", $this->m->total, "GET");
-                $xNav->limit = 50;
-                $this->m->pagesNav = $xNav->showPages();
-                
-                $this->m->_db->setQuery(
                             "SELECT `answers`.* "
                             . " , COUNT(`answer_collections`.`id`) as questions"
                             . " FROM `answers` "
                             . " LEFT JOIN `answer_collections` ON `answer_collections`.`answer_id` = `answers`.`id`"
                             . " WHERE `answers`.`status` = 1"
                             . " GROUP BY `answers`.`id`"
-                            . " LIMIT ".$xNav->limit." OFFSET ".$xNav->start.""
                         );
                 $this->m->data = $this->m->_db->loadObjectList();
             }
@@ -490,7 +497,6 @@
             echo json_encode($data);
         }
         
-<<<<<<< HEAD
         public function add_image_questionAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -522,7 +528,7 @@
                                                     . " LIMIT 1"
                                                 );
                                         $answer_id = $this->m->_db->loadResult();                                                                
-                                        if($answer_id){ 
+                                        if($answer_id){
                                             $this->m->_db->setQuery(
                                                     "UPDATE `answers` SET `answers`.`image_id` = '".$item['value']."'"
                                                     . " WHERE `answers`.`id` = ".(int)$answer_id
@@ -601,21 +607,129 @@
             }
         }
         
-=======
->>>>>>> 7639ba27449f61ea3a063154cdcbe3266c026d83
         public function questionsAction(){
             xload('class.admin.questions');
             $questions = new Questions($this->m);
-
-            $this->m->data = $questions->getData();
-
-            /*$this->m->_db->setQuery(
-                        "SELECT `answers`.`id` "
-                         . " , `answers`.`text`"
-                         . " FROM `answers` "
-                         . " WHERE `answers`.`status` = 1"
-                    );
-            $this->m->answers = $this->m->_db->loadObjectList();*/
+                
+             if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                
+                $_POST = json_decode(file_get_contents('php://input'), true); 
+                
+                $id = (int)$_POST['id'];
+                $row->value = strip_tags(trim($_POST['value']));
+                $row->score = (int)$_POST['score'];
+                $lesson_id = (int)$_POST['lesson_id'];
+                $answers  = $_POST['answers'];
+                                
+                if($id){        //EDIT
+                    if($questions->updateMain($id,$row->value,$row->score)){
+                        foreach($answers as $item){     //добавляем вопросы
+                            switch($item['act']){
+                                case 'update':
+                                        //нужно получить ансвет айди по колекшн айди
+                                        $this->m->_db->setQuery(
+                                                    "SELECT `answer_collections`.`answer_id` as id"
+                                                    . " FROM `answer_collections`"
+                                                    . " WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $answer_id = $this->m->_db->loadResult();
+                                                                                
+                                        if($answer_id){
+                                            $this->m->_db->setQuery(
+                                                    "UPDATE `answers` SET `answers`.`text` = '".$item['value']."'"
+                                                    . " WHERE `answers`.`id` = ".(int)$answer_id
+                                                    . " LIMIT 1"
+                                                );
+                                            $this->m->_db->query();
+                                        }
+                                        if($item['correct'])$correct = $item['id'];                                        
+                                    break;
+                                case 'insert':
+                                        $answer = new stdClass();
+                                        $answer->text = $item['value'];
+                                        $answer->date = date("Y-m-d H:i:s");
+                                        $this->m->_db->insertObject('answers',$answer,'id');
+                                        
+                                        $collection = new stdClass();
+                                        $collection->answer_id = $answer->id;
+                                        $collection->question_id = $id;
+                                        $this->m->_db->insertObject('answer_collections',$collection,'id');
+                                        
+                                        if($item['correct'])$correct = $collection->id;
+                                    break;
+                                case 'delete':
+                                        if(!$item['id']) break;
+                                        $this->m->_db->setQuery(
+                                                    "DELETE FROM `answer_collections` WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $this->m->_db->query();
+                                        
+                                    break;
+                            }
+                        }
+                        
+                        $questions->updateCorrect($id,$correct);
+                        
+                        echo '{"status":"success"}';
+                    }else{
+                        echo '{"status":"error"}';
+                    }
+                }else{          //ADD
+                    if($questions->addNew($row)){
+                        foreach($answers as $item){     //добавляем вопросы
+                            if($item['act'] == 'insert'){   //добавляем новый
+                                $answer = new stdClass();
+                                $answer->text = $item['value'];
+                                $answer->date = date("Y-m-d H:i:s");
+                                $this->m->_db->insertObject('answers',$answer,'id');
+                                
+                                $collection = new stdClass();
+                                $collection->answer_id = $answer->id;
+                                $collection->question_id = $row->id;
+                                
+                                $this->m->_db->insertObject('answer_collections',$collection,'id');
+                                
+                                if($item['correct'])$correct = $collection->id;
+                            }else if($item['act'] == 'select'){ //закрепляем существующий
+                                $collection->answer_id = (int)$item['value'];
+                                $collection->question_id = $row->id;
+                                $this->m->_db->insertObject('answer_collections',$collection,'id');
+                                
+                                if($item['correct'])$correct = $collection->id;
+                            }
+                        }
+                        
+                        $questions->updateCorrect($row->id,$correct);
+                        
+                        //закрепляем за уроком если есть лессон айди
+                        if($lesson_id){
+                            $lesson = new stdClass();
+                            $lesson->question_id = $row->id;
+                            $lesson->lesson_id = $lesson_id;
+                            $this->m->_db->insertObject('question_collections',$lesson);
+                        }
+                        
+                        echo '{"status":"success"}';
+                    }else{
+                        
+                        echo '{"status":"error"}';
+                    }
+                }
+            }else{
+                $this->m->data = $questions->getData();
+                
+                $this->m->_db->setQuery(
+                            "SELECT `answers`.`id` "
+                             . " , `answers`.`text`"
+                             . " FROM `answers` "
+                             . " WHERE `answers`.`status` = 1"
+                        );
+                $this->m->answers = $this->m->_db->loadObjectList();
+            }
         }
     }
 ?>

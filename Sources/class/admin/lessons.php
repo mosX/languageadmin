@@ -11,14 +11,18 @@ class Lessons{
                     "UPDATE `lessons` SET `lessons`.`name` = '".$row->name."'"
                     . " , `lessons`.`show_answers` = '".(int)$row->show_answers."'"
                     . " , `lessons`.`description` = '".$row->description."'"
+                    . " , `lessons`.`poster_id` = ".(int)$row->poster_id
+                    . " , `lessons`.`language` = '".$row->language."'"
                     . ($row->terms ? " , `lessons`.`terms` = '".$row->terms."'" : '')
                     . " WHERE `lessons`.`id` = ".(int)$id
                     . " LIMIT 1"
                 );
         if($this->m->_db->query()){
-            echo '{"status":"success"}';
+            //echo '{"status":"success"}';
+            return true;
         }else{
-            echo '{"status":"error"}';
+            return false;
+            //echo '{"status":"error"}';
         }
     }
     

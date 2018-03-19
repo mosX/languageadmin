@@ -75,6 +75,7 @@
                     </div>
                 </div>
             </div>
+            
             <script>
                 $('document').ready(function(){
                     $( ".datepicker" ).datepicker({
@@ -85,7 +86,6 @@
                         firstDay: 1
                     });
                 });
-
             </script>
            
             <div class='filter_inner'>
@@ -106,9 +106,8 @@
             <a class="svg_controls">
                 <svg><use xlink:href="#controls--button-more"></use></svg>
             </a>
-            <a data-toggle="modal" data-target="#selectQuestionModal" class="button add_deal">Выбрать Вопрос</a>
-            <a data-toggle="modal" data-target="#addImageQuestionModal" class="button add_deal">+ Вопрос Изображения</a>
-            <a data-toggle="modal" data-target="#addQuestionModal" class="button add_deal">+ Вопрос</a>
+            <!--<a data-toggle="modal" data-target="#selectQuestionModal" class="button add_deal">Выбрать Вопрос</a>-->
+            <a data-toggle="modal" data-target="#addQuestionModal" class="button add_deal">+ Новый Вопрос</a>
         </div>
     </div>
 </div>
@@ -125,7 +124,7 @@
         
         $scope.submit = function(event){
             $http({
-                url:'/lessons/delete_question_collection/?id='+$scope.id,
+                url:'/questions/delete_question_collection/?id='+$scope.id,
                 method:'GET'
             }).then(function(ret){
                 if(ret.data.status == 'success'){

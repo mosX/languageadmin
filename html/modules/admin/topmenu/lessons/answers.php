@@ -2,7 +2,7 @@
     <?=$this->module('header')?>
     <div class="page_menu">
         <div class="preset">
-            <div class='title_button'>Уроки</div>
+            <div class='title_button'>Ответы</div>
             <div class="buttons_wrapper">
                 <a href="/channels/sequence/" class="svg_pipe <?=$this->_action == 'sequence' ? 'active':''?>">
                     <svg style="width:14px; height:16px;" ><use xlink:href="#common--pipe"></use></svg>
@@ -137,7 +137,7 @@
             
             $http({
                 method:'POST',
-                url:'/lessons/',
+                url:'/lessons/answers/',
                 data:$scope.form
             }).then(function(ret){
                 console.log(ret.data);

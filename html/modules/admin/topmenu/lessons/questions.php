@@ -96,21 +96,72 @@
                 <label for="search_input" class='ico'>
                     <svg class="svg_search_icon"><use xlink:href="#common--filter-search"></use></svg>
                 </label>
-            </div>        
+            </div>
         </form>
 
         <div class="actions">
-            <a class="svg_settings">
+            <!--<a class="svg_settings">
                 <svg><use xlink:href="#common--settings"></use></svg>
             </a>
             <a class="svg_controls">
                 <svg><use xlink:href="#controls--button-more"></use></svg>
             </a>            
-            <a data-toggle="modal" data-target="#addQuestionModal" class="button add_deal">+ НОВЫЙ ВОПРОС</a>
+            <a data-toggle="modal" data-target="#addQuestionModal" class="button add_deal">+ НОВЫЙ ВОПРОС</a>-->
         </div>
     </div>
 </div>
 
+
+<script>
+    app.controller('deleteModalCtrl', ['$scope', '$http', function ($scope, $http) {
+        $scope.id = '';
+
+        $scope.$on('delete', function (event,id){
+            console.log(id); // Данные, которые нам прислали
+            $scope.id = id;
+            $('#deleteModal').modal('show');
+        });
+        
+        $scope.submit = function(event){
+            $http({
+                url:'/questions/delete_question_collection/?question_id='+$scope.id,
+                method:'GET'
+            }).then(function(ret){
+                if(ret.data.status == 'success'){
+                    location.href = location.href;
+                }else{
+                    
+                }
+            });
+            event.preventDefault();
+        }
+    }]);
+</script>
+<div class="modal fade" ng-controller="deleteModalCtrl" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удалить контакт</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action='' method='POST' ng-submit="submit($event)">
+                <div class="modal-body">
+                    <p>Вы действительно хотите удалить предмет?</p>
+
+                    <p>Все данные, как-либо связанные с ним, будут удалены. Восстановить удалённые данные будет невозможно.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type='hidden' name='id' value=''>
+                    <input type="submit" class="btn btn-secondary" value='Подтвердить'>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Отменить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--
 <script>
     app.controller('questionEditModalCtrl', ['$scope','$http',function($scope,$http,$userinfo){
         $scope.form = {};
@@ -222,9 +273,7 @@
                                     <div class="col-sm-12">
                                         <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Добавить Ответ</div>
                                     </div>
-                                    <!--<div class="col-sm-6">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>-->
+                                   
                                 </div>
                             </div>
                             
@@ -277,8 +326,8 @@
             </div>
         </div>
     </div>
-</div>
-
+</div>-->
+<!--
 <script>
     app.controller('questionModalCtrl', ['$scope','$http',function($scope,$http){
         $scope.form = {answers:[]};
@@ -378,9 +427,7 @@
                                     <div class="col-sm-12">
                                         <div class="btn btn-primary" style="width:100%" ng-click="createAnswer($event)">Добавить Ответ</div>
                                     </div>
-                                    <!--<div class="col-sm-6">
-                                        <div class="btn btn-primary" style="width:100%" ng-click="selectAnswer($event)">Выбрать</div>
-                                    </div>-->
+                                    
                                 </div>
                             </div>
                             
@@ -417,4 +464,5 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
+<?=$this->module('questions')?>
