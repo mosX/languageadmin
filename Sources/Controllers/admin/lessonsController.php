@@ -489,8 +489,7 @@
             $data = $this->m->_db->loadObjectList();
             echo json_encode($data);
         }
-        
-<<<<<<< HEAD
+
         public function add_image_questionAction(){
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $this->disableTemplate();
@@ -600,9 +599,7 @@
                 }
             }
         }
-        
-=======
->>>>>>> 7639ba27449f61ea3a063154cdcbe3266c026d83
+
         public function questionsAction(){
             xload('class.admin.questions');
             $questions = new Questions($this->m);

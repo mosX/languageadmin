@@ -23,6 +23,7 @@ class mainframe {
     public $_stylesheet = array();
 
     function run(){
+        
         session_start();
         $this->parsePath();
         $this->setConfig();
@@ -93,7 +94,7 @@ class mainframe {
         }
         
         xload('class.lib.model');
-        
+                
         if(file_exists(XPATH_SOURCES . DS . 'Controllers' .DS . $this->_permission.  DS . $this->_controller . 'Controller.php')){            
             require_once XPATH_SOURCES . DS . 'Controllers'  .DS. $this->_permission. DS . $this->_controller . 'Controller.php';
         }else if (file_exists(XPATH_SOURCES . DS . 'Controllers' .  DS . $this->_controller . 'Controller.php')) {

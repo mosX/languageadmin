@@ -326,7 +326,7 @@
                                                 <textarea class="form-control" style="height: 40px;"></textarea>
                                             </div>
                                             <div class="col-sm-2">
-                                                <input type="radio" name="answer">
+                                                <!--<input type="radio" name="answer">-->
                                             </div>
                                         </div>
                                     </div>
@@ -354,7 +354,7 @@
                                                 <textarea class="form-control" style="height: 40px;"></textarea>
                                             </div>
                                             <div class="col-sm-2">
-                                                <input type="radio" name="answer">
+                                                <!--<input type="radio" name="answer">-->
                                             </div>
                                         </div>
                                     </div>
