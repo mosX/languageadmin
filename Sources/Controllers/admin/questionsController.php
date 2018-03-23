@@ -82,7 +82,6 @@
                                 . " LIMIT 1"
                             );
                     $this->m->_db->query();
-                    
                 }
                 
                 switch($_POST['type']){
