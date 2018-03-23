@@ -110,7 +110,7 @@
                     </li>
                 </ul>
                 <style>
-                    .table .personal {        
+                    .table .personal {
                         background : #f8faff;
                         font-weight: bolder;
                     }
@@ -122,6 +122,7 @@
                         <th>Ответ</th>
                         <th>Балов</th>
                         <th>Ответов</th>
+                        <th>Тип</th>
                         <th style="width:100px;"></th>
                         <th style="width:100px;"></th>
                     </tr>
@@ -143,14 +144,9 @@
                             <?php } ?>
                             <td><?=$item->score?></td>
                             <td><?=$item->answers?></td>
-                            
+                            <td><?=$item->type?></td>
                             <td>
                                 <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
-                                <!--<?php if($item->type == 1){ ?>
-                                    <a ng-click="editForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
-                                <?php }else{ ?>
-                                    <a ng-click="editImageForm($event,<?=$item->question_id?>)" class="edit_tags_ico" href=""></a>
-                                <?php } ?>-->
                                 <a ng-click="remove($event,<?=$item->id?>,'<?=$item->name?>')" class="del_user_ico" href=""></a>
                             </td>
                             <td><div ng-click="publish($event,<?=$item->id?>)" class="trigger <?=$item->published ? 'on':'off'?>"></div></td>

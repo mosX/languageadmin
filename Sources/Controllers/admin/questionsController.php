@@ -195,7 +195,6 @@
             $this->disableTemplate();
             
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
-                
                 $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
                 
                 $this->m->_db->setQuery(

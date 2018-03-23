@@ -489,7 +489,117 @@
             $data = $this->m->_db->loadObjectList();
             echo json_encode($data);
         }
-        
+
+        public function add_image_questionAction(){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $this->disableTemplate();
+                $this->disableView();
+                
+                xload('class.admin.questions');                
+                $questions = new Questions($this->m);
+                
+                $_POST = json_decode(file_get_contents('php://input'), true); 
+                
+                $id = (int)$_POST['id'];
+                $row->value = strip_tags(trim($_POST['value']));
+                $row->score = (int)$_POST['score'];
+                $row->type = 2;
+                $lesson_id = (int)$_POST['lesson_id'];
+                $answers  = $_POST['answers'];
+                
+                if($id){        //EDIT
+                    if($questions->updateMain($id,$row->value,$row->score)){
+                        foreach($answers as $item){     //добавляем вопросы
+                            
+                            switch($item['act']){
+                                case 'update':
+                                        //нужно получить ансвет айди по колекшн айди
+                                        $this->m->_db->setQuery(
+                                                    "SELECT `answer_collections`.`answer_id` as id"
+                                                    . " FROM `answer_collections`"
+                                                    . " WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $answer_id = $this->m->_db->loadResult();                                                                
+                                        if($answer_id){ 
+                                            $this->m->_db->setQuery(
+                                                    "UPDATE `answers` SET `answers`.`image_id` = '".$item['value']."'"
+                                                    . " WHERE `answers`.`id` = ".(int)$answer_id
+                                                    . " LIMIT 1"
+                                                );
+                                            $this->m->_db->query();
+                                        }
+                                        if($item['correct'])$correct = $item['id'];                                        
+                                    break;
+                                case 'insert':
+                                        $answer = new stdClass();
+                                        $answer->image_id = (int)$item['value'];
+                                        $answer->date = date("Y-m-d H:i:s");
+                                        $this->m->_db->insertObject('answers',$answer,'id');
+                                        
+                                        $collection = new stdClass();
+                                        $collection->answer_id = $answer->id;
+                                        $collection->question_id = $id;
+                                        
+                                        $this->m->_db->insertObject('answer_collections',$collection,'id');
+
+                                        if($item['correct'])$correct = $collection->id;
+                                    break;
+                                case 'delete':
+                                        $this->m->_db->setQuery(
+                                                    "DELETE FROM `answer_collections` WHERE `answer_collections`.`id` = ".(int)$item['id']
+                                                    . " LIMIT 1"
+                                                );
+                                        $this->m->_db->query();
+                                        
+                                        if($item['correct'])$correct = '';
+                                    break;    
+                                    
+                            }
+                        }
+                        
+                        $questions->updateCorrect($id, $correct);
+                        
+                        echo '{"status":"success"}';
+                    }
+                }else{
+                    if($questions->addNew($row)){
+                        foreach($answers as $item){     //добавляем вопросы
+                            if($item['act'] == 'insert'){   //добавляем новый
+                                $answer = new stdClass();
+                                $answer->image_id = (int)$item['value'];
+                                $answer->date = date("Y-m-d H:i:s");
+                                $this->m->_db->insertObject('answers',$answer,'id');
+                                
+                                $collection = new stdClass();
+                                $collection->answer_id = $answer->id;
+                                $collection->question_id = $row->id;
+                                
+                                $this->m->_db->insertObject('answer_collections',$collection,'id');
+                                
+                                if($item['correct'])$correct = $collection->id;
+                            }
+                        }
+                        
+                        $questions->updateCorrect($id, $correct);
+                        
+                        //закрепляем за уроком если есть лессон айди
+                        if($lesson_id){
+                            $lesson = new stdClass();
+                            $lesson->question_id = $row->id;
+                            $lesson->lesson_id = $lesson_id;
+                            $this->m->_db->insertObject('question_collections',$lesson);
+                        }
+                        
+                        echo '{"status":"success"}';
+                    }else{
+                        
+                        echo '{"status":"error"}';
+                    }
+                }
+            }
+        }
+
         public function questionsAction(){
             xload('class.admin.questions');
             $questions = new Questions($this->m);
