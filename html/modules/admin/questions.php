@@ -472,7 +472,7 @@
             $scope.form.answers = [];
             
             switch(parseInt($scope.mode)){
-                case 1:case 5:case 6:
+                case 1:case 3:case 4:case 5:case 6:
                     $scope.form.audio_id = $('#editQuestionModal input[name=audio_id]').val();
                     $('#editQuestionModal .answers_block .answer_item').each(function(){
                         var act = $(this).attr('data-act');
@@ -480,7 +480,6 @@
                     });
                 break;
                 case 2:
-                    
                     $('#editQuestionModal .answers_block .answer_item').each(function(){
                         var act = $(this).attr('data-act');
                         $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('input[name=image_id]',this).val()});
@@ -628,6 +627,62 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 2">
+                                    <div class="answer_item" data-act="{{item.act}}">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                               <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 3">
+                                    <div class="answer_item" data-act="{{item.act}}">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 4">
+                                    <div class="answer_item" data-act="{{item.act}}">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control" style="height: 40px;">{{item.text}}</textarea>
+                                                <input type='hidden' class='id' value='{{item.id}}'>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer" ng-checked="form.correct == item.id">
+                                            </div>
+                                            
+                                            <div class="col-sm-2">
+                                                <div ng-click="item.act='delete'" class="glyphicon glyphicon-remove delete_element"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 
                                 <div class="form-group" ng-repeat="item in answer_edit" ng-if="mode == 5">
                                     <div class="answer_item" data-act="{{item.act}}">

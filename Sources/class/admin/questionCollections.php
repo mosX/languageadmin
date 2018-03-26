@@ -42,13 +42,16 @@ class QuestionCollections{
                     . " , `questions`.`score`"
                     . " , `questions`.`type`"
                     . " , `answers`.`text` as answer"
-                    . " , `images`.`filename`"                    
+                    . " , `images`.`filename`"
+                    . " , `audios`.`filename` as audio"
+                    . " , `audios`.`description`"
                     . " , (SELECT COUNT(`answer_collections`.`id`) FROM `answer_collections` WHERE `answer_collections`.`question_id` = `questions`.`id`) as answers"
                     . " FROM `question_collections`"
                     . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
                     . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
                     . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                     . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
+                    . " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
                     . " ORDER BY `questions`.`id` DESC"
                     . " LIMIT ".$xNav->limit." OFFSET ".$xNav->start.""
@@ -147,15 +150,19 @@ class QuestionCollections{
         }
         return $this->m->_db->query() ? true: false;
     }
-    public function getGivenLesson($lesson_id){
+    public function getGivenLesson($lesson_id,$ids = null){
         $this->m->_db->setQuery(
                     "SELECT `question_collections`.* "
                     . " , `questions`.`value`"
                     . " , `questions`.`correct`"
                     . " , `questions`.`type`"
+                    . " , `audios`.`filename` as audio"
                     . " FROM `question_collections`"
                     . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
+                    . " LEFt JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
+                    . ($ids ? " AND `questions`.`id` IN (".implode(',',$ids).")" :"")
+                    . " AND `questions`.`status` = 1"
                 );
 
         $data = $this->m->_db->loadObjectList('question_id');        

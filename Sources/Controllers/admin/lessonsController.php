@@ -226,10 +226,13 @@
             
             $result->results = unserialize($result->results);
             
+            //получаем айдишники
+            foreach($result->results as $key=>$item) $ids[] = $key;
+            
             xload('class.admin.questionCollections');
             $questionCollections = new QuestionCollections($this->m);
             
-            $data = $questionCollections->getGivenLesson($result->lesson_id);
+            $data = $questionCollections->getGivenLesson($result->lesson_id,$ids);
             
             foreach($data as $item)$ids[] = $item->question_id;
             
@@ -264,7 +267,8 @@
                 $data[$item->question_id]->answers[] = $item;
             }
             $this->m->data = $data;
-            
+            //p($this->m->data);
+            //die();
             //$this->m->testing = $data;
         }
         
@@ -371,6 +375,7 @@
                 
                 $this->m->list = $questions->getList();                
                 $this->m->data = $questionCollections->getData($this->m->_path[2]);
+                
             }
         }
         

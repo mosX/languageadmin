@@ -13,6 +13,11 @@
             event.preventDefault();
         }
         
+        $scope.listen = function(filename){
+            var sound = new Audio('/assets/audios/'+filename);
+            sound.play();
+        }
+        
         $scope.submit = function(event){
             $http({
                 url:location.href,
@@ -101,14 +106,14 @@
         <div class="content">
             <?php foreach($this->m->data as $item){ ?>
                 <div class="question_block" data-type="<?=$item->type?>">
-                    <div class="question">
-                        <?=$item->value?> 
-                        <?php if($item->time){ ?>
-                            <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
-                        <?php } ?>
-                    </div>
-                    <?php foreach($item->answers as $answer){?>
-                        <?php if($item->type == 1){ ?>
+                    <?php if($item->type == 1){ ?>
+                        <div class="question">
+                            <?=$item->value?> 
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){?>            
                             <?php if($answer->correct && $answer->selected){ ?>
                                 <div class="answer match"><?=$answer->text?></div>
                             <?php }else if($answer->correct){ ?>
@@ -118,7 +123,15 @@
                             <?php }else{ ?>
                                 <div class="answer"><?=$answer->text?></div>
                             <?php } ?>
-                        <?php }else{ ?>
+                        <?php } ?>
+                    <?php }else if($item->type == 2){ ?>
+                        <div class="question">
+                            <?=$item->value?> 
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){?>            
                             <?php if($answer->correct && $answer->selected){ ?>
                                 <div class="answer match">
                                     <img src="/assets/images/<?=$answer->filename?>">
@@ -129,6 +142,79 @@
                                 <div class="answer selected"><img src="/assets/images/<?=$answer->filename?>"></div>
                             <?php }else{ ?>
                                 <div class="answer"><img src="/assets/images/<?=$answer->filename?>"></div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php }else if($item->type == 3){ ?>
+                        <div class="question">
+                            <?=$item->value?> 
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){?>            
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match"><?=$answer->text?></div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><?=$answer->text?></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><?=$answer->text?></div>
+                            <?php }else{ ?>
+                                <div class="answer"><?=$answer->text?></div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php }else if($item->type == 4){ ?>
+                        <div class="question">
+                            <?=$item->value?> 
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){?>    
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match"><?=$answer->text?></div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><?=$answer->text?></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><?=$answer->text?></div>
+                            <?php }else{ ?>
+                                <div class="answer"><?=$answer->text?></div>
+                            <?php } ?>
+                        <?php } ?>    
+                    <?php }else if($item->type == 5){ ?>
+                        <div class="question">
+                            <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать </div>
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                                
+                        </div>
+                        <?php foreach($item->answers as $answer){?>        
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match"><?=$answer->text?></div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><?=$answer->text?></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><?=$answer->text?></div>
+                            <?php }else{ ?>
+                                <div class="answer"><?=$answer->text?></div>
+                            <?php } ?>
+                        <?php } ?>
+                    <?php }else if($item->type == 6){ ?>
+                        <div class="question">
+                            <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать </div>
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){?>
+                            <?php if($answer->correct && $answer->selected){ ?>
+                                <div class="answer match"><?=$answer->text?></div>
+                            <?php }else if($answer->correct){ ?>
+                                <div class="answer correct"><?=$answer->text?></div>
+                            <?php }else if($answer->selected){ ?>
+                                <div class="answer selected"><?=$answer->text?></div>
+                            <?php }else{ ?>
+                                <div class="answer"><?=$answer->text?></div>
                             <?php } ?>
                         <?php } ?>
                     <?php } ?>

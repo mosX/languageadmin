@@ -34,8 +34,6 @@
             event.preventDefault();
         }
         
-        
-        
         $scope.deleteChannelConfrimation = function(event,id,name){
             $('#confirmModal').modal('show');
             $scope.channel_id = id;
@@ -63,6 +61,11 @@
             
             event.preventDefault();
         }*/
+            
+        $scope.listen = function(filename){
+            var sound = new Audio('/assets/audios/'+filename);
+            sound.play();
+        }
         
         $scope.publish = function(event,id){
             var status = 0;
@@ -132,16 +135,25 @@
                             <td><?=$item->question_id?></td>
                                 
                             <td class="username_td" style='overflow:hidden;'>
-                                <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
+                                <?php if($item->type == 6 || $item->type == 5){ ?>
+                                    <div class='btn btn-primary' ng-click="listen('<?=$item->audio?>')">Прослушать</div>
+                                <?php }else{ ?>
+                                    <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
+                                <?php } ?>
                             </td>
                             
-                            <?php if($item->type == 1){ ?>
-                                <td><?=$item->answer?></td>
-                            <?php }else if($item->type == 2){ ?>
-                                <td><img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>"></td>
-                            <?php }else{ ?>
-                                <td><?=$item->answer?></td>
-                            <?php } ?>
+                            <td>
+                                <?php if($item->type == 1){ ?>
+                                    <?=$item->answer?>
+                                <?php }else if($item->type == 2){ ?>
+                                    <img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>">
+                                <?php }else if($item->type == 5 || $item->type == 6){ ?>
+                                    <?=$item->description?>
+                                <?php }else{ ?>
+                                    <?=$item->answer?>
+                                <?php } ?>
+                            </td>
+                                
                             <td><?=$item->score?></td>
                             <td><?=$item->answers?></td>
                             <td><?=$item->type?></td>

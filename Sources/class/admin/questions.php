@@ -252,7 +252,7 @@ class Questions{
                     //. " , `audios`.`description`"
                     //. " , `audios`.`filename`"
                     . " FROM `questions` "
-                    . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"
+                    . " LEFT JOIN `answer_collections` ON `answer_collections`.`question_id` = `questions`.`id`"                    
                     //. " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id` "
                     . " WHERE `questions`.`status` = 1"
                     . " GROUP by `questions`.`id`"
