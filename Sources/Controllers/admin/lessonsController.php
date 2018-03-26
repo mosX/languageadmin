@@ -234,8 +234,13 @@
             
             $data = $questionCollections->getGivenLesson($result->lesson_id,$ids);
             
-            foreach($data as $item)$ids[] = $item->question_id;
             
+            foreach($data as $item){
+                $ids[] = $item->question_id;
+                p($result->results[$item->question_id]);
+            }
+            p($result);
+            die(p($data));
             //получаем ответы
             $this->m->_db->setQuery(
                         "SELECT `answer_collections`.* "
@@ -267,8 +272,7 @@
                 $data[$item->question_id]->answers[] = $item;
             }
             $this->m->data = $data;
-            //p($this->m->data);
-            //die();
+            
             //$this->m->testing = $data;
         }
         

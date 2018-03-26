@@ -107,11 +107,18 @@
             $scope.form.answers = [];            
             
             switch(parseInt($scope.form.mode)){
-                case 1:case 5:case 6:case 3 :case 4:
+                case 1:case 5:case 6:case 3 :
                     $scope.form.audio_id = $('#addQuestionModal input[name=audio_id]').val();
                     $('#addQuestionModal .answers_block .answer_item').each(function(){
                         
                         $scope.form.answers.push({act:'insert',correct:$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
+                    });
+                    break;
+                case 4:
+                    $scope.form.audio_id = $('#addQuestionModal input[name=audio_id]').val();
+                    $('#addQuestionModal .answers_block .answer_item').each(function(){
+                        
+                        $scope.form.answers.push({act:'insert',value:$('textarea',this).val()});
                     });
                     break;
                 case 2:
@@ -472,11 +479,18 @@
             $scope.form.answers = [];
             
             switch(parseInt($scope.mode)){
-                case 1:case 3:case 4:case 5:case 6:
+                case 1:case 3:case 5:case 6:
                     $scope.form.audio_id = $('#editQuestionModal input[name=audio_id]').val();
                     $('#editQuestionModal .answers_block .answer_item').each(function(){
                         var act = $(this).attr('data-act');
                         $scope.form.answers.push({'act':act,'correct':$('input[type=radio]',this)[0].checked,'id':$('.id',this).val(),value:$('textarea',this).val()});
+                    });
+                break;
+                case 4:
+                    $scope.form.audio_id = $('#editQuestionModal input[name=audio_id]').val();
+                    $('#editQuestionModal .answers_block .answer_item').each(function(){
+                        var act = $(this).attr('data-act');
+                        $scope.form.answers.push({'act':act,'id':$('.id',this).val(),value:$('textarea',this).val()});
                     });
                 break;
                 case 2:
@@ -487,7 +501,9 @@
                 break;
             }
             
-            
+            console.log($scope.form);
+            event.preventDefault();
+            return false;
             $http({
                 method:'POST',
                 url:'/questions/edit/',
