@@ -108,6 +108,7 @@
                 <div class="question_block" data-type="<?=$item->type?>">
                     <?php if($item->type == 1){ ?>
                         <div class="question">
+                            
                             <?=$item->value?> 
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
@@ -146,6 +147,7 @@
                         <?php } ?>
                     <?php }else if($item->type == 3){ ?>
                         <div class="question">
+                            
                             <?=$item->value?> 
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
@@ -164,12 +166,12 @@
                         <?php } ?>
                     <?php }else if($item->type == 4){ ?>
                         <div class="question">
-                            <?=$item->value?> 
+                            <?=$item->value?>
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
-                        <?php foreach($item->answers as $answer){?>    
+                        <?php foreach($item->answers as $answer){?>
                             <?php if($answer->correct && $answer->selected){ ?>
                                 <div class="answer match"><?=$answer->text?></div>
                             <?php }else if($answer->correct){ ?>
@@ -179,16 +181,16 @@
                             <?php }else{ ?>
                                 <div class="answer"><?=$answer->text?></div>
                             <?php } ?>
-                        <?php } ?>    
+                        <?php } ?>
                     <?php }else if($item->type == 5){ ?>
                         <div class="question">
-                            <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать </div>
+                            <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать</div>
+                            <?=$item->result_answer?>
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
-                                
                         </div>
-                        <?php foreach($item->answers as $answer){?>        
+                        <?php foreach($item->answers as $answer){?>
                             <?php if($answer->correct && $answer->selected){ ?>
                                 <div class="answer match"><?=$answer->text?></div>
                             <?php }else if($answer->correct){ ?>
@@ -202,6 +204,7 @@
                     <?php }else if($item->type == 6){ ?>
                         <div class="question">
                             <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать </div>
+                            <?=$item->result_answer?>
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
