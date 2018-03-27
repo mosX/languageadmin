@@ -502,8 +502,7 @@
             }
             
             console.log($scope.form);
-            event.preventDefault();
-            return false;
+            
             $http({
                 method:'POST',
                 url:'/questions/edit/',

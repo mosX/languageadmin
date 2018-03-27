@@ -235,7 +235,6 @@
             
             foreach($data as $item){
                 $ids[] = $item->question_id;
-                //p($result->results[$item->question_id]);
                 $item->result_answer = $result->results[$item->question_id]['answer'];                
             }
             
@@ -251,18 +250,6 @@
                     );
             $answers = $this->m->_db->loadObjectList();
             
-            //проверяем правильный ответ или нет
-            /*foreach($data as $item){
-                if($item->type == 5 || $item->type == 6){
-                    p($item);
-                    foreach()
-                }else{
-                    if($item->result_answer == $item->correct){
-                        $item->status = 'correct';
-                    }
-                }
-            }*/
-            
             foreach($answers as $item){
                 $data[$item->question_id]->answers[] = $item;
             }
@@ -270,14 +257,14 @@
             foreach($data as $item){
                 $item->status = 'wrong';
                 
-                if($item->type == 5 || $item->type == 6){
+                if($item->type == 4 || $item->type == 6){
                     foreach($item->answers as $answer){
                         if($answer->text == $item->result_answer){
                             $item->status = 'correct';
                             break;
                         }
                     }
-                }else{                    
+                }else{
                     if($item->result_answer == $item->correct){
                         $item->status = 'correct';
                     }
@@ -285,32 +272,6 @@
             }
             
             $this->m->data = $data;
-            return;
-            
-            /*
-            foreach($answers as $item){
-                if(is_array($result->results[$item->question_id])){
-                    if($item->id == $result->results[$item->question_id]['answer']){
-                        $data[$item->question_id]->time = $result->results[$item->question_id]['time'];
-                        $item->selected = 'true';
-                    }
-                }else{
-                    if($item->id == $result->results[$item->question_id]){
-                         $item->selected = 'true';
-                    }
-                }
-                
-                if($data[$item->question_id]->correct == $item->id){
-                    $item->correct = 'true';
-                }
-                
-                $data[$item->question_id]->answers[] = $item;
-            }
-            
-            $this->m->data = $data;
-            
-            die();
-            //$this->m->testing = $data;*/
         }
         
         public function resultsAction(){

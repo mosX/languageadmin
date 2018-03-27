@@ -56,19 +56,16 @@
                 font-size: 16px;
                 font-weight:bolder;
             }
-            .question_block[data-type="1"] .answer{
+            .question_block .answer{
                 padding-left:20px;
                 height: 30px;
                 border-left:3px solid transparent;
             }
-            .question_block[data-type="1"] .correct{
+            .question_block .correct{
                 border-left:3px solid green;
             }
-            .question_block[data-type="1"] .selected{
+            .question_block .wrong{
                 border-left:3px solid red;
-            }
-            .question_block[data-type="1"] .match{
-                border-left:3px solid blue;
             }
         </style>
         
@@ -78,16 +75,16 @@
             }
             
             .question_block[data-type="2"] .answer{
-                border:2px solid transparent;
+                text-align: center;
+                padding:0px;
+                border:2px solid #ddd;
+                
             }
             .question_block[data-type="2"] .correct{
                 border:2px solid green;
             }
-            .question_block[data-type="2"] .selected{
+            .question_block[data-type="2"] .wrong{
                 border:2px solid red;
-            }
-            .question_block[data-type="2"] .match{
-                border:2px solid blue;
             }
             
             .question_block[data-type="2"] .answer{
@@ -101,31 +98,57 @@
                 max-width: 100px;
                 max-height: 100px;
             }
+            
+            
+            .question_block{
+                border-bottom:1px solid #ddd;
+                padding-bottom: 20px;
+            }
+            .question_block .type_title{
+                font-weight: bold;
+                color: #FA7252;
+            }            
+            
+            .question_block .result_answer{
+                display:inline-block;
+                vertical-align: middle;
+                padding:2px 20px;
+                text-align: center;
+                border-radius: 7px;
+                margin-left: 20px;
+                border: 2px solid #337ab7;
+            }
+            
+            .question_block .result_answer.correct{
+                border:2px solid green;
+            }
+            .question_block .result_answer.wrong{
+                border:2px solid red;
+            }
         </style>
         
         <div class="content">
+            
             <?php foreach($this->m->data as $item){ ?>
                 <div class="question_block" data-type="<?=$item->type?>">
-                    <?php if($item->type == 1){ ?>
+                    <?php if($item->type == 1){ ?>                    
+                        <div class="type_title">Выберите Правильный ответ</div>
                         <div class="question">
-                            
                             <?=$item->value?> 
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
-                        <?php foreach($item->answers as $answer){?>            
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match"><?=$answer->text?></div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><?=$answer->text?></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><?=$answer->text?></div>
-                            <?php }else{ ?>
-                                <div class="answer"><?=$answer->text?></div>
-                            <?php } ?>
+                        <?php foreach($item->answers as $answer){ ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>
                         <?php } ?>
                     <?php }else if($item->type == 2){ ?>
+                        <div class="type_title">Выберите Изображение</div>
+                            
                         <div class="question">
                             <?=$item->value?> 
                             <?php if($item->time){ ?>
@@ -133,92 +156,78 @@
                             <?php } ?>
                         </div>
                         <?php foreach($item->answers as $answer){?>            
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match">
-                                    <img src="/assets/images/<?=$answer->filename?>">
-                                </div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><img src="/assets/images/<?=$answer->filename?>"></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><img src="/assets/images/<?=$answer->filename?>"></div>
-                            <?php }else{ ?>
-                                <div class="answer"><img src="/assets/images/<?=$answer->filename?>"></div>
-                            <?php } ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_correct?> <?=$status_wrong?>">
+                                <img src="/assets/images/<?=$answer->filename?>">
+                            </div>
                         <?php } ?>
                     <?php }else if($item->type == 3){ ?>
+                        <div class="type_title">Пропущенное слово</div>
                         <div class="question">
-                            
                             <?=$item->value?> 
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
                         <?php foreach($item->answers as $answer){?>            
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match"><?=$answer->text?></div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><?=$answer->text?></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><?=$answer->text?></div>
-                            <?php }else{ ?>
-                                <div class="answer"><?=$answer->text?></div>
-                            <?php } ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>                            
                         <?php } ?>
                     <?php }else if($item->type == 4){ ?>
+                        <div class="type_title">Написать перевод</div>
                         <div class="question">
                             <?=$item->value?>
+                            
+                            <div class="result_answer <?=$item->status?>"><?=$item->result_answer?></div>
+                            
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
                         <?php foreach($item->answers as $answer){?>
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match"><?=$answer->text?></div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><?=$answer->text?></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><?=$answer->text?></div>
-                            <?php }else{ ?>
-                                <div class="answer"><?=$answer->text?></div>
-                            <?php } ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>
                         <?php } ?>
                     <?php }else if($item->type == 5){ ?>
+                        <div class="type_title">Прослушать и выбрать</div>
                         <div class="question">
                             <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать</div>
-                            <?=$item->result_answer?>
+                            
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
                         <?php foreach($item->answers as $answer){?>
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match"><?=$answer->text?></div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><?=$answer->text?></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><?=$answer->text?></div>
-                            <?php }else{ ?>
-                                <div class="answer"><?=$answer->text?></div>
-                            <?php } ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?> <?=$item->correct?> <?=$item->result_answer?> <?=$answer->id?></div>
                         <?php } ?>
                     <?php }else if($item->type == 6){ ?>
+                        <div class="type_title">Прослушать и написать</div>
                         <div class="question">
                             <div ng-click="listen('<?=$item->audio?>')" class="btn btn-primary">Прослушать </div>
-                            <?=$item->result_answer?>
+                            <div class="result_answer <?=$item->status?>"><?=$item->result_answer?></div>
                             <?php if($item->time){ ?>
                                 <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
                             <?php } ?>
                         </div>
-                        <?php foreach($item->answers as $answer){?>
-                            <?php if($answer->correct && $answer->selected){ ?>
-                                <div class="answer match"><?=$answer->text?></div>
-                            <?php }else if($answer->correct){ ?>
-                                <div class="answer correct"><?=$answer->text?></div>
-                            <?php }else if($answer->selected){ ?>
-                                <div class="answer selected"><?=$answer->text?></div>
-                            <?php }else{ ?>
-                                <div class="answer"><?=$answer->text?></div>
-                            <?php } ?>
+                        <?php foreach($item->answers as $answer){ ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>
                         <?php } ?>
                     <?php } ?>
                 </div>
