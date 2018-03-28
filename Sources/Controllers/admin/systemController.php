@@ -9,6 +9,15 @@
             
         }
         
+        public function visitorsAction(){
+            $this->m->_db->setQuery(
+                        "SELECT * FROM `visitors`"
+                        . " ORDER BY `activity` DESC"
+                    );
+            $this->m->data = $this->m->_db->loadObjectList();
+            
+        }
+        
         public function generatePassword($password){
             //$password = 123456;
             $salt   = makePassword(16);

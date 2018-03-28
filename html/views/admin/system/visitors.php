@@ -53,62 +53,40 @@
                 
                 <ul class="tabs_list">
                     <li class="<?=!$_GET['act'] || $_GET['all'] ? 'active':''?>">
-                        <a href="/system/admins/">Все</a>
-                    </li>
-                    <li class="<?=$_GET['act'] == 'admins' ? 'active' : ''?>">
-                        <a href="/system/admins/?act=admins">Админы</a>
-                    </li>
-                    <li class="<?=$_GET['act'] == 'operators' ? 'active':''?>">
-                        <a href="/system/admins/?act=operators">Операторы</a>
-                    </li>
-                    <li class="<?=$_GET['act'] == 'support' ? 'active':''?>">
-                        <a href="/system/admins/?act=support">Суппорт</a>
+                        <a href="/system/visitors/">Все</a>
                     </li>
                 </ul>
                 <table class='table'>
                     <tr>
                         <th style="width:37px;"></th>
-                        <th style="width:350px;">ИМЯ</th>
-                        <th>ПРАВА</th>
-                        <th>КЕМ СОЗДАН</th>                        
-                        <th>Created At</th>
+                        <th style="width:70px;">ID</th>
+                        <th style="width:120px;">IP</th>
+                        <th >UserAgent</th>
+                        <th style="width:160px;">Date</th>
+                        <th style="width:160px;">Activity</th>
+                        
                         <th style="width:100px"></th>
                     </tr>
 
                     <?php foreach ($this->m->data as $item){ ?>
                         <tr data-id="<?=$item->id?>">
-                            <td>
-                                <!--<label class='checkbox'>
-                                    <input type="checkbox" class="action_panel_triger">
-                                    <div class='box'></div>
-                                </label>-->
-                            </td>   
+                            <td></td>   
+
                             <td class="username_td">
-                                <!--<div class="actions_panel">
-                                    <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags" href=""><span></span>редактировать</a>
-                                    <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user" href=""><span></span>блок</a>
-                                </div>-->
+                                <?=$item->id?>
+                            </td>
+                            
+                            <td><?=$item->ip?></td>
+                            <td style="overflow:hidden; text-overflow:ellipsis; white-space: nowrap;" title="<?=$item->user_agent?>"><?=$item->user_agent?></td>
                                 
-                                <div class='username_block' style='position:relative;display:inline-block;'>
-                                    <a class='username' href="/contacts/details/<?= $item->id ?>/"><?= $item->email ?></a>
-                                </div>
+                            <td style="text-align: center">
+                                <?=date('d M Y',strtotime($item->date))?>
+                                <div style="text-align: center;"><?=date('H:i:s',strtotime($item->date))?></div>
                             </td>
-                            
-                            <td>
-                                <?php
-                                    switch($item->gid){
-                                        case 10:echo 'Admin';break;
-                                        case 20:echo 'Support';break;
-                                        case 30:echo 'Operator';break;
-                                    }
-                                ?>
+                            <td style="text-align: center;">
+                                <?=date('d M Y',strtotime($item->activity))?>
+                                <div style="text-align: center;"><?=date('H:i:s',strtotime($item->activity))?></div>
                             </td>
-                            
-                            <td style="position:relative;">
-                                <?=$item->partner_email?>
-                            </td>
-                            
-                            <td><?=date('d M Y',strtotime($item->date))?></td>
                             <td>
                                 <a ng-click="editModal($event,<?=$item->id?>)" class="edit_tags_ico" href=""></a>
                                 <a ng-click='showBlockModal($event,<?=$item->id?>)' class="del_user_ico" href=""></a>
