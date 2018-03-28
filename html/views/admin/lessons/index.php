@@ -124,7 +124,7 @@
                                 <a href="/lessons/question_collections/<?=$item->id?>"><?=$item->name?></a>
                             </td>
                             
-                            <td class="username_td">
+                            <td class="username_td" style='white-space: nowrap; overflow:hidden; text-overflow:ellipsis'>
                                 <?=$item->description?>
                             </td>
                             <td class="username_td">

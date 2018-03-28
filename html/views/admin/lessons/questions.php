@@ -73,7 +73,6 @@
 
 <div ng-controller="pageCtrl">
     <div id="page_wrapper">
-        
         <?= $this->m->module('topmenu'.DS.'lessons'.DS.'questions') ?>
 
         <div class="content">
