@@ -229,6 +229,21 @@
                             ?>
                             <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>
                         <?php } ?>
+                    <?php }else if($item->type == 7){ ?>
+                        <div class="type_title">Что изображено на рисунке</div>
+                        <div class="question">
+                            <img style="max-width:100px; max-height: 100px;" src="/assets/questions/<?=$item->image?>">
+                            <?php if($item->time){ ?>
+                                <span style="color: #222; font-size:12px;">(<?=$item->time?>)</span>
+                            <?php } ?>
+                        </div>
+                        <?php foreach($item->answers as $answer){ ?>
+                            <?php 
+                                $status_correct = ($item->correct == $answer->id?'correct':'');
+                                $status_wrong = ($item->result_answer == $answer->id && $item->status == 'wrong'?'wrong':'');
+                            ?>
+                            <div class="answer <?=$status_wrong?> <?=$status_correct?>"><?=$answer->text?></div>
+                        <?php } ?>
                     <?php } ?>
                 </div>
             <?php } ?>

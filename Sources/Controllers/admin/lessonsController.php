@@ -233,9 +233,10 @@
             $questionCollections = new QuestionCollections($this->m);
             $data = $questionCollections->getGivenLesson($result->lesson_id,$ids);
             
+            
             foreach($data as $item){
                 $ids[] = $item->question_id;
-                $item->result_answer = $result->results[$item->question_id]['answer'];                
+                $item->result_answer = $result->results[$item->question_id]['answer'];
             }
             
             //получаем ответы

@@ -126,8 +126,13 @@
                         $scope.form.answers.push({'act':'insert','correct':$('input[type=radio]',this)[0].checked,value:$('input[name=image_id]',this).val()});                
                     });
                     break;
+                case 7:
+                    $scope.form.image_id = $('#addQuestionModal input[name=question_image_id]').val();
+                    $('#addQuestionModal .answers_block .answer_item').each(function(){
+                        $scope.form.answers.push({act:'insert',correct:$('input[type=radio]',this)[0].checked,value:$('textarea',this).val()});
+                    });
+                    break;
             }
-            
             /*console.log($scope.form);
             
             event.preventDefault();
@@ -184,9 +189,11 @@
             
             if($scope.form.mode == 5 || $scope.form.mode == 6){
                 $scope.mode = 'audio';
+            }else if($scope.form.mode == 7){
+                $scope.mode = 'image';
             }else{
                 $scope.mode = 'text';
-            }
+            }            
         }
     }]);
 </script>
@@ -220,6 +227,8 @@
                                             <option value="4">Написать перевод</option>
                                             <option value="5">Прослушать и выбрать</option>
                                             <option value="6">Прослушать и написать</option>
+                                            
+                                            <option value="7">Изображение/Ответы</option>
                                         </select>
                                     </div>                                    
                                 </div>
@@ -274,6 +283,33 @@
                                 </div>
                             </div>
                             
+                            <div class="form-group" ng-if="mode == 'image'">
+                                <div class="answer_item">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="uploadFileBtn">Загрузить
+                                                <iframe id="hiddenIframeUpload" src="{{'/questions/loadaddquestion/'}}"></iframe>
+                                            </div>
+                                            <input type="hidden" name="question_image_id" value="0">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class='preview_question' style="width:100px; height:100px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <script>
+                                function addQuestionImage(filename,id){
+                                    console.log(filename,id);
+                                    $('.preview_question','#addQuestionModal').css({'background':'url("'+filename+'") no-repeat center center','background-size':'cover'});
+                                    $('input[name=question_image_id]','#addQuestionModal').val(id);
+                                }
+                                function addQuestionError(error){
+                                    console.log('editError');
+                                }
+                            </script>
+                            
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -298,6 +334,21 @@
                             </div>
                             <div class="answers_block" ng-if="form.mode == '1'">
                                 <div class="form-group" ng-repeat="item in answers_list[1]">
+                                    <div class="answer_item">
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" style="height: 40px;"></textarea>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="radio" name="answer">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="answers_block" ng-if="form.mode == '7'">
+                                <div class="form-group" ng-repeat="item in answers_list[7]">
                                     <div class="answer_item">
                                         <div class="row">
                                             <div class="col-sm-10">

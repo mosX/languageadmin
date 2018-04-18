@@ -41,8 +41,10 @@ class QuestionCollections{
                     . " , `questions`.`correct`"
                     . " , `questions`.`score`"
                     . " , `questions`.`type`"
+                    . " , `questions`.`image_id`"
                     . " , `answers`.`text` as answer"
                     . " , `images`.`filename`"
+                    . " , `img`.`filename` as question_image"
                     . " , `audios`.`filename` as audio"
                     . " , `audios`.`description`"
                     . " , (SELECT COUNT(`answer_collections`.`id`) FROM `answer_collections` WHERE `answer_collections`.`question_id` = `questions`.`id`) as answers"
@@ -51,13 +53,18 @@ class QuestionCollections{
                     . " LEFT JOIN `answer_collections` ON `answer_collections`.`id` = `questions`.`correct`"
                     . " LEFT JOIN `answers` ON `answers`.`id` = `answer_collections`.`answer_id`"
                     . " LEFT JOIN `images` ON `images`.`id` = `answers`.`image_id`"
+                
+                    . " LEFT JOIN `images` img ON `img`.`id` = `questions`.`image_id`"
+                
                     . " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
+                    
                     . " ORDER BY `questions`.`id` DESC"
                     . " LIMIT ".$xNav->limit." OFFSET ".$xNav->start.""
                 );
         $data = $this->m->_db->loadObjectList();
         
+                
         return $data;
     }
     
@@ -157,9 +164,11 @@ class QuestionCollections{
                     . " , `questions`.`correct`"
                     . " , `questions`.`type`"
                     . " , `audios`.`filename` as audio"
+                    . " , `images`.`filename` as image"
                     . " FROM `question_collections`"
                     . " LEFT JOIN `questions` ON `questions`.`id` = `question_collections`.`question_id`"
-                    . " LEFt JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
+                    . " LEFT JOIN `audios` ON `audios`.`id` = `questions`.`audio_id`"
+                    . " LEFt JOIN `images` ON `images`.`id` = `questions`.`image_id`"
                     . " WHERE `question_collections`.`lesson_id` = ".(int)$lesson_id
                     . ($ids ? " AND `questions`.`id` IN (".implode(',',$ids).")" :"")
                     . " AND `questions`.`status` = 1"

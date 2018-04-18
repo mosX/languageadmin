@@ -91,7 +91,7 @@
                     case 4:$questions->editNormal($answers,$id);break;
                     case 5:$questions->editNormal($answers,$id);break;
                 }
-
+                
                 //$questions->updateCorrect($id,$correct);
 
                 echo '{"status":"success"}';
@@ -111,7 +111,8 @@
             $row->score = (int)$_POST['score'];
             $row->type = (int)$_POST['mode'];
             $row->audio_id = (int)$_POST['audio_id'];
-            
+            $row->image_id = (int)$_POST['image_id'];
+                        
             $description = strip_tags(trim($_POST['audio_description']));
             
             $lesson_id = (int)$_POST['lesson_id'];
@@ -138,6 +139,7 @@
                     case 4:$questions->addNormal($answers,$row->id);break;
                     case 5:$questions->addNormal($answers,$row->id);break;
                     case 6:$questions->addNormal($answers,$row->id);break;
+                    case 7:$questions->addNormal($answers,$row->id);break;
                     //case 5:$questions->addAudio($answers,$row->id);break;
                     //case 5:$questions->addAudio($answers,$row->id);break;
                     
@@ -331,6 +333,53 @@
                 }
             }
         }
+        
+        public function loadaddquestionAction(){
+            $this->disableTemplate();
+            
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+                xload('class.images');
+                $images = new Images($this->m);
+                
+                $hash = md5(file_get_contents($_FILES['file']['tmp_name']));
+                //проверяем Хеш
+                $this->m->_db->setQuery(
+                            "SELECT `images`.* "
+                            . " FROM `images` "
+                            . " WHERE `images`.`hash` = '".$hash."'"
+                            . " AND `images`.`type` = 3"
+                        );
+                $this->m->_db->loadObject($image);
+                
+                if($image){
+                    $this->m->filename = $image->filename;
+                    $this->m->status = 'success';
+                    $this->m->id = $image->id;
+                }else{
+                    $images->initImage($_FILES, $this->m->config->assets_path.DS.'questions');
+
+                    if($images->validation == true){
+                        $images->saveThumbs(array(array(200,200,'')));
+                    }
+
+                    if($images->validation == false){
+                        $this->m->status = 'error';
+                        $this->m->error = $images->error;
+                    }else{
+                        $this->m->filename = $images->filename;
+                        $this->m->status = 'success';
+
+                        $image = new stdClass();
+                        $image->filename = $this->m->filename;
+                        $image->hash = $hash;
+                        $image->date = date("Y-m-d H:i:s");
+                        $this->m->_db->insertObject('images',$image,'id');
+                        $this->m->id = $image->id;
+                    }
+                }
+            }
+        }
+        
         
         
         /*public function question_image_dataAction(){

@@ -137,6 +137,8 @@
                             <td class="username_td" style='overflow:hidden;'>
                                 <?php if($item->type == 6 || $item->type == 5){ ?>
                                     <div class='btn btn-primary' ng-click="listen('<?=$item->audio?>')">Прослушать</div>
+                                <?php }else if($item->type == 7){ ?>
+                                    <img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/questions/<?=$item->question_image?>">
                                 <?php }else{ ?>
                                     <a href="/lessons/answer_collections/<?=$item->question_id?>/"><?=$item->value?></a>
                                 <?php } ?>
@@ -149,6 +151,8 @@
                                     <img style="max-width:50px; max-height: 50px;" src="<?=$this->m->config->assets_url?>/images/<?=$item->filename?>">
                                 <?php }else if($item->type == 5 || $item->type == 6){ ?>
                                     <?=$item->description?>
+                                <?php }else if($item->type == 7){ ?>
+                                    <?=$item->answer?>
                                 <?php }else{ ?>
                                     <?=$item->answer?>
                                 <?php } ?>
